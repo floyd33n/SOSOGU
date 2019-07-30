@@ -1,15 +1,20 @@
 <!DOCTYPE html>
+<html>
 <head>
   <meta charset="UTF-8">
+  <title>Elm</title>
   <link rel="stylesheet" href="style.css">
+  <script src="main.js"></script>
 </head>
 
 <body>
- <h1>Poured Masu</h1>
+  <div id="elm">
+   <script>
+      var app = Elm.Main.init({
+        node: document.getElementById("elm")
+      });
+    </script>
+  </div>
 </body>
-
-<footer>
-  <small>@floyd33n</small>
-<footer>
 
 </html>
