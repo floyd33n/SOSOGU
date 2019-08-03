@@ -52,22 +52,22 @@ getCampusColor model n =
 updateCampus : Model ->  Int -> String -> List (Int, String)
 updateCampus model n color =
     let
-        firstTemp : List (Int, String) -> List (Int, String)
-        firstTemp temp =
+        firstTemp : List (Int, String)
+        firstTemp =
             List.take (n-1) model.campus
 
-        updateTemp : Int -> String -> List (Int, String)
-        updateTemp nn colorr =
+        updateTemp : List (Int, String)
+        updateTemp =
             [((n-1), color)]
 
-        secondTemp : List (Int, String) -> List (Int, String)
-        secondTemp temp =
+        secondTemp : List (Int, String)
+        secondTemp =
             List.drop n model.campus
 
 
         appendTemps : List (Int, String) -> List (Int, String)
         appendTemps temp =
-            List.append (List.append (firstTemp model.campus) (updateTemp n color)) (secondTemp model.campus)
+            List.append (List.append firstTemp updateTemp) (secondTemp)
 
     in
         model.campus |> appendTemps
