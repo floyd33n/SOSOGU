@@ -41,6 +41,7 @@ view model =
     div []
         [ h1 [] [ text "Pour-Masu" ]
         , p [] [ text "Pixel Art Editor with Elm" ]
+        , chkFunc model
         ]
 
 --FUNC--
@@ -71,3 +72,10 @@ updateCampus model n color =
     in
         model.campus |> appendTemps
 --DEBUG--
+chkFunc : Model -> Html Msg
+chkFunc model =
+    div []
+        [ h3 [] [ text "--Debug--" ]
+        , button [ onClick (ChangeColor 3 "red")  ] [ text "red" ]
+        , p [ style "color" (getCampusColor model 2) ] [ text "What Color" ] 
+        ]
