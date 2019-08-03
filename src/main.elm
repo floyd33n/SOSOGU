@@ -46,7 +46,7 @@ view model =
                            , td [ (onClick (ChangeColor 1 "pink")), (style "background-color" (getCampusColor model 1)) ] []
                            ]
                    , tr [] [ td [ (onClick (ChangeColor 2 "green")), (style "background-color" (getCampusColor model 2)) ] []
-                           , td [] []
+                           , td [ (onClick (ChangeColor 3 "blue")), style "background-color" (getCampusColor model 3) ] []
                            ]
                    ]
         , chkFunc model
