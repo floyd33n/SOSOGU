@@ -35,12 +35,20 @@ update msg model =
         ChangeColor n color ->
             { model | campus = updateCampus model n color }
 
+
 --VIEW--
 view : Model -> Html Msg
 view model =
     div []
         [ h1 [] [ text "Pour-Masu" ]
         , p [] [ text "Pixel Art Editor with Elm" ]
+        , table [] [ tr [] [ td [ (onClick (ChangeColor 0 "red")), (style "background-color" (getCampusColor model 0)) ] []
+                           , td [ (onClick (ChangeColor 1 "pink")), (style "background-color" (getCampusColor model 1)) ] []
+                           ]
+                   , tr [] [ td [ (onClick (ChangeColor 2 "green")), (style "background-color" (getCampusColor model 2)) ] []
+                           , td [] []
+                           ]
+                   ]
         , chkFunc model
         ]
 
@@ -48,29 +56,33 @@ view model =
 getCampusColor : Model -> Int -> String
 getCampusColor model n =
     Tuple.second (Maybe.withDefault (-1, "_") (Array.get n (Array.fromList model.campus)))
-
+{-
 updateCampus : Model ->  Int -> String -> List (Int, String)
 updateCampus model n color =
     let
-        firstTemp : List (Int, String)
-        firstTemp =
+        firstTemp : List (Int, String) -> List (Int, String)
+        firstTemp temp =
             List.take (n-1) model.campus
 
-        updateTemp : List (Int, String)
-        updateTemp =
-            [((n-1), color)]
+        updateTemp : Int -> String -> List (Int, String)
+        updateTemp tempn tempcolor =
+            List.singleton ((n-1), color)
 
-        secondTemp : List (Int, String)
-        secondTemp =
+        secondTemp : List (Int, String) -> List (Int, String)
+        secondTemp temp =
             List.drop n model.campus
 
 
         appendTemps : List (Int, String) -> List (Int, String)
         appendTemps temp =
-            List.append (List.append firstTemp updateTemp) (secondTemp)
-
+            List.append (List.append (firstTemp model.campus) (updateTemp n color)) (secondTemp model.campus)
     in
         model.campus |> appendTemps
+-}
+updateCampus : Model -> Int -> String -> List (Int, String)
+updateCampus model n color =
+    List.append (List.append (List.take n model.campus) (List.singleton (n, color))) (List.drop (n+1) model.campus)
+
 --DEBUG--
 chkFunc : Model -> Html Msg
 chkFunc model =
