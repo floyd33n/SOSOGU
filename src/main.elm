@@ -11,91 +11,63 @@ main =
 
 --MODEL--
 type alias Model = 
-  { settingColorContent : String
-  , masuX1Y1 : String
-  , masuX1Y2 : String
-  , masuX2Y1 : String
-  , masuX2Y2 : String
+  { campus : Campus
   }
 
 init : Model
 init =
-  Model "black" "white" "white" "white" "white"
+    Model initCampus
+
+type alias Campus
+    = List (Int, String)
+
+initCampus : List (Int, String)
+initCampus =
+    (Array.toIndexedList (Array.fromList (List.repeat 256 "white")))
 
 --UPDATE--
 type Msg
-  = ChangeColorField String
-  | PourX1Y1 String
-  | PourX1Y2 String
-  | PourX2Y1 String
-  | PourX2Y2 String
+    = ChangeColor Int String
 
 update : Msg -> Model -> Model
 update msg model =
-  case msg of
-    ChangeColorField newsetcolor->
-      { model | settingColorContent = newsetcolor }
-    
-    PourX1Y1 color ->
-      { model | masuX1Y1 = color }
-
-    PourX1Y2 color ->
-      { model | masuX1Y2 = color }
-      
-    PourX2Y1 color ->
-      { model | masuX2Y1 = color }
-      
-    PourX2Y2 color ->
-      { model | masuX2Y2 = color }
+    case msg of
+        ChangeColor n color ->
+            { model | campus = updateCampus model n color }
 
 --VIEW--
 view : Model -> Html Msg
 view model =
-  div [ style "margin" "0"
-      --, class "masudiv"
-      ] 
-    [ div []
-        [ a [] [ text "Set Color: " ] 
-        , input [ (placeholder "Color Field"), (onInput ChangeColorField), id "color" ] []
-        , button [ style "background-color" model.settingColorContent
-                 , style "height" "20px"
-                 , style "width" "20px"
-                 , style "border" "1px solid"
-                 , style "padding" "0px"
-                 , style "vertical-align" "middle"
-                 ] []
+    div []
+        [ h1 [] [ text "Pour-Masu" ]
+        , p [] [ text "Pixel Art Editor with Elm" ]
         ]
-    , div [] 
-        [ table []
-            [ tr [] [ td [] [ masuButton model PourX1Y1 model.masuX1Y1 ]
-                    , td [] [ masuButton model PourX2Y1 model.masuX2Y1 ]
-                    ]
-            , tr [] [ td [] [ masuButton model PourX1Y2 model.masuX1Y2 ]
-                    , td [] [ masuButton model PourX2Y2 model.masuX2Y2 ]
-                    ]
-            ]
-        ]
-    --, debugfunc model
-    ]
 
 --FUNC--
-masuButton : Model -> (String -> Msg) -> String -> Html Msg
-masuButton model pourpoint modelpoint =
-  button [ onClick (pourpoint model.settingColorContent)
-         , style "background-color" modelpoint
-         , class "masu"
-         --, style "height" "30px"
-         --, style "width" "30px"
-         --, style "border" "1px solid"
-         ] []
+getCampusColor : Model -> Int -> String
+getCampusColor model n =
+    Tuple.second (Maybe.withDefault (-1, "_") (Array.get n (Array.fromList model.campus)))
 
-  
+updateCampus : Model ->  Int -> String -> List (Int, String)
+updateCampus model n color =
+    let
+        firstTemp : List (Int, String) -> List (Int, String)
+        firstTemp temp =
+            List.take (n-1) model.campus
+
+        updateTemp : Int -> String -> List (Int, String)
+        updateTemp nn colorr =
+            [((n-1), color)]
+
+        secondTemp : List (Int, String) -> List (Int, String)
+        secondTemp temp =
+            List.drop n model.campus
 
 
+        appendTemps : List (Int, String) -> List (Int, String)
+        appendTemps temp =
+            List.append (List.append (firstTemp model.campus) (updateTemp n color)) (secondTemp model.campus)
+
+    in
+        model.campus |> appendTemps
 --DEBUG--
-{-
-debugfunc : Model -> Html Msg
-debugfunc model =
-  div [] [ div [ style "color" model.settingColorContent ] [ text ("Inputed Color: " ++ model.settingColorContent) ]
-         ]
--}
