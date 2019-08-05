@@ -45,7 +45,7 @@ update msg model =
 view : Model -> Html Msg
 view model =
     div []
-        [ h1 [] [ text "Pour-Masu" ]
+        [ h1 [] [ text "SOSOGU" ]
         , p [] [ text "Pixel Art Editor with Elm" ]
         , div [] [ input [ (placeholder "Color"), (onInput ColorValue) ] [] ]
         , create8x8Campus model
