@@ -48,6 +48,7 @@ view model =
         [ h1 [] [ text "SOSOGU" ]
         , p [] [ text "Pixel Art Editor with Elm" ]
         , div [] [ input [ (placeholder "Color"), (onInput ColorValue) ] [] ]
+        , makeTable model 4 4
         , create8x8Campus model
         ]
 
@@ -64,8 +65,8 @@ makeTable : Model -> Int -> Int -> Html Msg
 makeTable model width height =
     div []
         [ table []
-            <| List.map(\n -> tr[]
-                <| List.map(\m -> td [] [])
+            <| List.map(\y -> tr[]
+                <| List.map(\x -> td [] [ text ( "(x: " ++ (String.fromInt x) ++ ", y: " ++(String.fromInt y) ++ "),") ])
                     <| List.range 1 width)
                         <| List.range 1 height ]
 
@@ -140,8 +141,7 @@ create8x8Campus model =
                 , td [ onClick (ChangeColor 55 model.colorValue), style "background-color" (getCampusColor model 55) ] []
                 ]
         , tr [] [ td [ onClick (ChangeColor 56 model.colorValue), style "background-color" (getCampusColor model 56) ] []
-                , td [ onClick (ChangeColor 57 model.colorValue), style "background-color" (getCampusColor model 57) ] []
-                , td [ onClick (ChangeColor 58 model.colorValue), style "background-color" (getCampusColor model 58) ] []
+
                 , td [ onClick (ChangeColor 59 model.colorValue), style "background-color" (getCampusColor model 59) ] []
                 , td [ onClick (ChangeColor 60 model.colorValue), style "background-color" (getCampusColor model 60) ] []
                 , td [ onClick (ChangeColor 61 model.colorValue), style "background-color" (getCampusColor model 61) ] []
