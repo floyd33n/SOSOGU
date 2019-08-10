@@ -20,3 +20,20 @@ td {
 tr {
   padding: 0px;
 }
+
+#palette_square {
+  height: 30px;
+  width: 30px;
+  padding 0px;
+  border: 1px solid #000;
+  margin-bottom: -1px;
+}
+
+#main_palette {
+    height: 35px;
+    width: 35px;
+    padding: 0px;
+    border: 1px solid #000;
+    margin-bottom: -1px;
+}
+
