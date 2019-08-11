@@ -6,6 +6,7 @@ import Html.Attributes exposing(..)
 import Html.Events exposing (..)
 import Array exposing (..)
 import Debug exposing (..)
+import Regex exposing (..)
 
 main =
   Browser.sandbox { init = init, update = update, view = view }
@@ -41,7 +42,7 @@ update msg model =
             { model | campus = updateCampus model x y color}
 
         ColorValue value ->
-            { model | colorValue = value }
+            { model | colorValue = (String.toLower value) }
 
         AddColorToPalette color ->
             { model | palette = addColorToPalette model color }
@@ -59,7 +60,7 @@ view model =
         , div [ (id "palette"), (style "float" "right") ]
             [ div []
                 [ input [ (placeholder "Color"), (onInput ColorValue) ] []
-                , button [onClick (AddColorToPalette model.colorValue) ] [ text "Add" ]
+                , button [(onClick (AddColorToPalette model.colorValue)), (disabled (chkColorField model)) ] [ text "Add" ]
                 , div [ (id "main_palette"), (style "background-color" model.mainPalette) ] []
                 ]
             , displayPalette model
@@ -128,18 +129,42 @@ addColorToPalette model color =
 displayPalette : Model -> Html Msg
 displayPalette model =
     div []
-        <| List.map (\plt -> div [ (id "palette_square"), (onClick (SetMainPalette (plt - 1))), (style "background-color" (getPaletteColor model (plt - 1))) ] [ text (String.fromInt plt) ])
-            <| List.range 1 (List.length model.palette)
+        <| List.map (\plt -> div []
+            [ div [ (id "palette_square"), (onClick (SetMainPalette (plt - 1))), (style "background-color" (getPaletteColor model (plt - 1))) ] [ text (String.fromInt plt) ]
+            , div [ id "palette_color_name" ] [text (getPaletteColor model (plt - 1)) ]
+            ])
+                <| List.range 1 (List.length model.palette)
 
+chkColorField : Model -> Bool
+chkColorField model =
+    let
+        chkHexColorCode : String -> Bool
+        chkHexColorCode hex =
+            Regex.contains (Maybe.withDefault Regex.never <| Regex.fromString "[g-z]") hex
+        
+        chkColorCodeLength : Bool
+        chkColorCodeLength =
+            (not ((String.length model.colorValue) == 4)) && (not ((String.length model.colorValue) == 7))
 
+        cssColorNames = ["aliceblue", "antiquewhite", "aqua", "aquamarine", "azure", "beige", "bisque", "black", "blanchedalmond", "blue"
+                        , "blueviolet", "brown", "burlywood", "cadetblue", "chartreuse", "chocolate", "coral", "cornflowerblue", "cornsilk", "crimson"
+                        , "cyan", "darkblue", "darkcyan", "darkgoldenrod", "darkgray", "darkgrey", "darkgreen", "darkkhaki", "darkmagenta", "darkolivegreen"
+                        , "darkorange", "darkorchid", "darkred", "darksalmon", "darkseagreen", "darkslateblue", "darkslategrey", "darkslategray", "darkturquoise", "darkviolet"
+                        , "deeppink", "deepskyblue", "dimgray", "dimgrey", "dodgerblue", "firebrick", "floralwhite", "forestgreen", "fuchsia", "gainsboro"
+                        , "ghostwhite", "gold", "goldenrod", "gray", "grey", "green", "greenyellow", "honeydew", "hotpink", "indianred"
+                        , "indigo", "ivory", "khaki", "lavender", "lavenderblush", "lawngreen", "lemonchiffon", "lightblue", "lightcoral", "lightcyan"
+                        , "lightgoldenrodyellow", "lightgray", "lightgrey", "lightgreen", "lightpink", "lightsalmon", "lightseagreen", "lightskyblue", "lightslategray", "lightslategrey"
+                        , "lightsteelblue", "lightyellow", "lime", "limegreen", "linen", "magenta", "mediumaquamarine", "mediumblue", "mediumorchid", "mediumpurple"
+                        , "mediumseagreen", "mediumslateblue", "mediumspringgreen", "mediumturquoise", "mediumvioletred", "midnightblue", "mintcream", "mistyrose", "moccasin", "navajowhite"
+                        , "navy", "oldlace", "olive", "olivedrab", "orange", "orangered", "orchid", "palegoldenrod", "palegreen", "paleturquoise"
+                        , "palevioletred", "papayawhip", "peachpuff", "peru", "pink", "plum", "powderblue", "purple", "rebeccapurple", "red"
+                        , "rosybrown", "royalblue", "saddlebrown", "salmon", "sandybrown", "seagreen", "seashell", "sienna", "silver", "skyblue"
+                        , "slateblue", "slategray", "slategrey", "snow", "springgreen", "steelblue", "tan", "teal", "thistle", "tomato"
+                        , "turquoise", "violet", "wheat", "white", "whitesmoke", "yellow", "yellowgreen"]
+                        -- By https://www.w3schools.com/colors/colors_names.asp
 
-
-
-
-
-
-
-
-
-
-
+        chkColorName : Bool
+        chkColorName =
+            List.member model.colorValue cssColorNames
+    in
+        (String.isEmpty model.colorValue) || (not chkColorName) && chkColorCodeLength
