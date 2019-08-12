@@ -17,23 +17,33 @@ type alias Model =
   , colorValue : String
   , palette : List String
   , mainPalette : String
+  , campusSize : CampusSize
+  , tempCampusSize : CampusSize
   }
 
+type alias CampusSize =
+    { width : Int
+    , height : Int
+     }
+
+--INIT--
 init : Model
 init =
-    Model initCampus "" [] ""
-
+    Model [[(0, "")]] "" [] "" (CampusSize -1 -1) (CampusSize 1 1)
+{-
 initCampus : List (List (Int, String))
 initCampus =
     List.repeat (8) (Array.toIndexedList (Array.fromList (List.repeat (8) "white")))
-
-    
+-}
 --UPDATE--
 type Msg
     = ChangeColor Int Int String
     | ColorValue String
     | AddColorToPalette String
     | SetMainPalette Int
+    | SetCampusWidth String
+    | SetCampusHeight String
+    | CreateCampus
 
 update : Msg -> Model -> Model
 update msg model =
@@ -49,26 +59,49 @@ update msg model =
            
         SetMainPalette n ->
             { model | mainPalette = getPaletteColor model n }
-
+        
+        SetCampusWidth width ->
+            { model | tempCampusSize = { width = Maybe.withDefault 1 (String.toInt width), height = model.tempCampusSize.height } }
+        
+        SetCampusHeight height ->
+            { model | tempCampusSize = { height = Maybe.withDefault 1 (String.toInt height), width = model.tempCampusSize.width } }
+       
+        CreateCampus ->
+             { model | campusSize = model.tempCampusSize
+                     , campus = List.repeat model.tempCampusSize.height (Array.toIndexedList (Array.fromList (List.repeat model.tempCampusSize.width "white")))
+             }
 --VIEW--
 view : Model -> Html Msg
 view model =
     div []
         [ div [ (id "campus"), (style "float" "left") ]
-            [ makeTable model 8 8
+            [ div []
+                [ input [ (style "width" "30px"), (placeholder "width"), (onInput (SetCampusWidth)) ] []
+                , input [ (style "width" "30px"), (placeholder "height"), (onInput (SetCampusHeight)) ] []
+                , button [ onClick CreateCampus ] [ text "Create Campus" ]
+                ]
+            , makeTable model model.campusSize.width model.campusSize.height
             ]
         , div [ (id "palette"), (style "float" "right") ]
             [ div []
-                [ input [ (placeholder "Color"), (onInput ColorValue) ] []
+                [ input [ (placeholder "Color"), (onInput ColorValue ) ] []
                 , button [(onClick (AddColorToPalette model.colorValue)), (disabled (chkColorField model)) ] [ text "Add" ]
                 , div [ (id "main_palette"), (style "background-color" model.mainPalette) ] []
                 ]
             , displayPalette model
             ]
+        , input [] []
         ]
 
-
 --FUNC--
+{-
+campusSizeField : Model -> Html Msg
+campusSizeField model =
+    div []
+        [ input [ (placeholder "Width"), (onInput SetCampusWidth) ] []
+        --, input [ (placeholder "Height"), (onInput model.campusSize.height) ]
+        ]
+  -}      
 getPaletteColor : Model -> Int -> String
 getPaletteColor model n =
     model.palette
@@ -105,7 +138,7 @@ makeTable model width height =
     div []
         [ table []
             <| List.map(\y -> tr[]
-                <| List.map(\x -> td [onClick(ChangeColor y x model.mainPalette), style "background-color" (getCampusColor model y x)] [ text ((String.fromInt y) ++ "," ++ (String.fromInt x)) ])
+                <| List.map(\x -> td [onClick(ChangeColor y x model.mainPalette), style "background-color" (getCampusColor model y x)] [ {-text ((String.fromInt y) ++ "," ++ (String.fromInt x)) -}])
                     <| List.range 0 (width-1))
                         <| List.range 0 (height-1) ]
 
