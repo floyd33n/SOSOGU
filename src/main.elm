@@ -29,7 +29,7 @@ type alias CampusSize =
 --INIT--
 init : Model
 init =
-    Model [[(0, "")]] "" [] "" (CampusSize -1 -1) (CampusSize 1 1)
+    Model [[(0, "")]] "" [] "" (CampusSize -1 -1) (CampusSize 0 0)
 {-
 initCampus : List (List (Int, String))
 initCampus =
@@ -76,9 +76,9 @@ view model =
     div []
         [ div [ (id "campus"), (style "float" "left") ]
             [ div []
-                [ input [ (style "width" "30px"), (placeholder "width"), (onInput (SetCampusWidth)) ] []
-                , input [ (style "width" "30px"), (placeholder "height"), (onInput (SetCampusHeight)) ] []
-                , button [ onClick CreateCampus ] [ text "Create Campus" ]
+                [ input [ (type_ "number"), (style "width" "45px"), (placeholder "width"), (onInput (SetCampusWidth)) ] []
+                , input [ (type_ "number"), (style "width" "45px"), (placeholder "height"), (onInput (SetCampusHeight)) ] []
+                , button [ (onClick CreateCampus), (disabled (chkWidthHeightField model)) ] [ text "Create Campus" ]
                 ]
             , makeTable model model.campusSize.width model.campusSize.height
             ]
@@ -201,3 +201,7 @@ chkColorField model =
             List.member model.colorValue cssColorNames
     in
         (String.isEmpty model.colorValue) || (not chkColorName) && chkColorCodeLength
+
+chkWidthHeightField : Model -> Bool
+chkWidthHeightField model =
+    not ((model.tempCampusSize.width * model.tempCampusSize.height) > 0) || not (( model.tempCampusSize.width <= 64 ) && ( model.tempCampusSize.height <= 64 ))
