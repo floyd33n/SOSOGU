@@ -90,7 +90,6 @@ view model =
                 ]
             , displayPalette model
             ]
-        , input [] []
         ]
 
 --FUNC--
