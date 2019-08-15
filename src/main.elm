@@ -1,14 +1,22 @@
 module Main exposing(main)
---branch
 import Browser
 import Html exposing (..)
 import Html.Attributes exposing(..)
 import Html.Events exposing (..)
 import Array exposing (..)
+import Debug exposing (..)
 import Regex exposing (..)
+-- elm-ui --
+import Element as Ele exposing (..)
+import Element.Background as Background
+import Element.Border as Border
+import Element.Input as Input
+import Element.Font as Font
+import Element.Region as Region
 
 main =
   Browser.sandbox { init = init, update = update, view = view }
+
 
 --MODEL--
 type alias Model = 
@@ -17,8 +25,13 @@ type alias Model =
   , palette : List String
   , mainPalette : String
   , campusSize : CampusSize
-  , tempCampusSize : CampusSize
+  , tempCampusSize : TempCampusSize
   }
+
+type alias TempCampusSize =
+    { width : String
+    , height : String
+    }
 
 type alias CampusSize =
     { width : Int
@@ -28,7 +41,7 @@ type alias CampusSize =
 --INIT--
 init : Model
 init =
-    Model [[(0, "")]] "" [] "" (CampusSize -1 -1) (CampusSize 0 0)
+    Model [[(0, "")]] "" [] "White" (CampusSize 0 0) (TempCampusSize "" "")
 {-
 initCampus : List (List (Int, String))
 initCampus =
@@ -43,6 +56,7 @@ type Msg
     | SetCampusWidth String
     | SetCampusHeight String
     | CreateCampus
+    | DisabledCreateCampus
 
 update : Msg -> Model -> Model
 update msg model =
@@ -60,46 +74,58 @@ update msg model =
             { model | mainPalette = getPaletteColor model n }
         
         SetCampusWidth width ->
-            { model | tempCampusSize = { width = Maybe.withDefault 1 (String.toInt width), height = model.tempCampusSize.height } }
+            { model | tempCampusSize = { width = width, height = model.tempCampusSize.height } }
         
         SetCampusHeight height ->
-            { model | tempCampusSize = { height = Maybe.withDefault 1 (String.toInt height), width = model.tempCampusSize.width } }
+            { model | tempCampusSize = { height = height, width = model.tempCampusSize.width } }
        
         CreateCampus ->
-             { model | campusSize = model.tempCampusSize
-                     , campus = List.repeat model.tempCampusSize.height (Array.toIndexedList (Array.fromList (List.repeat model.tempCampusSize.width "white")))
+             { model | campusSize = { width = (Maybe.withDefault 0 (String.toInt model.tempCampusSize.width)), height = (Maybe.withDefault 0 (String.toInt model.tempCampusSize.height)) }
+                     , campus = List.repeat model.campusSize.height (Array.toIndexedList (Array.fromList (List.repeat model.campusSize.width "white")))
              }
+          
+        DisabledCreateCampus -> 
+            { model | colorValue = model.colorValue }
+
 --VIEW--
 view : Model -> Html Msg
 view model =
-    div []
-        [ div [ (id "campus"), (style "float" "left") ]
-            [ div []
-                [ input [ (type_ "number"), (style "width" "45px"), (placeholder "width"), (onInput (SetCampusWidth)) ] []
-                , input [ (type_ "number"), (style "width" "45px"), (placeholder "height"), (onInput (SetCampusHeight)) ] []
-                , button [ (onClick CreateCampus), (disabled (chkWidthHeightField model)) ] [ text "Create Campus" ]
+  div [ style "height" "100%"  ] [ layout [explain Debug.todo] <|
+            column [ Ele.width fill, Ele.height fill, explain Debug.todo ]
+                [ row [ Ele.width fill, Ele.height <| px 100 ] [ Ele.text "header" ]
+                , row [ Ele.width fill, Ele.height fill, explain Debug.todo ]
+                    [ column [ Ele.width <| px 100, Ele.height fill ] [ Ele.text "setting"
+                                                                      , Input.text [] { onChange = SetCampusWidth
+                                                                                      , text = model.tempCampusSize.width
+                                                                                      , placeholder = Just (Input.placeholder [] (Ele.text "Width"))
+                                                                                      , label = (Input.labelHidden "?")
+                                                                                      }
+                                                                      , Input.text [] { onChange = SetCampusHeight
+                                                                                      , text = model.tempCampusSize.height
+                                                                                      , placeholder = Just (Input.placeholder [] (Ele.text "Height"))
+                                                                                      , label = (Input.labelHidden "?")
+                                                                                      }
+                                                                      , createCampusButton model
+                                                                      ]
+                    , column [ Ele.width <| px 100, Ele.height fill ] [ Ele.text "palette"
+                                                                      , Input.text [] { onChange = ColorValue
+                                                                                      , text = model.colorValue
+                                                                                      , placeholder = Just (Input.placeholder [] (Ele.text "Color"))
+                                                                                      , label = (Input.labelHidden "?")
+                                                                                      }
+                                                                      , addColorButton model
+                                                                      , html (div [ (id "main_palette"), (style "background-color" model.mainPalette) ] [] )
+                                                                      , html (displayPalette model)
+                                                                      ]
+                    , column [ Ele.width fill, Ele.height fill ] [ Ele.text "campus"
+                                                                 , html ( makeTable model model.campusSize.width model.campusSize.height )
+                                                                 ]
+                    ]
+                , row [ Ele.width fill, Ele.height <| px 100 ] [ Ele.text "footer" ]
                 ]
-            , makeTable model model.campusSize.width model.campusSize.height
-            ]
-        , div [ (id "palette"), (style "float" "right") ]
-            [ div []
-                [ input [ (placeholder "Color"), (onInput ColorValue ) ] []
-                , button [(onClick (AddColorToPalette model.colorValue)), (disabled (chkColorField model)) ] [ text "Add" ]
-                , div [ (id "main_palette"), (style "background-color" model.mainPalette) ] []
-                ]
-            , displayPalette model
-            ]
-        ]
+         ]
 
 --FUNC--
-{-
-campusSizeField : Model -> Html Msg
-campusSizeField model =
-    div []
-        [ input [ (placeholder "Width"), (onInput SetCampusWidth) ] []
-        --, input [ (placeholder "Height"), (onInput model.campusSize.height) ]
-        ]
-  -}      
 getPaletteColor : Model -> Int -> String
 getPaletteColor model n =
     model.palette
@@ -130,11 +156,21 @@ getCampusInt model n =
         |> Array.get n
         |> Maybe.withDefault (-2, "_")
         |> Tuple.first
+{-
+testTable : Int -> Int -> Html Msg
+testTable width height =
+    div []
+        [ Html.table []
+            <| List.map(\y -> tr[]
+                <| List.map(\x -> td [])
+                    <| List.range 0 (width-1))
+                        <| List.range 0 (height-1) ]
+-}
 
 makeTable : Model -> Int -> Int -> Html Msg
 makeTable model width height =
     div []
-        [ table []
+        [ Html.table []
             <| List.map(\y -> tr[]
                 <| List.map(\x -> td [onClick(ChangeColor y x model.mainPalette), style "background-color" (getCampusColor model y x)] [ {-text ((String.fromInt y) ++ "," ++ (String.fromInt x)) -}])
                     <| List.range 0 (width-1))
@@ -161,8 +197,8 @@ displayPalette : Model -> Html Msg
 displayPalette model =
     div []
         <| List.map (\plt -> div []
-            [ div [ (id "palette_square"), (onClick (SetMainPalette (plt - 1))), (style "background-color" (getPaletteColor model (plt - 1))) ] [ text (String.fromInt plt) ]
-            , div [ id "palette_color_name" ] [text (getPaletteColor model (plt - 1)) ]
+            [ div [ (id "palette_square"), (onClick (SetMainPalette (plt - 1))), (style "background-color" (getPaletteColor model (plt - 1))) ] [ Html.text (String.fromInt plt) ]
+            , div [ id "palette_color_name" ] [ Html.text (getPaletteColor model (plt - 1)) ]
             ])
                 <| List.range 1 (List.length model.palette)
 
@@ -202,4 +238,39 @@ chkColorField model =
 
 chkWidthHeightField : Model -> Bool
 chkWidthHeightField model =
-    not ((model.tempCampusSize.width * model.tempCampusSize.height) > 0) || not (( model.tempCampusSize.width <= 64 ) && ( model.tempCampusSize.height <= 64 ))
+    let
+        chkInt : Bool
+        chkInt =
+            (Maybe.withDefault 0 (String.toInt model.tempCampusSize.width)) * (Maybe.withDefault 0 (String.toInt model.tempCampusSize.height)) > 0
+
+        chkLength : Bool
+        chkLength =
+            (Maybe.withDefault 0 (String.toInt model.tempCampusSize.width)) <= 64 && (Maybe.withDefault 0 (String.toInt model.tempCampusSize.height)) <= 64
+    in
+        chkInt && chkLength
+
+createCampusButton model =
+    if (chkWidthHeightField model) then
+        Input.button [] { onPress = Just CreateCampus
+                        , label = (Ele.text "Create!")
+                        }
+    else
+        Input.button [ Region.description "fuck you"
+                     , Background.color (rgb255 84 84 84)
+                     ]
+                     { onPress = Just DisabledCreateCampus
+                     , label = (Ele.text "Create!")
+                     }
+
+addColorButton model =
+    if (not (chkColorField model)) then
+        Input.button [] { onPress = Just (AddColorToPalette model.colorValue)
+                        , label = (Ele.text "Add")
+                        }
+    else
+        Input.button [ Region.description "fuck"
+                     , Background.color (rgb255 84 84 84)
+                     ]
+                     { onPress = Just DisabledCreateCampus
+                     , label = (Ele.text ";_;")
+                     }
