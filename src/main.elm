@@ -42,11 +42,7 @@ type alias CampusSize =
 init : Model
 init =
     Model [[(0, "")]] "" [] "White" (CampusSize 0 0) (TempCampusSize "" "")
-{-
-initCampus : List (List (Int, String))
-initCampus =
-    List.repeat (8) (Array.toIndexedList (Array.fromList (List.repeat (8) "white")))
--}
+
 --UPDATE--
 type Msg
     = ChangeColor Int Int String
@@ -80,10 +76,18 @@ update msg model =
             { model | tempCampusSize = { height = height, width = model.tempCampusSize.width } }
        
         CreateCampus ->
-             { model | campusSize = { width = (Maybe.withDefault 0 (String.toInt model.tempCampusSize.width)), height = (Maybe.withDefault 0 (String.toInt model.tempCampusSize.height)) }
-                     , campus = List.repeat model.campusSize.height (Array.toIndexedList (Array.fromList (List.repeat model.campusSize.width "white")))
-             }
-          
+            let
+                testFuncA : Model -> List (List (Int, String))
+                testFuncA tmodel =
+                    let
+                        temp = { width = (Maybe.withDefault 0 (String.toInt tmodel.tempCampusSize.width)), height = (Maybe.withDefault 0 (String.toInt tmodel.tempCampusSize.height)) }
+                    in
+                        List.repeat temp.height (Array.toIndexedList (Array.fromList (List.repeat temp.width "white")))
+            in
+                { model | campus = testFuncA model
+                ,         campusSize = { width = (Maybe.withDefault 0 (String.toInt model.tempCampusSize.width)), height = (Maybe.withDefault 0 (String.toInt model.tempCampusSize.height)) }
+                }
+
         DisabledCreateCampus -> 
             { model | colorValue = model.colorValue }
 
@@ -156,16 +160,6 @@ getCampusInt model n =
         |> Array.get n
         |> Maybe.withDefault (-2, "_")
         |> Tuple.first
-{-
-testTable : Int -> Int -> Html Msg
-testTable width height =
-    div []
-        [ Html.table []
-            <| List.map(\y -> tr[]
-                <| List.map(\x -> td [])
-                    <| List.range 0 (width-1))
-                        <| List.range 0 (height-1) ]
--}
 
 makeTable : Model -> Int -> Int -> Html Msg
 makeTable model width height =
