@@ -1,13 +1,14 @@
 module Main exposing(main)
 import Browser
-import Html exposing (..)
+import Html as H exposing (..)
 import Html.Attributes exposing(..)
 import Html.Events exposing (..)
 import Array exposing (..)
 import Debug exposing (..)
 import Regex exposing (..)
+import Result.Extra as ExResult exposing  (..)
 -- elm-ui --
-import Element as Ele exposing (..)
+import Element as E exposing (..)
 import Element.Background as Background
 import Element.Border as Border
 import Element.Input as Input
@@ -95,37 +96,40 @@ update msg model =
 view : Model -> Html Msg
 view model =
   div [ style "height" "100%"  ] [ layout [explain Debug.todo] <|
-            column [ Ele.width fill, Ele.height fill, explain Debug.todo ]
-                [ row [ Ele.width fill, Ele.height <| px 100 ] [ Ele.text "header" ]
-                , row [ Ele.width fill, Ele.height fill, explain Debug.todo ]
-                    [ column [ Ele.width <| px 100, Ele.height fill ] [ Ele.text "setting"
+            column [ E.width fill, E.height fill, explain Debug.todo ]
+                [ row [ explain Debug.todo, E.width fill, E.height <| px 100 ] [ E.text "title" 
+                                                           , row [ htmlAttribute <| style "margin-left" "auto" ] [ column [] [ html <| H.a [ href <|"" ] [ H.text "a" ] ]
+                                                                                                                 ]
+                                                           ]
+                , row [ E.width fill, E.height fill, explain Debug.todo ]
+                    [ column [ E.width <| px 100, E.height fill ] [ E.text "setting"
                                                                       , Input.text [] { onChange = SetCampusWidth
                                                                                       , text = model.tempCampusSize.width
-                                                                                      , placeholder = Just (Input.placeholder [] (Ele.text "Width"))
-                                                                                      , label = (Input.labelHidden "?")
+                                                                                      , placeholder = Just (Input.placeholder [] (E.text "Width"))
+                                                                                      , label = (Input.labelHidden "")
                                                                                       }
                                                                       , Input.text [] { onChange = SetCampusHeight
                                                                                       , text = model.tempCampusSize.height
-                                                                                      , placeholder = Just (Input.placeholder [] (Ele.text "Height"))
-                                                                                      , label = (Input.labelHidden "?")
+                                                                                      , placeholder = Just (Input.placeholder [] (E.text "Height"))
+                                                                                      , label = (Input.labelHidden "")
                                                                                       }
                                                                       , createCampusButton model
                                                                       ]
-                    , column [ Ele.width <| px 100, Ele.height fill ] [ Ele.text "palette"
+                    , column [ E.width <| px 100, E.height fill ] [ E.text "palette"
                                                                       , Input.text [] { onChange = ColorValue
                                                                                       , text = model.colorValue
-                                                                                      , placeholder = Just (Input.placeholder [] (Ele.text "Color"))
+                                                                                      , placeholder = Just (Input.placeholder [] (E.text "Color"))
                                                                                       , label = (Input.labelHidden "?")
                                                                                       }
                                                                       , addColorButton model
                                                                       , html (div [ (id "main_palette"), (style "background-color" model.mainPalette) ] [] )
                                                                       , html (displayPalette model)
                                                                       ]
-                    , column [ Ele.width fill, Ele.height fill ] [ Ele.text "campus"
+                    , column [ E.width fill, E.height fill ] [ E.text "campus"
                                                                  , html ( makeTable model model.campusSize.width model.campusSize.height )
                                                                  ]
                     ]
-                , row [ Ele.width fill, Ele.height <| px 100 ] [ Ele.text "footer" ]
+                , row [ E.width fill, E.height <| px 100 ] [E.text"a"]
                 ]
          ]
 
@@ -164,7 +168,7 @@ getCampusInt model n =
 makeTable : Model -> Int -> Int -> Html Msg
 makeTable model width height =
     div []
-        [ Html.table []
+        [ H.table []
             <| List.map(\y -> tr[]
                 <| List.map(\x -> td [onClick(ChangeColor y x model.mainPalette), style "background-color" (getCampusColor model y x)] [ {-text ((String.fromInt y) ++ "," ++ (String.fromInt x)) -}])
                     <| List.range 0 (width-1))
@@ -191,44 +195,45 @@ displayPalette : Model -> Html Msg
 displayPalette model =
     div []
         <| List.map (\plt -> div []
-            [ div [ (id "palette_square"), (onClick (SetMainPalette (plt - 1))), (style "background-color" (getPaletteColor model (plt - 1))) ] [ Html.text (String.fromInt plt) ]
-            , div [ id "palette_color_name" ] [ Html.text (getPaletteColor model (plt - 1)) ]
+            [ div [ (id "palette_square"), (onClick (SetMainPalette (plt - 1))), (style "background-color" (getPaletteColor model (plt - 1))) ] [ H.text (String.fromInt plt) ]
+            , div [ id "palette_color_name" ] [ H.text (getPaletteColor model (plt - 1)) ]
             ])
                 <| List.range 1 (List.length model.palette)
 
-chkColorField : Model -> Bool
-chkColorField model =
-    let
-        chkHexColorCode : String -> Bool
-        chkHexColorCode hex =
-            Regex.contains (Maybe.withDefault Regex.never <| Regex.fromString "[g-z]") hex
+isColor : Model -> Bool
+isColor model =
+    case (String.left 1 model.colorValue) of
+        "#" ->
+            not (Regex.contains (Maybe.withDefault Regex.never <| Regex.fromString "[g-z]" ) (String.dropLeft 1 model.colorValue) )
+              && (String.length model.colorValue == 4)
+                || (String.length model.colorValue == 7)
+
+        _ ->
+            let 
+                cssColorNames = ["aliceblue", "antiquewhite", "aqua", "aquamarine", "azure", "beige", "bisque", "black", "blanchedalmond", "blue"
+                                , "blueviolet", "brown", "burlywood", "cadetblue", "chartreuse", "chocolate", "coral", "cornflowerblue", "cornsilk", "crimson"
+                                , "cyan", "darkblue", "darkcyan", "darkgoldenrod", "darkgray", "darkgrey", "darkgreen", "darkkhaki", "darkmagenta", "darkolivegreen"
+                                , "darkorange", "darkorchid", "darkred", "darksalmon", "darkseagreen", "darkslateblue", "darkslategrey", "darkslategray", "darkturquoise", "darkviolet"
+                                , "deeppink", "deepskyblue", "dimgray", "dimgrey", "dodgerblue", "firebrick", "floralwhite", "forestgreen", "fuchsia", "gainsboro"
+                                , "ghostwhite", "gold", "goldenrod", "gray", "grey", "green", "greenyellow", "honeydew", "hotpink", "indianred"
+                                , "indigo", "ivory", "khaki", "lavender", "lavenderblush", "lawngreen", "lemonchiffon", "lightblue", "lightcoral", "lightcyan"
+                                , "lightgoldenrodyellow", "lightgray", "lightgrey", "lightgreen", "lightpink", "lightsalmon", "lightseagreen", "lightskyblue", "lightslategray", "lightslategrey"
+                                , "lightsteelblue", "lightyellow", "lime", "limegreen", "linen", "magenta", "mediumaquamarine", "mediumblue", "mediumorchid", "mediumpurple"
+                                , "mediumseagreen", "mediumslateblue", "mediumspringgreen", "mediumturquoise", "mediumvioletred", "midnightblue", "mintcream", "mistyrose", "moccasin", "navajowhite"
+                                , "navy", "oldlace", "olive", "olivedrab", "orange", "orangered", "orchid", "palegoldenrod", "palegreen", "paleturquoise"
+                                , "palevioletred", "papayawhip", "peachpuff", "peru", "pink", "plum", "powderblue", "purple", "rebeccapurple", "red"
+                                , "rosybrown", "royalblue", "saddlebrown", "salmon", "sandybrown", "seagreen", "seashell", "sienna", "silver", "skyblue"
+                                , "slateblue", "slategray", "slategrey", "snow", "springgreen", "steelblue", "tan", "teal", "thistle", "tomato"
+                                , "turquoise", "violet", "wheat", "white", "whitesmoke", "yellow", "yellowgreen"]
+                                -- By https://www.w3schools.com/colors/colors_names.asp
+
+                isColorName : Bool
+                isColorName =
+                    List.member model.colorValue cssColorNames
+            in
+                isColorName
+
         
-        chkColorCodeLength : Bool
-        chkColorCodeLength =
-            (not ((String.length model.colorValue) == 4)) && (not ((String.length model.colorValue) == 7))
-
-        cssColorNames = ["aliceblue", "antiquewhite", "aqua", "aquamarine", "azure", "beige", "bisque", "black", "blanchedalmond", "blue"
-                        , "blueviolet", "brown", "burlywood", "cadetblue", "chartreuse", "chocolate", "coral", "cornflowerblue", "cornsilk", "crimson"
-                        , "cyan", "darkblue", "darkcyan", "darkgoldenrod", "darkgray", "darkgrey", "darkgreen", "darkkhaki", "darkmagenta", "darkolivegreen"
-                        , "darkorange", "darkorchid", "darkred", "darksalmon", "darkseagreen", "darkslateblue", "darkslategrey", "darkslategray", "darkturquoise", "darkviolet"
-                        , "deeppink", "deepskyblue", "dimgray", "dimgrey", "dodgerblue", "firebrick", "floralwhite", "forestgreen", "fuchsia", "gainsboro"
-                        , "ghostwhite", "gold", "goldenrod", "gray", "grey", "green", "greenyellow", "honeydew", "hotpink", "indianred"
-                        , "indigo", "ivory", "khaki", "lavender", "lavenderblush", "lawngreen", "lemonchiffon", "lightblue", "lightcoral", "lightcyan"
-                        , "lightgoldenrodyellow", "lightgray", "lightgrey", "lightgreen", "lightpink", "lightsalmon", "lightseagreen", "lightskyblue", "lightslategray", "lightslategrey"
-                        , "lightsteelblue", "lightyellow", "lime", "limegreen", "linen", "magenta", "mediumaquamarine", "mediumblue", "mediumorchid", "mediumpurple"
-                        , "mediumseagreen", "mediumslateblue", "mediumspringgreen", "mediumturquoise", "mediumvioletred", "midnightblue", "mintcream", "mistyrose", "moccasin", "navajowhite"
-                        , "navy", "oldlace", "olive", "olivedrab", "orange", "orangered", "orchid", "palegoldenrod", "palegreen", "paleturquoise"
-                        , "palevioletred", "papayawhip", "peachpuff", "peru", "pink", "plum", "powderblue", "purple", "rebeccapurple", "red"
-                        , "rosybrown", "royalblue", "saddlebrown", "salmon", "sandybrown", "seagreen", "seashell", "sienna", "silver", "skyblue"
-                        , "slateblue", "slategray", "slategrey", "snow", "springgreen", "steelblue", "tan", "teal", "thistle", "tomato"
-                        , "turquoise", "violet", "wheat", "white", "whitesmoke", "yellow", "yellowgreen"]
-                        -- By https://www.w3schools.com/colors/colors_names.asp
-
-        chkColorName : Bool
-        chkColorName =
-            List.member model.colorValue cssColorNames
-    in
-        (String.isEmpty model.colorValue) || (not chkColorName) && chkColorCodeLength
 
 chkWidthHeightField : Model -> Bool
 chkWidthHeightField model =
@@ -246,25 +251,25 @@ chkWidthHeightField model =
 createCampusButton model =
     if (chkWidthHeightField model) then
         Input.button [] { onPress = Just CreateCampus
-                        , label = (Ele.text "Create!")
+                        , label = (E.text "Create!")
                         }
     else
         Input.button [ Region.description "fuck you"
                      , Background.color (rgb255 84 84 84)
                      ]
                      { onPress = Just DisabledCreateCampus
-                     , label = (Ele.text "Create!")
+                     , label = (E.text "Create!")
                      }
 
 addColorButton model =
-    if (not (chkColorField model)) then
+    if ((isColor model)) then
         Input.button [] { onPress = Just (AddColorToPalette model.colorValue)
-                        , label = (Ele.text "Add")
+                        , label = (E.text "Add")
                         }
     else
         Input.button [ Region.description "fuck"
                      , Background.color (rgb255 84 84 84)
                      ]
                      { onPress = Just DisabledCreateCampus
-                     , label = (Ele.text ";_;")
+                     , label = (E.text ";_;")
                      }
