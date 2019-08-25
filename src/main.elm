@@ -65,7 +65,10 @@ update msg model =
             { model | colorValue = (String.toLower value) }
 
         AddColorToPalette color ->
-            { model | palette = addColorToPalette model color }
+            { model | palette = addColorToPalette model color
+            ,         mainPalette = model.colorValue
+            }
+
            
         SetMainPalette n ->
             { model | mainPalette = getPaletteColor model n }
@@ -98,7 +101,7 @@ view model =
   div [ style "height" "100%"  ] [ layout [explain Debug.todo] <|
             column [ E.width fill, E.height fill, explain Debug.todo ]
                 [ row [ explain Debug.todo, E.width fill, E.height <| px 100 ] [ E.text "title" 
-                                                           , row [ htmlAttribute <| style "margin-left" "auto" ] [ column [] [ html <| H.a [ href <|"" ] [ H.text "a" ] ]
+                                                           , row [ htmlAttribute <| style "margin-left" "auto" ] [ column [] [ html <| H.a [ href <|"" ] [ H.text "Nav" ] ]
                                                                                                                  ]
                                                            ]
                 , row [ E.width fill, E.height fill, explain Debug.todo ]
@@ -129,7 +132,7 @@ view model =
                                                                  , html ( makeTable model model.campusSize.width model.campusSize.height )
                                                                  ]
                     ]
-                , row [ E.width fill, E.height <| px 100 ] [E.text"a"]
+                , row [ explain Debug.todo, E.width fill, E.height <| px 50 ] [ el [ centerX, centerY ] <| E.text "footer" ]
                 ]
          ]
 
