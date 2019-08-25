@@ -1,3 +1,5 @@
+@import url("https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css");
+
 .masu {
   float: left;
   height: 100%;
@@ -37,3 +39,14 @@ tr {
     margin-bottom: -1px;
 }
 
+#setting-bak {
+  background-color: white;
+}
+
+#palette-bak {
+  background-color: white;
+}
+
+#campus-bak {
+  background-color: white;
+}
