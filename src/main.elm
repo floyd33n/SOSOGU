@@ -7,17 +7,13 @@ import Array exposing (..)
 import Debug exposing (..)
 import Regex exposing (..)
 import Result.Extra as ExResult exposing  (..)
--- elm-ui --
 import Element as E exposing (..)
 import Element.Background as Background
 import Element.Border as Border
 import Element.Input as Input
 import Element.Font as Font
 import Element.Region as Region
-
-main =
-  Browser.sandbox { init = init, update = update, view = view }
-
+import Dialog
 
 --MODEL--
 type alias Model = 
@@ -27,6 +23,7 @@ type alias Model =
   , mainPalette : String
   , campusSize : CampusSize
   , tempCampusSize : TempCampusSize
+  , showDialog : Bool
   }
 
 type alias TempCampusSize =
@@ -40,9 +37,18 @@ type alias CampusSize =
      }
 
 --INIT--
-init : Model
-init =
-    Model [[(0, "")]] "" [] "White" (CampusSize 0 0) (TempCampusSize "" "")
+init : () -> (Model, Cmd Msg)
+init _ =
+    ( Model
+      [[(0, "")]] --campus
+      "" --colorValue
+      [] --palette
+      "White" --mainpalette
+      (CampusSize 0 0) --campusSize
+      (TempCampusSize "" "") --tempCampusSize
+      False --showDialog
+    , Cmd.none
+    )
 
 --UPDATE--
 type Msg
@@ -54,30 +60,43 @@ type Msg
     | SetCampusHeight String
     | CreateCampus
     | DisabledCreateCampus
+    | AcknowledgeDialog
 
-update : Msg -> Model -> Model
+update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
     case msg of
         ChangeColor x y color ->
-            { model | campus = updateCampus model x y color}
+            ( { model | campus = updateCampus model x y color}
+            , Cmd.none
+            )
 
         ColorValue value ->
-            { model | colorValue = (String.toLower value) }
+            ( { model | colorValue = (String.toLower value) }
+            , Cmd.none
+            )
 
         AddColorToPalette color ->
-            { model | palette = addColorToPalette model color
-            ,         mainPalette = model.colorValue
-            }
+            ( { model | palette = addColorToPalette model color
+              ,         mainPalette = model.colorValue
+              }
+            , Cmd.none
+            )
 
-           
+
         SetMainPalette n ->
-            { model | mainPalette = getPaletteColor model n }
+            ( { model | mainPalette = getPaletteColor model n }
+            , Cmd.none
+            )
         
         SetCampusWidth width ->
-            { model | tempCampusSize = { width = width, height = model.tempCampusSize.height } }
+            ( { model | tempCampusSize = { width = width, height = model.tempCampusSize.height } }
+            , Cmd.none
+            )
         
         SetCampusHeight height ->
-            { model | tempCampusSize = { height = height, width = model.tempCampusSize.width } }
+            ( { model | tempCampusSize = { height = height, width = model.tempCampusSize.width } }
+            , Cmd.none
+            )
        
         CreateCampus ->
             let
@@ -88,24 +107,49 @@ update msg model =
                     in
                         List.repeat temp.height (Array.toIndexedList (Array.fromList (List.repeat temp.width "white")))
             in
-                { model | campus = testFuncA model
-                ,         campusSize = { width = (Maybe.withDefault 0 (String.toInt model.tempCampusSize.width)), height = (Maybe.withDefault 0 (String.toInt model.tempCampusSize.height)) }
-                }
+                ( { model | campus = testFuncA model
+                  ,         campusSize = { width = (Maybe.withDefault 0 (String.toInt model.tempCampusSize.width)), height = (Maybe.withDefault 0 (String.toInt model.tempCampusSize.height)) }
+                  }
+                , Cmd.none
+                )
 
         DisabledCreateCampus -> 
-            { model | colorValue = model.colorValue }
+            ( { model | colorValue = model.colorValue }
+            , Cmd.none
+            )
+        
+        AcknowledgeDialog ->
+            case model.showDialog of
+                True ->
+                    ( { model | showDialog = False }
+                    , Cmd.none
+                    )
 
+                False -> 
+                    ( { model | showDialog = True }
+                    , Cmd.none
+                    )
+
+dialogConfig : Model -> Dialog.Config Msg
+dialogConfig model =
+    { closeMessage = Just AcknowledgeDialog
+    , containerClass = Just "zzz"
+    , header = Just (H.text "aaa")
+    , body = Just (H.text "bbb")
+    , footer = []
+    }
+css path =
+  node "link" [rel "stylesheet", href path] []
 --VIEW--
 view : Model -> Html Msg
 view model =
-  div [ style "height" "100%"  ] [ layout [explain Debug.todo] <|
+    div [ style "height" "100%"] [ css <| "../style.css", layout [explain Debug.todo] <|
             column [ E.width fill, E.height fill, explain Debug.todo ]
-                [ row [ explain Debug.todo, E.width fill, E.height <| px 100 ] [ E.text "title" 
-                                                           , row [ htmlAttribute <| style "margin-left" "auto" ] [ column [] [ html <| H.a [ href <|"" ] [ H.text "Nav" ] ]
-                                                                                                                 ]
-                                                           ]
+                [ row [ explain Debug.todo, E.width fill, E.height <| px 100 ] [ E.el [alignLeft] <| E.text "SOSOGU"
+                                                                               , E.el [alignRight, E.width <| px 100 ] <| E.text "nav"
+                                                                               ]
                 , row [ E.width fill, E.height fill, explain Debug.todo ]
-                    [ column [ E.width <| px 100, E.height fill ] [ E.text "setting"
+                    [ column [ E.width <| px 100, E.height fill, htmlAttribute <| id "setting-bak"] [ E.text "setting"
                                                                       , Input.text [] { onChange = SetCampusWidth
                                                                                       , text = model.tempCampusSize.width
                                                                                       , placeholder = Just (Input.placeholder [] (E.text "Width"))
@@ -117,8 +161,15 @@ view model =
                                                                                       , label = (Input.labelHidden "")
                                                                                       }
                                                                       , createCampusButton model
+                                                                      , html <| button [ onClick AcknowledgeDialog ] [ H.text "Dialog" ]
+                                                                      , html <| Dialog.view
+                                                                          ( if model.showDialog then
+                                                                                Just (dialogConfig model)
+                                                                            else
+                                                                                Nothing
+                                                                          )
                                                                       ]
-                    , column [ E.width <| px 100, E.height fill ] [ E.text "palette"
+                    , column [E.width <| px 100, E.height fill, htmlAttribute <| id "palette-bak"] [ E.text "palette"
                                                                       , Input.text [] { onChange = ColorValue
                                                                                       , text = model.colorValue
                                                                                       , placeholder = Just (Input.placeholder [] (E.text "Color"))
@@ -128,14 +179,16 @@ view model =
                                                                       , html (div [ (id "main_palette"), (style "background-color" model.mainPalette) ] [] )
                                                                       , html (displayPalette model)
                                                                       ]
-                    , column [ E.width fill, E.height fill ] [ E.text "campus"
+                    , column [ E.width fill, E.height fill, htmlAttribute <| id "campus-bak"] [ E.text "campus"
                                                                  , html ( makeTable model model.campusSize.width model.campusSize.height )
                                                                  ]
                     ]
-                , row [ explain Debug.todo, E.width fill, E.height <| px 50 ] [ el [ centerX, centerY ] <| E.text "footer" ]
+                , row [ explain Debug.todo, E.width fill, E.height <| px 10 ] [E.text "footer" ]
                 ]
          ]
-
+modalFunc : H.Attribute Msg
+modalFunc =
+    style "background-color" "rgba(0,0,0,0.3)"
 --FUNC--
 getPaletteColor : Model -> Int -> String
 getPaletteColor model n =
@@ -276,3 +329,15 @@ addColorButton model =
                      { onPress = Just DisabledCreateCampus
                      , label = (E.text ";_;")
                      }
+
+main =
+    Browser.element
+        { init = init
+        , update = update
+        , subscriptions = subscriptions
+        , view = view
+         }
+
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    Sub.none
