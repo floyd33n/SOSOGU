@@ -13,12 +13,16 @@
             "elm/regex": "1.0.0",
             "elm-community/list-extra": "8.2.1",
             "elm-community/result-extra": "2.2.1",
+            "jouderianjr/elm-dialog": "1.0.1",
             "mdgriffith/elm-ui": "1.1.5"
         },
         "indirect": {
+            "elm/http": "1.0.0",
             "elm/time": "1.0.0",
             "elm/url": "1.0.0",
-            "elm/virtual-dom": "1.0.2"
+            "elm/virtual-dom": "1.0.2",
+            "etaque/elm-response": "3.1.0",
+            "krisajenkins/elm-exts": "28.0.0"
         }
     },
     "test-dependencies": {
