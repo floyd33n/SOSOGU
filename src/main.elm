@@ -13,7 +13,13 @@ import Element.Border as Border
 import Element.Input as Input
 import Element.Font as Font
 import Element.Region as Region
-import Bootstrap.Button as BBtn exposing (..)
+import Bootstrap.Button as BBtn
+import Bootstrap.Modal as BModal
+import Bootstrap.CDN as BCDN
+import Bootstrap.Grid as BGrid
+import Bootstrap.Grid.Col as BCol
+import Bootstrap.Grid.Row as BRow
+import Bootstrap.Form.Input as BInput
 css path =
   node "link" [rel "stylesheet", href path] []
 
@@ -25,7 +31,8 @@ type alias Model =
   , mainPalette : String
   , campusSize : CampusSize
   , tempCampusSize : TempCampusSize
-  , modalVisibility : Modal.Visibility
+  , modalVisibility : BModal.Visibility
+  , openingModalWindow : BModal.Visibility
   }
 
 type alias TempCampusSize =
@@ -48,6 +55,8 @@ init _ =
       "White" --mainpalette
       (CampusSize 0 0) --campusSize
       (TempCampusSize "" "") --tempCampusSize
+      BModal.hidden
+      BModal.shown
     , Cmd.none
     )
 
@@ -61,6 +70,8 @@ type Msg
     | SetCampusHeight String
     | CreateCampus
     | DisabledCreateCampus
+    | ShowModal
+    | CloseModal
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -109,12 +120,23 @@ update msg model =
             in
                 ( { model | campus = testFuncA model
                   ,         campusSize = { width = (Maybe.withDefault 0 (String.toInt model.tempCampusSize.width)), height = (Maybe.withDefault 0 (String.toInt model.tempCampusSize.height)) }
+                  ,         openingModalWindow = BModal.hidden
                   }
                 , Cmd.none
                 )
 
         DisabledCreateCampus -> 
             ( { model | colorValue = model.colorValue }
+            , Cmd.none
+            )
+
+        ShowModal ->
+            ( { model | modalVisibility = BModal.shown }
+            , Cmd.none
+            )
+
+        CloseModal ->
+            ( { model | openingModalWindow = BModal.hidden }
             , Cmd.none
             )
 
@@ -128,18 +150,7 @@ view model =
                                                                                ]
                 , row [ E.width fill, E.height fill, explain Debug.todo ]
                     [ column [ E.width <| px 100, E.height fill, htmlAttribute <| id "setting-bak"] [ E.text "setting"
-                                                                      , Input.text [] { onChange = SetCampusWidth
-                                                                                      , text = model.tempCampusSize.width
-                                                                                      , placeholder = Just (Input.placeholder [] (E.text "Width"))
-                                                                                      , label = (Input.labelHidden "")
-                                                                                      }
-                                                                      , Input.text [] { onChange = SetCampusHeight
-                                                                                      , text = model.tempCampusSize.height
-                                                                                      , placeholder = Just (Input.placeholder [] (E.text "Height"))
-                                                                                      , label = (Input.labelHidden "")
-                                                                                      }
-                                                                      , createCampusButton model
-                                                                      ]
+                                                                                                    ]
                     , column [E.width <| px 100, E.height fill, htmlAttribute <| id "palette-bak"] [ E.text "palette"
                                                                       , Input.text [] { onChange = ColorValue
                                                                                       , text = model.colorValue
@@ -152,11 +163,52 @@ view model =
                                                                       ]
                     , column [ E.width fill, E.height fill, htmlAttribute <| id "campus-bak"] [ E.text "campus"
                                                                  , html ( makeTable model model.campusSize.width model.campusSize.height )
+                                                                 , html <| createCampusWindow model
                                                                  ]
                     ]
                 , row [ explain Debug.todo, E.width fill, E.height <| px 10 ] [E.text "footer" ]
                 ]
          ]
+
+createCampusWindow : Model -> Html Msg
+createCampusWindow model =
+    div [style "" ""] 
+        [ BModal.config CloseModal
+            |> BModal.hideOnBackdropClick False
+            |> BModal.small
+            |> BModal.h5 [style "margin" "auto"] [ H.text "Enter Campus Size" ]
+            |> BModal.body []
+              [ BGrid.containerFluid []
+                  [ BGrid.row []
+                      [ BGrid.col
+                          [ BCol.xs5 ]
+                          [ div [style "margin" "5px"] [H.text "Width"]
+                          , BInput.number [ BInput.small
+                                          , BInput.onInput SetCampusWidth
+                                          ]
+                          ] 
+                      , BGrid.col
+                          [ BCol.xs5 ]
+                          [ div [style "margin" "5px"] [H.text "Height"]
+                          , BInput.number [ BInput.small
+                                          , BInput.onInput SetCampusHeight
+                                          ]
+                          ]
+                      ]
+                  ]
+              ]
+          |> BModal.footer [style "margin" "auto"]
+              [ BBtn.button
+                  [ BBtn.outlinePrimary
+                  , if not <| (isCorrectWidthHeight model) then BBtn.primary else BBtn.secondary
+                  , BBtn.attrs [ onClick CreateCampus ]
+                  , BBtn.disabled <| isCorrectWidthHeight model
+                  ]
+                  [ H.text "Create!" ]
+              ]
+          |> BModal.view model.openingModalWindow
+        ]
+        
 --FUNC--
 getPaletteColor : Model -> Int -> String
 getPaletteColor model n =
@@ -259,8 +311,8 @@ isColor model =
 
         
 
-chkWidthHeightField : Model -> Bool
-chkWidthHeightField model =
+isCorrectWidthHeight : Model -> Bool
+isCorrectWidthHeight model =
     let
         chkInt : Bool
         chkInt =
@@ -270,10 +322,10 @@ chkWidthHeightField model =
         chkLength =
             (Maybe.withDefault 0 (String.toInt model.tempCampusSize.width)) <= 64 && (Maybe.withDefault 0 (String.toInt model.tempCampusSize.height)) <= 64
     in
-        chkInt && chkLength
+        not <| chkInt && chkLength
 
 createCampusButton model =
-    if (chkWidthHeightField model) then
+    if (isCorrectWidthHeight model) then
         Input.button [] { onPress = Just CreateCampus
                         , label = (E.text "Create!")
                         }
