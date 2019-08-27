@@ -1,8 +1,8 @@
 module Main exposing(main)
 import Browser
 import Html as H exposing (..)
-import Html.Attributes exposing(..)
-import Html.Events exposing (..)
+import Html.Attributes as HAttrs exposing(..)
+import Html.Events as HEvents exposing (..)
 import Array exposing (..)
 import Debug exposing (..)
 import Regex exposing (..)
@@ -13,7 +13,9 @@ import Element.Border as Border
 import Element.Input as Input
 import Element.Font as Font
 import Element.Region as Region
-import Dialog
+import Bootstrap.Button as BBtn exposing (..)
+css path =
+  node "link" [rel "stylesheet", href path] []
 
 --MODEL--
 type alias Model = 
@@ -23,7 +25,7 @@ type alias Model =
   , mainPalette : String
   , campusSize : CampusSize
   , tempCampusSize : TempCampusSize
-  , showDialog : Bool
+  , modalVisibility : Modal.Visibility
   }
 
 type alias TempCampusSize =
@@ -46,7 +48,6 @@ init _ =
       "White" --mainpalette
       (CampusSize 0 0) --campusSize
       (TempCampusSize "" "") --tempCampusSize
-      False --showDialog
     , Cmd.none
     )
 
@@ -60,7 +61,6 @@ type Msg
     | SetCampusHeight String
     | CreateCampus
     | DisabledCreateCampus
-    | AcknowledgeDialog
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -117,29 +117,7 @@ update msg model =
             ( { model | colorValue = model.colorValue }
             , Cmd.none
             )
-        
-        AcknowledgeDialog ->
-            case model.showDialog of
-                True ->
-                    ( { model | showDialog = False }
-                    , Cmd.none
-                    )
 
-                False -> 
-                    ( { model | showDialog = True }
-                    , Cmd.none
-                    )
-
-dialogConfig : Model -> Dialog.Config Msg
-dialogConfig model =
-    { closeMessage = Just AcknowledgeDialog
-    , containerClass = Just "zzz"
-    , header = Just (H.text "aaa")
-    , body = Just (H.text "bbb")
-    , footer = []
-    }
-css path =
-  node "link" [rel "stylesheet", href path] []
 --VIEW--
 view : Model -> Html Msg
 view model =
@@ -161,13 +139,6 @@ view model =
                                                                                       , label = (Input.labelHidden "")
                                                                                       }
                                                                       , createCampusButton model
-                                                                      , html <| button [ onClick AcknowledgeDialog ] [ H.text "Dialog" ]
-                                                                      , html <| Dialog.view
-                                                                          ( if model.showDialog then
-                                                                                Just (dialogConfig model)
-                                                                            else
-                                                                                Nothing
-                                                                          )
                                                                       ]
                     , column [E.width <| px 100, E.height fill, htmlAttribute <| id "palette-bak"] [ E.text "palette"
                                                                       , Input.text [] { onChange = ColorValue
@@ -186,9 +157,6 @@ view model =
                 , row [ explain Debug.todo, E.width fill, E.height <| px 10 ] [E.text "footer" ]
                 ]
          ]
-modalFunc : H.Attribute Msg
-modalFunc =
-    style "background-color" "rgba(0,0,0,0.3)"
 --FUNC--
 getPaletteColor : Model -> Int -> String
 getPaletteColor model n =
@@ -226,7 +194,7 @@ makeTable model width height =
     div []
         [ H.table []
             <| List.map(\y -> tr[]
-                <| List.map(\x -> td [onClick(ChangeColor y x model.mainPalette), style "background-color" (getCampusColor model y x)] [ {-text ((String.fromInt y) ++ "," ++ (String.fromInt x)) -}])
+                <| List.map(\x -> td [ HEvents.onClick (ChangeColor y x model.mainPalette), style "background-color" (getCampusColor model y x)] [] )
                     <| List.range 0 (width-1))
                         <| List.range 0 (height-1) ]
 
@@ -251,7 +219,7 @@ displayPalette : Model -> Html Msg
 displayPalette model =
     div []
         <| List.map (\plt -> div []
-            [ div [ (id "palette_square"), (onClick (SetMainPalette (plt - 1))), (style "background-color" (getPaletteColor model (plt - 1))) ] [ H.text (String.fromInt plt) ]
+            [ div [ (id "palette_square"), ( HEvents.onClick (SetMainPalette (plt - 1))), (style "background-color" (getPaletteColor model (plt - 1))) ] [ H.text (String.fromInt plt) ]
             , div [ id "palette_color_name" ] [ H.text (getPaletteColor model (plt - 1)) ]
             ])
                 <| List.range 1 (List.length model.palette)
@@ -330,6 +298,7 @@ addColorButton model =
                      , label = (E.text ";_;")
                      }
 
+--MAIN--
 main =
     Browser.element
         { init = init
