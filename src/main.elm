@@ -168,7 +168,6 @@ view model =
                     , column [ E.width fill, E.height fill, htmlAttribute <| id "campus-bak"] [ E.text "campus"
                                                                  , el [ centerX, centerY ] <| html <| makeTable model model.campusSize.width model.campusSize.height
                                                                  , html <| createCampusWindow model
-                                                                 , html <| button [ onClick ChangePalettePosition ] [ H.text "change position" ]
                                                                  ]
                     , palettePosition model (model.palettePosition == Left)
                     ]
