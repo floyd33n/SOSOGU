@@ -31,6 +31,7 @@ type alias Model =
   , mainPalette : String
   , campusSize : CampusSize
   , tempCampusSize : TempCampusSize
+  , palettePosition : PalettePosition
   , modalVisibility : BModal.Visibility
   , openingModalWindow : BModal.Visibility
   }
@@ -45,6 +46,7 @@ type alias CampusSize =
     , height : Int
      }
 
+type PalettePosition = Right | Left
 --INIT--
 init : () -> (Model, Cmd Msg)
 init _ =
@@ -55,6 +57,7 @@ init _ =
       "White" --mainpalette
       (CampusSize 0 0) --campusSize
       (TempCampusSize "" "") --tempCampusSize
+      Right
       BModal.hidden
       BModal.shown
     , Cmd.none
@@ -72,6 +75,7 @@ type Msg
     | DisabledCreateCampus
     | ShowModal
     | CloseModal
+    | ChangePalettePosition
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -140,6 +144,17 @@ update msg model =
             , Cmd.none
             )
 
+        ChangePalettePosition ->
+            ( { model | palettePosition = 
+                            case model.palettePosition of
+                                Right ->
+                                    Left
+                                Left ->
+                                    Right
+              }
+            , Cmd.none
+            )
+
 --VIEW--
 view : Model -> Html Msg
 view model =
@@ -149,30 +164,39 @@ view model =
                                                                                , E.el [alignRight, E.width <| px 100 ] <| E.text "nav"
                                                                                ]
                 , row [ E.width fill, E.height fill, explain Debug.todo ]
-                    [ column [ E.width <| px 100, E.height fill, htmlAttribute <| id "setting-bak"] [ E.text "setting"
-                                                                                                    ]
-                    , column [E.width <| px 100, E.height fill, htmlAttribute <| id "palette-bak"] [ E.text "palette"
-                                                                      , Input.text [] { onChange = ColorValue
-                                                                                      , text = model.colorValue
-                                                                                      , placeholder = Just (Input.placeholder [] (E.text "Color"))
-                                                                                      , label = (Input.labelHidden "?")
-                                                                                      }
-                                                                      , addColorButton model
-                                                                      , html (div [ (id "main_palette"), (style "background-color" model.mainPalette) ] [] )
-                                                                      , html (displayPalette model)
-                                                                      ]
+                    [ palettePosition model (model.palettePosition == Right)
                     , column [ E.width fill, E.height fill, htmlAttribute <| id "campus-bak"] [ E.text "campus"
-                                                                 , html ( makeTable model model.campusSize.width model.campusSize.height )
+                                                                 , el [ centerX, centerY ] <| html <| makeTable model model.campusSize.width model.campusSize.height
                                                                  , html <| createCampusWindow model
+                                                                 , html <| button [ onClick ChangePalettePosition ] [ H.text "change position" ]
                                                                  ]
+                    , palettePosition model (model.palettePosition == Left)
                     ]
                 , row [ explain Debug.todo, E.width fill, E.height <| px 10 ] [E.text "footer" ]
                 ]
          ]
 
+palettePosition : Model -> Bool -> Element Msg
+palettePosition model bool  =
+    if bool then
+        column [E.width <| px 100, E.height fill, htmlAttribute <| id "palette-bak" ]
+            [ html <| button [ onClick ChangePalettePosition ] [ H.text "position" ]
+            , E.text "palette"
+            , Input.text [] { onChange = ColorValue
+                            , text = model.colorValue
+                            , placeholder = Just (Input.placeholder [] (E.text "Color"))
+                            , label = (Input.labelHidden "?")
+                            }
+            , addColorButton model
+            , html (div [ (id "main_palette"), (style "background-color" model.mainPalette) ] [] )
+            , html (displayPalette model)
+            ]
+    else
+        E.none
+
 createCampusWindow : Model -> Html Msg
 createCampusWindow model =
-    div [style "" ""] 
+    BGrid.container [] 
         [ BModal.config CloseModal
             |> BModal.hideOnBackdropClick False
             |> BModal.small
@@ -223,10 +247,10 @@ getCampusColor model x y =
     model.campus
         |> Array.fromList
         |> Array.get x
-        |> Maybe.withDefault [(-2, "_")]
+        |> Maybe.withDefault [(0, "")]
         |> Array.fromList
         |> Array.get y
-        |> Maybe.withDefault (-2, "_")
+        |> Maybe.withDefault (0, "")
         |> Tuple.second
 
 
@@ -235,10 +259,10 @@ getCampusInt model n =
     model.campus
         |> Array.fromList
         |> Array.get n
-        |> Maybe.withDefault [(-2, "_")]
+        |> Maybe.withDefault [(0, "")]
         |> Array.fromList
         |> Array.get n
-        |> Maybe.withDefault (-2, "_")
+        |> Maybe.withDefault (0, "")
         |> Tuple.first
 
 makeTable : Model -> Int -> Int -> Html Msg
