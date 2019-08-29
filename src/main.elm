@@ -31,9 +31,11 @@ type alias Model =
   , mainPalette : String
   , campusSize : CampusSize
   , tempCampusSize : TempCampusSize
-  , palettePosition : PalettePosition
+  , palettePosition : Position
+  , settingPosition : Position
   , modalVisibility : BModal.Visibility
   , openingModalWindow : BModal.Visibility
+  , campusSetting : CampusSetting
   }
 
 type alias TempCampusSize =
@@ -46,7 +48,25 @@ type alias CampusSize =
     , height : Int
      }
 
-type PalettePosition = Right | Left
+type Position
+    = Right
+    | Left
+
+type Panel
+    = SettingPanel
+    | PalettePanel
+
+type alias CampusSetting =
+    { border : H.Attribute Msg
+    , width : H.Attribute Msg
+    , height : H.Attribute Msg
+    }
+initCampusSetting : CampusSetting
+initCampusSetting =
+    { border = style "border" "solid 1px"
+    , width = style "width" "30px"
+    , height = style "height" "30px"
+    }
 --INIT--
 init : () -> (Model, Cmd Msg)
 init _ =
@@ -57,9 +77,11 @@ init _ =
       "White" --mainpalette
       (CampusSize 0 0) --campusSize
       (TempCampusSize "" "") --tempCampusSize
-      Right
+      Right --palette
+      Left --setting
       BModal.hidden
       BModal.shown
+      initCampusSetting
     , Cmd.none
     )
 
@@ -75,7 +97,7 @@ type Msg
     | DisabledCreateCampus
     | ShowModal
     | CloseModal
-    | ChangePalettePosition
+    | ChangePosition Panel
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -96,7 +118,6 @@ update msg model =
               }
             , Cmd.none
             )
-
 
         SetMainPalette n ->
             ( { model | mainPalette = getPaletteColor model n }
@@ -144,16 +165,28 @@ update msg model =
             , Cmd.none
             )
 
-        ChangePalettePosition ->
-            ( { model | palettePosition = 
-                            case model.palettePosition of
-                                Right ->
-                                    Left
-                                Left ->
-                                    Right
-              }
-            , Cmd.none
-            )
+        ChangePosition panel ->
+            case panel of
+                PalettePanel ->
+                    ( { model | palettePosition =
+                                    case model.palettePosition of
+                                        Right ->
+                                            Left
+                                        Left ->
+                                            Right
+                      }
+                    , Cmd.none
+                    )
+                SettingPanel ->    
+                    ( { model | settingPosition =
+                                    case model.settingPosition of
+                                        Right ->
+                                            Left
+                                        Left ->
+                                            Right
+                      }
+                    , Cmd.none
+                    )
 
 --VIEW--
 view : Model -> Html Msg
@@ -164,12 +197,14 @@ view model =
                                                                                , E.el [alignRight, E.width <| px 100 ] <| E.text "nav"
                                                                                ]
                 , row [ E.width fill, E.height fill, explain Debug.todo ]
-                    [ palettePosition model (model.palettePosition == Right)
+                    [ settingPosition model (model.settingPosition == Left)
+                    , palettePosition model (model.palettePosition == Left)
                     , column [ E.width fill, E.height fill, htmlAttribute <| id "campus-bak"] [ E.text "campus"
                                                                  , el [ centerX, centerY ] <| html <| makeTable model model.campusSize.width model.campusSize.height
                                                                  , html <| createCampusWindow model
                                                                  ]
-                    , palettePosition model (model.palettePosition == Left)
+                    , palettePosition model (model.palettePosition == Right)
+                    , settingPosition model (model.settingPosition == Right)
                     ]
                 , row [ explain Debug.todo, E.width fill, E.height <| px 10 ] [E.text "footer" ]
                 ]
@@ -179,7 +214,7 @@ palettePosition : Model -> Bool -> Element Msg
 palettePosition model bool  =
     if bool then
         column [E.width <| px 100, E.height fill, htmlAttribute <| id "palette-bak" ]
-            [ html <| button [ onClick ChangePalettePosition ] [ H.text "position" ]
+            [ html <| button [ onClick <| ChangePosition PalettePanel] [ H.text "position" ]
             , E.text "palette"
             , Input.text [] { onChange = ColorValue
                             , text = model.colorValue
@@ -189,6 +224,16 @@ palettePosition model bool  =
             , addColorButton model
             , html (div [ (id "main_palette"), (style "background-color" model.mainPalette) ] [] )
             , html (displayPalette model)
+            ]
+    else
+        E.none
+
+settingPosition : Model -> Bool -> Element Msg
+settingPosition model bool  =
+    if bool then
+        column [E.width <| px 100, E.height fill, htmlAttribute <| id "palette-bak" ]
+            [ html <| button [ onClick <| ChangePosition SettingPanel] [ H.text "Position" ]
+            , E.text "setting"
             ]
     else
         E.none
@@ -268,8 +313,8 @@ makeTable : Model -> Int -> Int -> Html Msg
 makeTable model width height =
     div []
         [ H.table []
-            <| List.map(\y -> tr[]
-                <| List.map(\x -> td [ HEvents.onClick (ChangeColor y x model.mainPalette), style "background-color" (getCampusColor model y x)] [] )
+            <| List.map(\y -> tr[ model.campusSetting.height ]
+                <| List.map(\x -> td [ model.campusSetting.width, model.campusSetting.border, HEvents.onClick (ChangeColor y x model.mainPalette), style "background-color" (getCampusColor model y x)] [] )
                     <| List.range 0 (width-1))
                         <| List.range 0 (height-1) ]
 
