@@ -250,29 +250,27 @@ palettePosition model bool  =
                , Border.color<| rgb255 255 255 255
                , Background.color <| rgb255 89 88 87
                ]
-               [ column 
-                   [ centerX ] 
-                   [ el [Font.color <| rgb255 255 255 255
-                        , centerX, paddingXY 0 20
-                        ] <| 
-                            E.text "palette"
-                   , el [E.width <| px 90] <| 
-                       html <|
-                           H.input [onInput ColorValue] 
-                                   [H.text model.colorValue]
-                   , el [] <|
-                       if isColor<|model then
-                           Input.button [] 
-                               { onPress = Just (AddColorToPalette model.colorValue)
-                               , label = (E.text "Add")
-                               } 
-                    else
-                        Input.button [ Region.description "disabled"
-                                     , Background.color (rgb255 84 84 84)
-                                     ] 
-                                     { onPress = Just DisabledCreateCampus
-                                     , label = (E.text "disabled")
-                                     }
+               [ el [Font.color <| rgb255 255 255 255
+                    , centerX, paddingXY 0 20
+                    ] <| 
+                        E.text "palette"
+               , el [E.width <| px 90] <| 
+                   html <|
+                       H.input [onInput ColorValue] 
+                               [H.text model.colorValue]
+               , el [] <|
+                   if isColor<|model then
+                       Input.button [] 
+                                    { onPress = Just (AddColorToPalette model.colorValue)
+                                    , label = E.text "Add"
+                                    } 
+                   else
+                       Input.button [ Region.description "disabled"
+                                    , Background.color (rgb255 84 84 84)
+                                    ] 
+                                    { onPress = Just DisabledCreateCampus
+                                    , label = E.text "disabled"
+                                    }
                , html <|
                    div [ id<|"main_palette"
                        , HAttrs.style "background-color" model.mainPalette 
@@ -284,7 +282,6 @@ palettePosition model bool  =
                               { onPress = Just <| ChangePosition PalettePanel
                               , label = E.text <| changePositionText model.palettePosition
                               } 
-                   ]
                ]
     else
         E.none
@@ -392,7 +389,7 @@ makeTable : Model -> Int -> Int -> Html Msg
 makeTable model width height =
     div []
         [ H.table [] <| 
-            List.map(\y -> tr[ model.campusSetting.height ]  <| 
+            List.map( \y -> tr [ model.campusSetting.height ] <| 
                 List.map( \x -> td [ model.campusSetting.width
                                    , model.campusSetting.border
                                    , HEvents.onClick (ChangeColor y x model.mainPalette)
@@ -408,15 +405,30 @@ makeTable model width height =
 updateCampus : Model -> Int -> Int -> String -> List(List (Int, String))
 updateCampus model x y color =
     List.append
-        (List.append (List.take x model.campus) 
-                     ( (List.singleton (List.append
-                        (List.append (List.take y (Maybe.withDefault [(0, "")] (Array.get x (Array.fromList model.campus))))
-                                     (List.singleton ((getCampusInt model y), color))
-                                                                    )
-                                                       (List.drop (y+1) (Maybe.withDefault [(999, "_____")] (Array.get x (Array.fromList model.campus))))
-                                 )) )
-                    )
-                    (List.drop (x+1) model.campus)
+        (List.append 
+                (List.take x model.campus) 
+                (List.singleton <|
+                    List.append
+                        ((++)
+                            (List.take y <| 
+                                Maybe.withDefault [(0, "")] <|
+                                    Array.get x <| 
+                                        Array.fromList model.campus
+                            )
+                            (List.singleton (getCampusInt model <| y
+                                            , color
+                                            )
+                            )
+                        )
+                        (List.drop (y+1) <| 
+                                Maybe.withDefault [(0, "")] <| 
+                                    Array.get x <| 
+                                        Array.fromList model.campus
+                        )
+                ) 
+        )
+        (List.drop (x+1) model.campus)
+
 
 addColorToPalette : Model -> String -> List String
 addColorToPalette model color =
