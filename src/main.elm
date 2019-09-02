@@ -26,18 +26,18 @@ css path =
 
 --MODEL--
 type alias Model = 
-  { campus : List (List (Int, String))
-  , colorValue : String
-  , palette : List String
-  , mainPalette : String
-  , campusSize : CampusSize
-  , tempCampusSize : TempCampusSize
-  , palettePosition : Position
-  , settingPosition : Position
-  , modalVisibility : BModal.Visibility
-  , openingModalWindow : BModal.Visibility
-  , campusSetting : CampusSetting
-  }
+    { campus : List (List (Int, String))
+    , colorValue : String
+    , palette : List String
+    , mainPalette : String
+    , campusSize : CampusSize
+    , tempCampusSize : TempCampusSize
+    , palettePosition : Position
+    , settingPosition : Position
+    , modalVisibility : BModal.Visibility
+    , openingModalWindow : BModal.Visibility
+    , campusSetting : CampusSetting
+    }
 
 type alias TempCampusSize =
     { width : String
@@ -62,6 +62,7 @@ type alias CampusSetting =
     , width : H.Attribute Msg
     , height : H.Attribute Msg
     }
+
 initCampusSetting : CampusSetting
 initCampusSetting =
     { border = HAttrs.style "border" "solid 1px"
@@ -72,17 +73,17 @@ initCampusSetting =
 init : () -> (Model, Cmd Msg)
 init _ =
     ( Model
-      [[(0, "")]] --campus
-      "" --colorValue
-      [] --palette
-      "White" --mainpalette
-      (CampusSize 0 0) --campusSize
-      (TempCampusSize "" "") --tempCampusSize
-      Right --palette
-      Left --setting
-      BModal.hidden
-      BModal.shown
-      initCampusSetting
+        [[(0, "")]] --campus
+        "" --colorValue
+        [] --palette
+        "White" --mainpalette
+        (CampusSize 0 0) --campusSize
+        (TempCampusSize "" "") --tempCampusSize
+        Right --palette
+        Left --setting
+        BModal.hidden
+        BModal.shown
+        initCampusSetting
     , Cmd.none
     )
 
@@ -145,8 +146,8 @@ update msg model =
                         List.repeat temp.height (Array.toIndexedList (Array.fromList (List.repeat temp.width "white")))
             in
                 ( { model | campus = testFuncA model
-                  ,         campusSize = { width = (Maybe.withDefault 0 (String.toInt model.tempCampusSize.width)), height = (Maybe.withDefault 0 (String.toInt model.tempCampusSize.height)) }
-                  ,         openingModalWindow = BModal.hidden
+                          , campusSize = { width = (Maybe.withDefault 0 (String.toInt model.tempCampusSize.width)), height = (Maybe.withDefault 0 (String.toInt model.tempCampusSize.height)) }
+                          , openingModalWindow = BModal.hidden
                   }
                 , Cmd.none
                 )
@@ -192,23 +193,46 @@ update msg model =
 --VIEW--
 view : Model -> Html Msg
 view model =
-    div [ HAttrs.style "height" "100%"] [ css <| "../style.css", layout [debugLine False] <|
+    div [ HAttrs.style "height" "100%"]
+        [ css <| "../style.css"
+        , layout [debugLine False] <|
             column [ E.width fill, E.height fill, debugLine False]
-                [ row [ debugLine False, E.width fill, E.height <| px 50, Background.color <| rgb255 43 43 43, paddingXY 15 0, Border.width 1, Border.color <| rgb255 255 255 255] [ E.el [alignLeft, Font.color <| rgb255 255 255 255] <| E.text "SOSOGU"
-                                                                               , E.el [alignRight, E.width <| px 100, Font.color <| rgb255 255 255 255] <| E.text "nav"
+                [ row [ debugLine False
+                      , E.width fill
+                      , E.height <| px 50
+                      , Background.color <| rgb255 43 43 43
+                      , paddingXY 15 0
+                      , Border.width 1
+                      , Border.color <| rgb255 255 255 255
+                      ]
+                      [ E.el [alignLeft
+                             , Font.color <| rgb255 255 255 255
+                             ] <| 
+                                E.text "SOSOGU"
+                      , E.el [alignRight
+                             , E.width <| px 100
+                             , Font.color <| rgb255 255 255 255 ] <| 
+                                 E.text "nav"
                                                                                ]
-                , row [ E.width fill, E.height fill, debugLine False ]
-                    [ settingPosition model (model.settingPosition == Left)
-                    , palettePosition model (model.palettePosition == Left)
-                    , column [ E.width fill, E.height fill, Background.color <| rgb255 243 243 242] [ E.text "campus"
-                                                                 , el [ centerX, centerY ] <| html <| makeTable model model.campusSize.width model.campusSize.height
-                                                                 , html <| createCampusWindow model
-                                                                 ]
-                    , palettePosition model (model.palettePosition == Right)
-                    , settingPosition model (model.settingPosition == Right)
-                    ]
+                , row [ E.width fill
+                      , E.height fill
+                      , debugLine False 
+                      ] 
+                      [ settingPosition model (model.settingPosition == Left)
+                      , palettePosition model (model.palettePosition == Left)
+                      , column [ E.width fill
+                               , E.height fill
+                               , Background.color <| rgb255 243 243 242
+                               ] 
+                               [ E.text "campus"
+                               , el [ centerX, centerY ] <| html <| makeTable model model.campusSize.width model.campusSize.height
+                               , html <| createCampusWindow model
+                               ]  
+                               , palettePosition model (model.palettePosition == Right)
+                               , settingPosition model (model.settingPosition == Right)
+                      ]
                 ]
-         ]
+        ]
 
 changePositionText : Position -> String
 changePositionText position =
@@ -221,75 +245,110 @@ changePositionText position =
 palettePosition : Model -> Bool -> Element Msg
 palettePosition model bool  =
     if bool then
-        column [E.width <| px 100, E.height fill, Border.width 1, Border.color<| rgb255 255 255 255, Background.color <| rgb255 89 88 87]
-            [ el [Font.color <| rgb255 255 255 255, centerX, paddingXY 0 10] <| E.text "palette"
-            , Input.text [] { onChange = ColorValue
-                            , text = model.colorValue
-                            , placeholder = Just (Input.placeholder [] (E.text "Color"))
-                            , label = (Input.labelHidden "?")
-                            }
-            , addColorButton model
-            , html (div [ (id "main_palette"), (HAttrs.style "background-color" model.mainPalette) ] [] )
-            , html (displayPalette model)
-            , Input.button [alignBottom]
-                { onPress = Just <| ChangePosition PalettePanel
-                , label = E.text <| changePositionText model.palettePosition
-                }
-            ]
+        column [ E.width <| px 100
+               , E.height fill, Border.width 1
+               , Border.color<| rgb255 255 255 255
+               , Background.color <| rgb255 89 88 87
+               ]
+               [ column 
+                   [ centerX ] 
+                   [ el [Font.color <| rgb255 255 255 255
+                        , centerX, paddingXY 0 20
+                        ] <| 
+                            E.text "palette"
+                   , el [E.width <| px 90] <| 
+                       html <|
+                           H.input [onInput ColorValue] 
+                                   [H.text model.colorValue]
+                   , el [] <|
+                       if isColor<|model then
+                           Input.button [] 
+                               { onPress = Just (AddColorToPalette model.colorValue)
+                               , label = (E.text "Add")
+                               } 
+                    else
+                        Input.button [ Region.description "disabled"
+                                     , Background.color (rgb255 84 84 84)
+                                     ] 
+                                     { onPress = Just DisabledCreateCampus
+                                     , label = (E.text "disabled")
+                                     }
+               , html <|
+                   div [ id<|"main_palette"
+                       , HAttrs.style "background-color" model.mainPalette 
+                       ] 
+                       [] 
+               , html <| 
+                   displayPalette model
+               , Input.button [alignBottom]
+                              { onPress = Just <| ChangePosition PalettePanel
+                              , label = E.text <| changePositionText model.palettePosition
+                              } 
+                   ]
+               ]
     else
         E.none
 
 settingPosition : Model -> Bool -> Element Msg
 settingPosition model bool  =
     if bool then
-        column [E.width <| px 100, E.height fill, Border.width 1, Border.color <| rgb255 255 255 255, Background.color <| rgb255 89 88 87]
-            [ el [Font.color <| rgb255 255 255 255, centerX, paddingXY 0 10] <| E.text "setting"
-            , Input.button [alignBottom]
-                { onPress = Just <| ChangePosition SettingPanel
-                , label = E.text <| changePositionText model.settingPosition
-                }
-            ]
+        column [ E.width <| px 100
+               , E.height fill
+               , Border.width 1
+               , Border.color <| rgb255 255 255 255
+               , Background.color <| rgb255 89 88 87
+               ]
+               [ el [Font.color <| rgb255 255 255 255
+                    , centerX
+                    , paddingXY 0 10
+                    ] <| 
+                        E.text "setting"
+              , Input.button [alignBottom]
+                             { onPress = Just <| ChangePosition SettingPanel
+                             , label = E.text <| changePositionText model.settingPosition
+                             }
+              ]
     else
         E.none
 
 createCampusWindow : Model -> Html Msg
 createCampusWindow model =
     BGrid.container [] 
-        [ BModal.config CloseModal
-            |> BModal.hideOnBackdropClick False
-            |> BModal.small
-            |> BModal.h5 [HAttrs.style "margin" "auto"] [ H.text "Enter Campus Size" ]
-            |> BModal.body []
-              [ BGrid.containerFluid []
-                  [ BGrid.row []
-                      [ BGrid.col
-                          [ BCol.xs5 ]
-                          [ div [HAttrs.style "margin" "5px"] [H.text "Width"]
-                          , BInput.number [ BInput.small
-                                          , BInput.onInput SetCampusWidth
-                                          ]
-                          ] 
-                      , BGrid.col
-                          [ BCol.xs5 ]
-                          [ div [HAttrs.style "margin" "5px"] [H.text "Height"]
-                          , BInput.number [ BInput.small
-                                          , BInput.onInput SetCampusHeight
-                                          ]
-                          ]
-                      ]
-                  ]
-              ]
-          |> BModal.footer [HAttrs.style "margin" "auto"]
-              [ BBtn.button
-                  [ BBtn.outlinePrimary
-                  , if not <| (isCorrectWidthHeight model) then BBtn.primary else BBtn.secondary
-                  , BBtn.attrs [ onClick CreateCampus ]
-                  , BBtn.disabled <| isCorrectWidthHeight model
-                  ]
-                  [ H.text "Create!" ]
-              ]
-          |> BModal.view model.openingModalWindow
-        ]
+                    [ BModal.config CloseModal
+                        |> BModal.hideOnBackdropClick False
+                        |> BModal.small
+                        |> BModal.h5 [HAttrs.style "margin" "auto"] 
+                                     [ H.text "Enter Campus Size" ]
+                        |> BModal.body []
+                                       [ BGrid.containerFluid []
+                                                              [ BGrid.row []
+                                                                          [ BGrid.col [ BCol.xs5 ]
+                                                                                      [ div [HAttrs.style "margin" "5px"] 
+                                                                                            [H.text "Width"]
+                                                                                      , BInput.number [ BInput.small
+                                                                                                      , BInput.onInput SetCampusWidth
+                                                                                                      ]
+                                                                                      ] 
+                                                                          , BGrid.col [ BCol.xs5 ]
+                                                                                      [ div [HAttrs.style "margin" "5px"] 
+                                                                                            [H.text "Height"]
+                                                                          , BInput.number [ BInput.small
+                                                                                          , BInput.onInput SetCampusHeight
+                                                                                          ]
+                                                                                      ]
+                                                                          ]
+                                                              ]
+                                       ]
+                        |> BModal.footer [HAttrs.style "margin" "auto"]
+                                         [ BBtn.button [ BBtn.outlinePrimary
+                                                       , if not <| (isCorrectWidthHeight model) then BBtn.primary else BBtn.secondary
+                                                       , BBtn.attrs [ onClick CreateCampus ]
+                                                       , BBtn.disabled <| isCorrectWidthHeight model
+                                                       ]
+                                                       [ H.text "Create!" ]
+                                         ]                                             
+                        |> BModal.view model.openingModalWindow
+                    ]
 --DEBUG--
 debugLine : Bool ->  E.Attribute Msg
 debugLine bool =
@@ -303,7 +362,7 @@ getPaletteColor model n =
     model.palette
         |> Array.fromList
         |> Array.get n
-        |> Maybe.withDefault "unknown"
+        |> Maybe.withDefault ""
 
 
 getCampusColor : Model -> Int -> Int -> String
@@ -332,11 +391,19 @@ getCampusInt model n =
 makeTable : Model -> Int -> Int -> Html Msg
 makeTable model width height =
     div []
-        [ H.table []
-            <| List.map(\y -> tr[ model.campusSetting.height ]
-                <| List.map(\x -> td [ model.campusSetting.width, model.campusSetting.border, HEvents.onClick (ChangeColor y x model.mainPalette), HAttrs.style "background-color" (getCampusColor model y x)] [] )
-                    <| List.range 0 (width-1))
-                        <| List.range 0 (height-1) ]
+        [ H.table [] <| 
+            List.map(\y -> tr[ model.campusSetting.height ]  <| 
+                List.map( \x -> td [ model.campusSetting.width
+                                   , model.campusSetting.border
+                                   , HEvents.onClick (ChangeColor y x model.mainPalette)
+                                   , HAttrs.style "background-color" (getCampusColor model y x)
+                                   ] 
+                                   [] 
+                        ) <| 
+                            List.range 0 (width-1)
+                    ) <| 
+                        List.range 0 (height-1) 
+        ]
 
 updateCampus : Model -> Int -> Int -> String -> List(List (Int, String))
 updateCampus model x y color =
@@ -357,20 +424,28 @@ addColorToPalette model color =
 
 displayPalette : Model -> Html Msg
 displayPalette model =
-    div []
-        <| List.map (\plt -> div []
-            [ div [ (id "palette_square"), ( HEvents.onClick (SetMainPalette (plt - 1))), (HAttrs.style "background-color" (getPaletteColor model (plt - 1))) ] [ {-H.text (String.fromInt plt)-} ]
-            , div [ id "palette_color_name" ] [ {-H.text (getPaletteColor model (plt - 1))-} ]
-            ])
-                <| List.range 1 (List.length model.palette)
+    div [] <| 
+        List.map ( \plt -> div []
+                               [ div [ id "palette_square"
+                                     , HEvents.onClick <| SetMainPalette (plt - 1)
+                                     , HAttrs.style "background-color" <| getPaletteColor model (plt - 1)
+                                     ] 
+                                     []
+                               , div [ id "palette_color_name" ] 
+                                     []
+                               ]
+                 ) <| 
+                     List.range 1 (List.length model.palette)
 
 isColor : Model -> Bool
 isColor model =
     case (String.left 1 model.colorValue) of
         "#" ->
-            not (Regex.contains (Maybe.withDefault Regex.never <| Regex.fromString "[g-z]" ) (String.dropLeft 1 model.colorValue) )
-              && (String.length model.colorValue == 4)
-                || (String.length model.colorValue == 7)
+            not <| 
+                Regex.contains (Maybe.withDefault  Regex.never <| Regex.fromString "[g-z]" ) 
+                               (String.dropLeft 1 model.colorValue)
+                    && String.length model.colorValue == 4
+                        || String.length model.colorValue == 7
 
         _ ->
             let 
@@ -398,25 +473,31 @@ isColor model =
                 isColorName
 
         
-
 isCorrectWidthHeight : Model -> Bool
 isCorrectWidthHeight model =
     let
         chkInt : Bool
         chkInt =
-            (Maybe.withDefault 0 (String.toInt model.tempCampusSize.width)) * (Maybe.withDefault 0 (String.toInt model.tempCampusSize.height)) > 0
+            Maybe.withDefault 0 (String.toInt model.tempCampusSize.width)
+            * 
+            Maybe.withDefault 0 (String.toInt model.tempCampusSize.height) 
+            > 0
 
         chkLength : Bool
         chkLength =
-            (Maybe.withDefault 0 (String.toInt model.tempCampusSize.width)) <= 64 && (Maybe.withDefault 0 (String.toInt model.tempCampusSize.height)) <= 64
+            Maybe.withDefault 0 (String.toInt model.tempCampusSize.width) <= 64 
+            && 
+            Maybe.withDefault 0 (String.toInt model.tempCampusSize.height) <= 64
     in
-        not <| chkInt && chkLength
+        not <| 
+            chkInt && chkLength
 
 createCampusButton model =
     if (isCorrectWidthHeight model) then
-        Input.button [] { onPress = Just CreateCampus
-                        , label = (E.text "Create!")
-                        }
+        Input.button [] 
+                     { onPress = Just CreateCampus
+                     , label = (E.text "Create!")
+                     }
     else
         Input.button [ Region.description "fuck you"
                      , Background.color (rgb255 84 84 84)
@@ -425,18 +506,6 @@ createCampusButton model =
                      , label = (E.text "Create!")
                      }
 
-addColorButton model =
-    if ((isColor model)) then
-        Input.button [] { onPress = Just (AddColorToPalette model.colorValue)
-                        , label = (E.text "Add")
-                        }
-    else
-        Input.button [ Region.description "fuck"
-                     , Background.color (rgb255 84 84 84)
-                     ]
-                     { onPress = Just DisabledCreateCampus
-                     , label = (E.text ";_;")
-                     }
 
 --MAIN--
 main =
@@ -445,7 +514,7 @@ main =
         , update = update
         , subscriptions = subscriptions
         , view = view
-         }
+        }
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
