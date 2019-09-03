@@ -193,14 +193,16 @@ update msg model =
 --VIEW--
 view : Model -> Html Msg
 view model =
-    div [ HAttrs.style "height" "100%"]
+    div [ HAttrs.style "height" "100%"
+        ]
         [ css <| "../style.css"
-        , layout [debugLine False] <|
+        , layout [debugLine False
+                 ] <|
             column [ E.width fill, E.height fill, debugLine False]
                 [ row [ debugLine False
                       , E.width fill
                       , E.height <| px 50
-                      , Background.color <| rgb255 43 43 43
+                      , Background.color <| rouIro
                       , paddingXY 15 0
                       , Border.width 1
                       , Border.color <| rgb255 255 255 255
@@ -209,11 +211,26 @@ view model =
                              , Font.color <| rgb255 255 255 255
                              ] <| 
                                 E.text "SOSOGU"
-                      , E.el [alignRight
-                             , E.width <| px 100
-                             , Font.color <| rgb255 255 255 255 ] <| 
-                                 E.text "nav"
-                                                                               ]
+                      , row [ alignRight 
+                            , spacing 10
+                            ]
+                            [ E.el [] <|
+                                E.image [ htmlAttribute <| HAttrs.style "filter" "invert(100%)"
+                                        ]
+                                        { src = "svg/home.svg"
+                                        , description = "Home"
+                                        }
+                            , E.el [ Font.color <| rgb255 255 255 255 ] <|
+                                E.text "Home"
+                            , E.el [] <|
+                                E.image [ htmlAttribute <| HAttrs.style "filter" "invert(100%)" ]
+                                        { src = "svg/mark-github.svg"
+                                        , description = "GitHub"
+                                        }
+                            , E.el [ Font.color <| rgb255 255 255 255 ] <|
+                                E.text "GitHub"
+                            ]
+                      ]
                 , row [ E.width fill
                       , E.height fill
                       , debugLine False 
@@ -242,43 +259,53 @@ changePositionText position =
         Left ->
             "To Right "
 
+
 palettePosition : Model -> Bool -> Element Msg
 palettePosition model bool  =
     if bool then
         column [ E.width <| px 100
-               , E.height fill, Border.width 1
-               , Border.color<| rgb255 255 255 255
-               , Background.color <| rgb255 89 88 87
+               , E.height fill
+               , Border.width 1
+               , Border.color<| shiroIro
+               , Background.color <| rouIro
+               , debugLine False
                ]
-               [ el [Font.color <| rgb255 255 255 255
-                    , centerX, paddingXY 0 20
+               [ el [ Font.color <| rgb255 255 255 255
+                    , paddingXY 0 20
+                    , centerX
                     ] <| 
                         E.text "palette"
-               , el [E.width <| px 90] <| 
-                   html <|
-                       H.input [onInput ColorValue] 
-                               [H.text model.colorValue]
-               , el [] <|
+               , el [ E.width <| px 90
+                    , centerX
+                    ] <| 
+                        html <|
+                            H.input [onInput ColorValue ] 
+                                    [H.text model.colorValue]
+               , el [ centerX ] <|
                    if isColor<|model then
-                       Input.button [] 
+                       Input.button [ Background.color <| rgb255 220 220 220 ] 
                                     { onPress = Just (AddColorToPalette model.colorValue)
                                     , label = E.text "Add"
                                     } 
                    else
                        Input.button [ Region.description "disabled"
-                                    , Background.color (rgb255 84 84 84)
+                                    , Background.color (rgb255 150 150 150)
                                     ] 
                                     { onPress = Just DisabledCreateCampus
                                     , label = E.text "disabled"
                                     }
-               , html <|
-                   div [ id<|"main_palette"
-                       , HAttrs.style "background-color" model.mainPalette 
-                       ] 
-                       [] 
-               , html <| 
-                   displayPalette model
-               , Input.button [alignBottom]
+               , el [centerX] <|
+                  html <|
+                      div [ id<|"main_palette"
+                          , HAttrs.style "background-color" model.mainPalette 
+                          ] 
+                          [] 
+               , el [E.height fill, E.width fill] <|
+                  html <| 
+                      displayPalette model
+               , Input.button [ alignBottom
+                              , Font.color <| shiroIro
+                              ]
                               { onPress = Just <| ChangePosition PalettePanel
                               , label = E.text <| changePositionText model.palettePosition
                               } 
@@ -292,15 +319,17 @@ settingPosition model bool  =
         column [ E.width <| px 100
                , E.height fill
                , Border.width 1
-               , Border.color <| rgb255 255 255 255
-               , Background.color <| rgb255 89 88 87
+               , Border.color <| shiroIro
+               , Background.color <| rouIro
                ]
                [ el [Font.color <| rgb255 255 255 255
                     , centerX
-                    , paddingXY 0 10
+                    , paddingXY 0 20
                     ] <| 
                         E.text "setting"
-              , Input.button [alignBottom]
+              , Input.button [ alignBottom 
+                             , Font.color <| shiroIro
+                             ]
                              { onPress = Just <| ChangePosition SettingPanel
                              , label = E.text <| changePositionText model.settingPosition
                              }
@@ -531,3 +560,8 @@ main =
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.none
+
+--ColorSet--
+rouIro = rgb255 43 43 43
+sumiIro = rgb255 89 88 87
+shiroIro = rgb255 255 255 255
