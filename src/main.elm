@@ -37,6 +37,7 @@ type alias Model =
     , modalVisibility : BModal.Visibility
     , openingModalWindow : BModal.Visibility
     , campusSetting : CampusSetting
+    , borderColorValue : String
     }
 
 type alias TempCampusSize =
@@ -58,36 +59,29 @@ type Panel
     | PalettePanel
 
 type alias CampusSetting =
-    { border : H.Attribute Msg
-    , width : H.Attribute Msg
-    , height : H.Attribute Msg
-    , tempWidth : String
-    , tempHeight : String
+    { borderColor : String
     }
 
 initCampusSetting : CampusSetting
 initCampusSetting =
-    { border = HAttrs.style "border" <| "solid" ++ " " ++ "1px" ++ " " ++ "red"
-    , width = HAttrs.style "width" "30px"
-    , height = HAttrs.style "height" "30px"
-    , tempWidth = "30px"
-    , tempHeight = "30px"
+    { borderColor = "black"
     }
 --INIT--
 init : () -> (Model, Cmd Msg)
 init _ =
-    ( Model
-        [[(0, "")]] --campus
-        "" --colorValue
-        [] --palette
-        "White" --mainpalette
-        (CampusSize 0 0) --campusSize
-        (TempCampusSize "" "") --tempCampusSize
-        Right --palette
-        Left --setting
-        BModal.hidden
-        BModal.shown
-        initCampusSetting
+    ( { campus =  [[(0, "")]]
+      , colorValue = ""
+      , palette = []
+      , mainPalette = "white"
+      , campusSize = (CampusSize 0 0)
+      , tempCampusSize = (TempCampusSize "" "")
+      , palettePosition = Right
+      , settingPosition = Left
+      , modalVisibility = BModal.hidden
+      , openingModalWindow = BModal.shown
+      , campusSetting = initCampusSetting
+      , borderColorValue = ""
+      } 
     , Cmd.none
     )
 
@@ -100,10 +94,12 @@ type Msg
     | SetCampusWidth String
     | SetCampusHeight String
     | CreateCampus
-    | DisabledCreateCampus
+    | ForDisabled
     | ShowModal
     | CloseModal
     | ChangePosition Panel
+    | BorderColorValue String
+    | UpdateCampusSetting String
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -156,7 +152,7 @@ update msg model =
                 , Cmd.none
                 )
 
-        DisabledCreateCampus -> 
+        ForDisabled -> 
             ( { model | colorValue = model.colorValue }
             , Cmd.none
             )
@@ -193,6 +189,17 @@ update msg model =
                       }
                     , Cmd.none
                     )
+        
+        BorderColorValue value ->
+            ( { model | borderColorValue = (String.toLower value) }
+            , Cmd.none
+            )
+
+        UpdateCampusSetting color ->
+            ( { model | campusSetting = { borderColor = model.borderColorValue }
+              }
+            , Cmd.none
+            )
 
 --VIEW--
 view : Model -> Html Msg
@@ -200,7 +207,7 @@ view model =
     div [ HAttrs.style "height" "100%"
         ]
         [ css <| "../style.css"
---        , createCampusWindow model
+        , createCampusWindow model
         , layout [debugLine False
                  ] <|
             column [ E.width fill, E.height fill, debugLine False]
@@ -281,8 +288,10 @@ palettePosition model bool  =
                , debugLine False
                ]
                [ el [ Font.color <| rgb255 255 255 255
-                    , paddingXY 0 20
                     , centerX
+                    , paddingEach { top = 12, right = 12, left = 12, bottom = 8 }
+                    , Border.widthEach { top = 0, right = 0, left = 0, bottom = 1 }
+                    , Border.color <| shiroIro
                     ] <| 
                         E.text "palette"
                , el [ E.width <| px 90
@@ -294,7 +303,7 @@ palettePosition model bool  =
                                     , HAttrs.style "font-size" "0.7em"] 
                                     [H.text model.colorValue]
                , el [ centerX ] <|
-                   if isColor<|model then
+                   if isColor <| model.colorValue then
                        Input.button [ htmlAttribute <| HAttrs.style "color" "white"
                                     ] 
                                     { onPress = Just (AddColorToPalette model.colorValue)
@@ -305,7 +314,7 @@ palettePosition model bool  =
                        Input.button [ Region.description "disabled"
                                     , htmlAttribute <| HAttrs.style "color" "white"
                                     ] 
-                                    { onPress = Just DisabledCreateCampus
+                                    { onPress = Just ForDisabled
                                     , label = E.el [Font.color <| shiroIro] <| E.text "disabled"
                                     }
                , el [ centerX
@@ -365,16 +374,42 @@ settingPosition model bool  =
                , Border.color <| shiroIro
                , Background.color <| rouIro
                ]
-               [ el [Font.color <| rgb255 255 255 255
+               [ el [ Font.color <| rgb255 255 255 255
                     , centerX
-                    , paddingXY 0 20
+                    , paddingEach { top = 12, right = 12, left = 12, bottom = 8 }
+                    , Border.widthEach { top = 0, right = 0, left = 0, bottom = 1 }
+                    , Border.color <| shiroIro
                     ] <| 
                         E.text "setting"
               , E.el [ Font.size 14
                      , Font.color <| shiroIro
                      , centerX
                      ] <|
-                  E.text "Border Size"
+                  E.text "Border Color"
+              , E.el [ E.width <| px 90 
+                     , centerX
+                     ] <|
+                  html <|
+                      H.input [onInput BorderColorValue 
+                              , HAttrs.style "height" "14px"
+                              , HAttrs.style "font-size" "0.7em"
+                              ] 
+                              [H.text model.colorValue]
+              , el [ centerX ] <|
+                  if isColor<|model.borderColorValue then
+                      Input.button [ htmlAttribute <| HAttrs.style "color" "white"
+                                   ] 
+                                   { onPress = Just (UpdateCampusSetting model.colorValue)
+                                   , label = E.text "Add"
+                                   } 
+                  else
+                      E.el [htmlAttribute <| HAttrs.style "opacity" "0.6"] <|
+                      Input.button [ Region.description "disabled"
+                                   , htmlAttribute <| HAttrs.style "color" "white"
+                                   ] 
+                                   { onPress = Just ForDisabled
+                                   , label = E.el [Font.color <| shiroIro] <| E.text "disabled"
+                                   }
               , Input.button [ alignBottom 
                              , Font.color <| shiroIro
                              ]
@@ -467,9 +502,9 @@ makeTable : Model -> Int -> Int -> Html Msg
 makeTable model width height =
     div []
         [ H.table [] <| 
-            List.map( \y -> tr [ model.campusSetting.height ] <| 
-                List.map( \x -> td [ model.campusSetting.width
-                                   , model.campusSetting.border
+            List.map( \y -> tr [ HAttrs.style "height" "30px" {-model.campusSetting.height-} ] <| 
+                List.map( \x -> td [ HAttrs.style "width" "30px"--model.campusSetting.width
+                                   , HAttrs.style "border" ("solid 1px" ++ " " ++ model.campusSetting.borderColor)--model.campusSetting.border
                                    , HEvents.onClick (ChangeColor y x model.mainPalette)
                                    , HAttrs.style "background-color" (getCampusColor model y x)
                                    ] 
@@ -512,6 +547,8 @@ addColorToPalette : Model -> String -> List String
 addColorToPalette model color =
     List.append [color] model.palette
 
+--setBorderColor : Model -> String -> 
+
 displayPalette : Model -> Html Msg
 displayPalette model =
     div [] <| 
@@ -527,15 +564,15 @@ displayPalette model =
                  ) <| 
                      List.range 1 (List.length model.palette)
 
-isColor : Model -> Bool
-isColor model =
-    case (String.left 1 model.colorValue) of
+isColor : String -> Bool
+isColor exValue =
+    case (String.left 1 exValue) of
         "#" ->
-            not <| 
-                Regex.contains (Maybe.withDefault  Regex.never <| Regex.fromString "[g-z]" ) 
-                               (String.dropLeft 1 model.colorValue)
-                    && String.length model.colorValue == 4
-                        || String.length model.colorValue == 7
+            xor 
+                ( Regex.contains (Maybe.withDefault  Regex.never <| Regex.fromString "[g-z]" ) 
+                                 (String.dropLeft 1 exValue)
+                ) <| 
+                String.length exValue == 4 || String.length exValue == 7
 
         _ ->
             let 
@@ -558,7 +595,7 @@ isColor model =
 
                 isColorName : Bool
                 isColorName =
-                    List.member model.colorValue cssColorNames
+                    List.member exValue cssColorNames
             in
                 isColorName
 
@@ -592,7 +629,7 @@ createCampusButton model =
         Input.button [ Region.description "fuck you"
                      , Background.color (rgb255 84 84 84)
                      ]
-                     { onPress = Just DisabledCreateCampus
+                     { onPress = Just ForDisabled
                      , label = (E.text "Create!")
                      }
 
