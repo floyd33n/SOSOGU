@@ -21,8 +21,13 @@ import Bootstrap.Grid as BGrid
 import Bootstrap.Grid.Col as BCol
 import Bootstrap.Grid.Row as BRow
 import Bootstrap.Form.Input as BInput
+import Json.Decode as Json
 css path =
   H.node "link" [rel "stylesheet", href path] []
+
+onChange : (String -> msg) -> H.Attribute msg
+onChange handler =
+    on "change" (Json.map handler HEvents.targetValue)
 
 --MODEL--
 type alias Model = 
@@ -60,12 +65,15 @@ type Panel
 
 type alias CampusSetting =
     { borderColor : String
+    , borderStyle : String
     }
 
 initCampusSetting : CampusSetting
 initCampusSetting =
     { borderColor = "black"
+    , borderStyle = "solid 1px"
     }
+
 --INIT--
 init : () -> (Model, Cmd Msg)
 init _ =
@@ -100,6 +108,7 @@ type Msg
     | ChangePosition Panel
     | BorderColorValue String
     | UpdateCampusSetting String
+    | Change String
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -196,7 +205,17 @@ update msg model =
             )
 
         UpdateCampusSetting color ->
-            ( { model | campusSetting = { borderColor = model.borderColorValue }
+            ( { model | campusSetting = { borderColor = model.borderColorValue 
+                                        , borderStyle = model.campusSetting.borderStyle  
+                                        }
+              }
+            , Cmd.none
+            )
+
+        Change str ->
+            ( { model | campusSetting = { borderColor = model.campusSetting.borderColor
+                                        , borderStyle = str
+                                        }
               }
             , Cmd.none
             )
@@ -400,7 +419,7 @@ settingPosition model bool  =
                       Input.button [ htmlAttribute <| HAttrs.style "color" "white"
                                    ] 
                                    { onPress = Just (UpdateCampusSetting model.colorValue)
-                                   , label = E.text "Add"
+                                   , label = E.text "Apply"
                                    } 
                   else
                       E.el [htmlAttribute <| HAttrs.style "opacity" "0.6"] <|
@@ -410,6 +429,9 @@ settingPosition model bool  =
                                    { onPress = Just ForDisabled
                                    , label = E.el [Font.color <| shiroIro] <| E.text "disabled"
                                    }
+              , E.el [] <|
+                  html <|
+                      sltedStyle
               , Input.button [ alignBottom 
                              , Font.color <| shiroIro
                              ]
@@ -419,6 +441,23 @@ settingPosition model bool  =
               ]
     else
         E.none
+
+sltedStyle =
+    let
+        handler selectedValue =
+            Change selectedValue
+    in
+        div []
+            [ H.select [ onChange handler ]
+                       [ option [ value "solid 1px" ] [ H.text "solid" ]
+                       , option [ value "none" ] [ H.text "none" ]
+                       , option [ value "double" ] [ H.text "double" ]
+                       , option [ value "groove" ] [ H.text "groove" ]
+                       , option [ value "ridge" ] [ H.text "ridge" ]
+                       , option [ value "dashed 1px" ] [ H.text "dashed" ]
+                       , option [ value "dotted 1px" ] [ H.text "dotted" ]
+                       ]
+            ]
 
 createCampusWindow : Model -> Html Msg
 createCampusWindow model =
@@ -504,7 +543,7 @@ makeTable model width height =
         [ H.table [] <| 
             List.map( \y -> tr [ HAttrs.style "height" "30px" {-model.campusSetting.height-} ] <| 
                 List.map( \x -> td [ HAttrs.style "width" "30px"--model.campusSetting.width
-                                   , HAttrs.style "border" ("solid 1px" ++ " " ++ model.campusSetting.borderColor)--model.campusSetting.border
+                                   , HAttrs.style "border" (model.campusSetting.borderColor ++ " " ++ model.campusSetting.borderStyle)--model.campusSetting.border
                                    , HEvents.onClick (ChangeColor y x model.mainPalette)
                                    , HAttrs.style "background-color" (getCampusColor model y x)
                                    ] 
