@@ -61,13 +61,17 @@ type alias CampusSetting =
     { border : H.Attribute Msg
     , width : H.Attribute Msg
     , height : H.Attribute Msg
+    , tempWidth : String
+    , tempHeight : String
     }
 
 initCampusSetting : CampusSetting
 initCampusSetting =
-    { border = HAttrs.style "border" "solid 1px"
+    { border = HAttrs.style "border" <| "solid" ++ " " ++ "1px" ++ " " ++ "red"
     , width = HAttrs.style "width" "30px"
     , height = HAttrs.style "height" "30px"
+    , tempWidth = "30px"
+    , tempHeight = "30px"
     }
 --INIT--
 init : () -> (Model, Cmd Msg)
@@ -196,6 +200,7 @@ view model =
     div [ HAttrs.style "height" "100%"
         ]
         [ css <| "../style.css"
+--        , createCampusWindow model
         , layout [debugLine False
                  ] <|
             column [ E.width fill, E.height fill, debugLine False]
@@ -212,7 +217,7 @@ view model =
                              ] <| 
                                 E.text "SOSOGU"
                       , row [ alignRight 
-                            , spacing 10
+                            , spacing 5
                             ]
                             [ E.el [] <|
                                 E.image [ htmlAttribute <| HAttrs.style "filter" "invert(100%)"
@@ -220,14 +225,18 @@ view model =
                                         { src = "svg/home.svg"
                                         , description = "Home"
                                         }
-                            , E.el [ Font.color <| rgb255 255 255 255 ] <|
+                            , E.el [ Font.color <| rgb255 255 255 255 
+                                   , Font.size 16 
+                                   ] <|
                                 E.text "Home"
                             , E.el [] <|
                                 E.image [ htmlAttribute <| HAttrs.style "filter" "invert(100%)" ]
                                         { src = "svg/mark-github.svg"
                                         , description = "GitHub"
                                         }
-                            , E.el [ Font.color <| rgb255 255 255 255 ] <|
+                            , E.el [ Font.color <| rgb255 255 255 255 
+                                   , Font.size 16
+                                   ] <|
                                 E.text "GitHub"
                             ]
                       ]
@@ -239,11 +248,12 @@ view model =
                       , palettePosition model (model.palettePosition == Left)
                       , column [ E.width fill
                                , E.height fill
-                               , Background.color <| rgb255 243 243 242
+                               , Background.color <| shironezuIro
                                ] 
                                [ E.text "campus"
-                               , el [ centerX, centerY ] <| html <| makeTable model model.campusSize.width model.campusSize.height
-                               , html <| createCampusWindow model
+                               , el [ centerX, centerY ] <| 
+                                  html <| 
+                                      makeTable model model.campusSize.width model.campusSize.height
                                ]  
                                , palettePosition model (model.palettePosition == Right)
                                , settingPosition model (model.settingPosition == Right)
@@ -279,30 +289,36 @@ palettePosition model bool  =
                     , centerX
                     ] <| 
                         html <|
-                            H.input [onInput ColorValue ] 
+                            H.input [onInput ColorValue 
+                                    , HAttrs.style "height" "14px"
+                                    , HAttrs.style "font-size" "0.7em"] 
                                     [H.text model.colorValue]
                , el [ centerX ] <|
                    if isColor<|model then
-                       Input.button [ Background.color <| rgb255 220 220 220 ] 
+                       Input.button [ htmlAttribute <| HAttrs.style "color" "white"
+                                    ] 
                                     { onPress = Just (AddColorToPalette model.colorValue)
                                     , label = E.text "Add"
                                     } 
                    else
+                       E.el [htmlAttribute <| HAttrs.style "opacity" "0.6"] <|
                        Input.button [ Region.description "disabled"
-                                    , Background.color (rgb255 150 150 150)
+                                    , htmlAttribute <| HAttrs.style "color" "white"
                                     ] 
                                     { onPress = Just DisabledCreateCampus
-                                    , label = E.text "disabled"
+                                    , label = E.el [Font.color <| shiroIro] <| E.text "disabled"
                                     }
-               , el [centerX] <|
-                  html <|
-                      div [ id<|"main_palette"
-                          , HAttrs.style "background-color" model.mainPalette 
-                          ] 
-                          [] 
-               , el [E.height fill, E.width fill] <|
-                  html <| 
-                      displayPalette model
+               , el [ centerX
+                    ] <|
+                        html <|
+                            div [ id<|"main_palette"
+                                , HAttrs.style "background-color" model.mainPalette 
+                                ] 
+                                [] 
+               , E.el [ 
+                      ] <|
+                          --html <|
+                              showSubPalette model
                , Input.button [ alignBottom
                               , Font.color <| shiroIro
                               ]
@@ -312,6 +328,33 @@ palettePosition model bool  =
                ]
     else
         E.none
+
+showSubPalette : Model -> Element Msg
+showSubPalette model =
+    column [ centerX
+           ]
+           [ wrappedRow [spacing 3] <| List.map (\plt -> E.el [] <|
+                                                          html <|
+                                                              div [ HAttrs.style "width" "25px"
+                                                                  , HAttrs.style "height" "25px"
+                                                                  , HAttrs.style "background-color" <| getPaletteColor model (plt-1)
+                                                                  , HAttrs.style "border" "solid 1px black"
+                                                                  ] 
+                                                                  []
+                                                ) <| List.range 1 (List.length model.palette)
+           ]
+
+showPalette : Element Msg
+showPalette =
+    E.el [  
+         ] <|
+        html <|
+            div [ HAttrs.style "width" "25px"
+                , HAttrs.style "height" "25px"
+                , HAttrs.style "background-color" "white"
+                , HAttrs.style "border" "solid 1px black"
+                ] 
+                [] 
 
 settingPosition : Model -> Bool -> Element Msg
 settingPosition model bool  =
@@ -327,6 +370,11 @@ settingPosition model bool  =
                     , paddingXY 0 20
                     ] <| 
                         E.text "setting"
+              , E.el [ Font.size 14
+                     , Font.color <| shiroIro
+                     , centerX
+                     ] <|
+                  E.text "Border Size"
               , Input.button [ alignBottom 
                              , Font.color <| shiroIro
                              ]
@@ -343,8 +391,9 @@ createCampusWindow model =
                     [ BModal.config CloseModal
                         |> BModal.hideOnBackdropClick False
                         |> BModal.small
-                        |> BModal.h5 [HAttrs.style "margin" "auto"] 
-                                     [ H.text "Enter Campus Size" ]
+                        |> BModal.h5 [ HAttrs.style "margin" "auto"
+                                         ] 
+                                         [ H.text "Enter Campus Size" ]
                         |> BModal.body []
                                        [ BGrid.containerFluid []
                                                               [ BGrid.row []
@@ -565,3 +614,5 @@ subscriptions model =
 rouIro = rgb255 43 43 43
 sumiIro = rgb255 89 88 87
 shiroIro = rgb255 255 255 255
+shironeriIro = rgb255 243 243 242
+shironezuIro = rgb255 220 221 221
