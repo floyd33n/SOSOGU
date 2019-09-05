@@ -66,12 +66,20 @@ type Panel
 type alias CampusSetting =
     { borderColor : String
     , borderStyle : String
+    , width : String
+    , tempWidth : String
+    , height : String
+    , tempHeight : String
     }
 
 initCampusSetting : CampusSetting
 initCampusSetting =
     { borderColor = "black"
     , borderStyle = "solid 1px"
+    , width = "10"
+    , tempWidth = ""
+    , height = "10"
+    , tempHeight = ""
     }
 
 --INIT--
@@ -109,6 +117,9 @@ type Msg
     | BorderColorValue String
     | UpdateCampusSetting String
     | Change String
+    | ChangePixelSize String String
+    | SetPixelWidth String
+    | SetPixelHeight String
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -162,9 +173,7 @@ update msg model =
                 )
 
         ForDisabled -> 
-            ( { model | colorValue = model.colorValue }
-            , Cmd.none
-            )
+            ( model, Cmd.none )
 
         ShowModal ->
             ( { model | modalVisibility = BModal.shown }
@@ -207,6 +216,10 @@ update msg model =
         UpdateCampusSetting color ->
             ( { model | campusSetting = { borderColor = model.borderColorValue 
                                         , borderStyle = model.campusSetting.borderStyle  
+                                        , width = model.campusSetting.width
+                                        , tempWidth = model.campusSetting.tempWidth
+                                        , height = model.campusSetting.height
+                                        , tempHeight = model.campusSetting.tempHeight
                                         }
               }
             , Cmd.none
@@ -215,10 +228,55 @@ update msg model =
         Change str ->
             ( { model | campusSetting = { borderColor = model.campusSetting.borderColor
                                         , borderStyle = str
+                                        , width = model.campusSetting.width
+                                        , tempWidth = model.campusSetting.tempWidth
+                                        , height = model.campusSetting.height
+                                        , tempHeight = model.campusSetting.tempHeight
                                         }
               }
             , Cmd.none
             )
+
+        ChangePixelSize width_ height_ ->
+            if (Maybe.withDefault 0 (String.toInt width_)) * (Maybe.withDefault 0 (String.toInt height_)) > 0 then
+                ( { model | campusSetting = { borderColor = model.campusSetting.borderColor
+                                            , borderStyle = model.campusSetting.borderStyle
+                                            , width = width_
+                                            , tempWidth = model.campusSetting.tempWidth
+                                            , height = height_
+                                            , tempHeight = model.campusSetting.tempHeight
+                                            } 
+                  } 
+                , Cmd.none
+                )
+            else
+                (model, Cmd.none)
+
+        SetPixelWidth tempWidth_ ->
+            ( { model | campusSetting = { borderColor = model.campusSetting.borderColor
+                                        , borderStyle = model.campusSetting.borderStyle
+                                        , width = model.campusSetting.width
+                                        , tempWidth = tempWidth_
+                                        , height = model.campusSetting.height
+                                        , tempHeight = model.campusSetting.tempHeight
+                                        }
+              }
+            , Cmd.none
+            )
+        SetPixelHeight tempHeight_ ->
+            ( { model | campusSetting = { borderColor = model.campusSetting.borderColor
+                                        , borderStyle = model.campusSetting.borderStyle
+                                        , width = model.campusSetting.width
+                                        , tempWidth = model.campusSetting.tempWidth
+                                        , height = model.campusSetting.height
+                                        , tempHeight = tempHeight_
+                                        }
+              }
+            , Cmd.none
+            )
+
+
+
 
 --VIEW--
 view : Model -> Html Msg
@@ -400,6 +458,7 @@ settingPosition model bool  =
                     , Border.color <| shiroIro
                     ] <| 
                         E.text "setting"
+              , html <| div [HAttrs.style "width" "30px", HAttrs.style "height" "30px", HAttrs.style "background-color" "red"] []
               , E.el [ Font.size 14
                      , Font.color <| shiroIro
                      , centerX
@@ -409,7 +468,7 @@ settingPosition model bool  =
                      , centerX
                      ] <|
                   html <|
-                      H.input [onInput BorderColorValue 
+                      H.input [ onInput BorderColorValue 
                               , HAttrs.style "height" "14px"
                               , HAttrs.style "font-size" "0.7em"
                               ] 
@@ -432,6 +491,21 @@ settingPosition model bool  =
               , E.el [] <|
                   html <|
                       selectStyle
+              , E.el [] <|
+                  settingWidthHeight model
+              , E.el [] <|
+                  if ((Maybe.withDefault 0 (String.toInt model.campusSetting.tempWidth )) > 2) && ((Maybe.withDefault 0 (String.toInt model.campusSetting.tempHeight)) > 2) then
+                      Input.button [ htmlAttribute <| HAttrs.style "color" "white"
+                                   ]
+                                   { onPress = Just (ChangePixelSize model.campusSetting.tempWidth model.campusSetting.tempHeight)
+                                   , label = E.text "Apply"
+                                   }
+                  else
+                      Input.button [ htmlAttribute <| HAttrs.style "opacity" "0.6" 
+                                   ]
+                                   { onPress = Just (ForDisabled)
+                                   , label = E.text "Disabled"
+                                   }
               , Input.button [ alignBottom 
                              , Font.color <| shiroIro
                              ]
@@ -461,6 +535,34 @@ selectStyle =
                        , tempOption "dotted 1px" "dotted"
                        ]
             ]
+
+settingWidthHeight : Model -> Element Msg
+settingWidthHeight model =
+    E.el [] <|
+        html <|
+            div []
+                [ div [ HAttrs.style "color" "white" 
+                      , HAttrs.style "font-size" "14px"
+                      ]
+                      [ H.text "width: "
+                      , H.input [ HAttrs.style "" ""
+                                , HAttrs.style "width" "30px"
+                                , HAttrs.style "height" "14px"
+                                , onInput SetPixelWidth
+                                ] 
+                                []
+                      ] 
+                , div [ HAttrs.style "color" "white" 
+                      , HAttrs.style "font-size" "14px"
+                      ]
+                      [ H.text "height: "
+                      , H.input [ HAttrs.style "width" "30px" 
+                                , HAttrs.style "height" "14px"
+                                , onInput SetPixelHeight
+                                ]
+                                []
+                      ] 
+                ]
 
 createCampusWindow : Model -> Html Msg
 createCampusWindow model =
@@ -543,9 +645,10 @@ getCampusInt model n =
 makeTable : Model -> Int -> Int -> Html Msg
 makeTable model width height =
     div []
-        [ H.table [] <| 
-            List.map( \y -> tr [ HAttrs.style "height" "30px" {-model.campusSetting.height-} ] <| 
-                List.map( \x -> td [ HAttrs.style "width" "30px"--model.campusSetting.width
+        [ H.table [ HAttrs.style "table-layout" "fixed", HAttrs.style "border-collapse" "collapse"] <| 
+            List.map( \y -> tr [] <| 
+                List.map( \x -> td [ HAttrs.style "width" (model.campusSetting.width ++ "px")
+                                   , HAttrs.style "height" (model.campusSetting.height ++ "px")
                                    , HAttrs.style "border" (model.campusSetting.borderColor ++ " " ++ model.campusSetting.borderStyle)--model.campusSetting.border
                                    , HEvents.onClick (ChangeColor y x model.mainPalette)
                                    , HAttrs.style "background-color" (getCampusColor model y x)
