@@ -431,7 +431,7 @@ settingPosition model bool  =
                                    }
               , E.el [] <|
                   html <|
-                      sltedStyle
+                      selectStyle
               , Input.button [ alignBottom 
                              , Font.color <| shiroIro
                              ]
@@ -442,20 +442,23 @@ settingPosition model bool  =
     else
         E.none
 
-sltedStyle =
+selectStyle =
     let
         handler selectedValue =
             Change selectedValue
+        tempOption : String -> String -> Html Msg
+        tempOption value_ text_ =
+            option [ value value_ ] [ H.text text_ ]
     in
         div []
             [ H.select [ onChange handler ]
-                       [ option [ value "solid 1px" ] [ H.text "solid" ]
-                       , option [ value "none" ] [ H.text "none" ]
-                       , option [ value "double" ] [ H.text "double" ]
-                       , option [ value "groove" ] [ H.text "groove" ]
-                       , option [ value "ridge" ] [ H.text "ridge" ]
-                       , option [ value "dashed 1px" ] [ H.text "dashed" ]
-                       , option [ value "dotted 1px" ] [ H.text "dotted" ]
+                       [ tempOption "solid 1px" "solid"
+                       , tempOption "none" "none"
+                       , tempOption "double" "double"
+                       , tempOption "groove" "groove"
+                       , tempOption "ridge" "ridge"
+                       , tempOption "dashed 1px" "dashed"
+                       , tempOption "dotted 1px" "dotted"
                        ]
             ]
 
