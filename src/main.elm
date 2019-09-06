@@ -353,6 +353,14 @@ changePositionText position =
         Left ->
             "To Right "
 
+panelHr : Element Msg
+panelHr =
+    E.el [ centerX
+         , E.width <| px 80
+         , Border.widthEach { top = 0, right = 0, left = 0, bottom = 1 }
+         , Border.color <| shiroIro
+         ] <|
+         none
 
 palettePosition : Model -> Bool -> Element Msg
 palettePosition model bool  =
@@ -365,46 +373,88 @@ palettePosition model bool  =
                , debugLine False
                ]
                [ el [ Font.color <| rgb255 255 255 255
+                    , Font.size <| 17
                     , centerX
-                    , paddingEach { top = 12, right = 12, left = 12, bottom = 8 }
-                    , Border.widthEach { top = 0, right = 0, left = 0, bottom = 1 }
-                    , Border.color <| shiroIro
+                    , padding 2
                     ] <| 
-                        E.text "palette"
-               , el [ E.width <| px 90
-                    , centerX
-                    ] <| 
-                        html <|
-                            H.input [onInput ColorValue 
-                                    , HAttrs.style "height" "14px"
-                                    , HAttrs.style "font-size" "0.7em"] 
-                                    [H.text model.colorValue]
-               , el [ centerX ] <|
-                   if isColor <| model.colorValue then
-                       Input.button [ htmlAttribute <| HAttrs.style "color" "white"
-                                    ] 
-                                    { onPress = Just (AddColorToPalette model.colorValue)
-                                    , label = E.text "Add"
-                                    } 
-                   else
-                       E.el [htmlAttribute <| HAttrs.style "opacity" "0.6"] <|
-                       Input.button [ Region.description "disabled"
-                                    , htmlAttribute <| HAttrs.style "color" "white"
-                                    ] 
-                                    { onPress = Just ForDisabled
-                                    , label = E.el [Font.color <| shiroIro] <| E.text "disabled"
-                                    }
-               , el [ centerX
-                    ] <|
-                        html <|
-                            div [ id<|"main_palette"
-                                , HAttrs.style "background-color" model.mainPalette 
-                                ] 
-                                [] 
-               , E.el [ 
-                      ] <|
-                          --html <|
-                              showSubPalette model
+                        E.text "Palette"
+               , panelHr
+               {-
+               -}
+               , column [ centerX
+                        , padding 3
+                        , spacing 5
+                        ] 
+                        [ E.el [ Font.color <| shiroIro
+                               , Font.size <| 14
+                               , centerX
+                               ]  <|
+                                   E.text "Add Color"
+                        , panelHr
+                        , E.el [ E.width <| px 90
+                               ] <| 
+                                   html <|
+                                       H.input [ onInput ColorValue 
+                                               , HAttrs.style "width" "80px"
+                                               , HAttrs.style "height" "14px"
+                                               , HAttrs.style "font-size" "0.7em"
+                                               , HAttrs.style "margin" "0 auto"
+                                               ] 
+                                               [H.text model.colorValue]
+                        , el [ centerX ] <|
+                              if isColor <| model.colorValue then
+                                  Input.button [ htmlAttribute <| HAttrs.style "color" "white"
+                                               ] 
+                                               { onPress = Just (AddColorToPalette model.colorValue)
+                                               , label = E.el [ Font.color <| shiroIro
+                                                              , Font.size <| 14
+                                                              ] <|
+                                                                  E.text "Add"
+                                               } 
+                              else
+                                  E.el [ htmlAttribute <| HAttrs.style "opacity" "0.6"] <|
+                                      Input.button [ Region.description "disabled"
+                                                   , htmlAttribute <| HAttrs.style "color" "white"
+                                                   ] 
+                                                   { onPress = Just ForDisabled
+                                                   , label = E.el [ Font.color <| shiroIro
+                                                                  , Font.size <| 14
+                                                                  ] <| 
+                                                                      E.text "disabled"
+                                                    }
+                        ]
+               , column [ centerX
+                        , padding 3
+                        , spacing 5
+                        ]
+                        [ E.el [ Font.color <| shiroIro
+                               , Font.size <| 14
+                               , centerX
+                               ]  <|
+                                   E.text "Main Palette"
+                        , panelHr
+                        , E.el [ centerX
+                               ] <|
+                                   html <|
+                                       div [ HAttrs.style "width" "30px"
+                                           , HAttrs.style "height" "30px"
+                                           , HAttrs.style "border" "solid 1px black"
+                                           , HAttrs.style "background-color" model.mainPalette 
+                                           ] 
+                                           [] 
+                        ]
+               , column [ centerX
+                        , paddingEach { top = 2, right = 0, left = 0, bottom = 2 }
+                        , spacing 5
+                        ]
+                        [ E.el [ Font.color <| shiroIro
+                               , Font.size <| 14
+                               , centerX
+                               ] <|
+                                  E.text "Sub Palette"
+                        , panelHr
+                        , showSubPalette model
+                        ]
                , Input.button [ alignBottom
                               , Font.color <| shiroIro
                               ]
@@ -452,60 +502,109 @@ settingPosition model bool  =
                , Background.color <| rouIro
                ]
                [ el [ Font.color <| rgb255 255 255 255
+                    , Font.size <| 17
                     , centerX
-                    , paddingEach { top = 12, right = 12, left = 12, bottom = 8 }
-                    , Border.widthEach { top = 0, right = 0, left = 0, bottom = 1 }
-                    , Border.color <| shiroIro
+                    , padding 2
                     ] <| 
-                        E.text "setting"
-              , html <| div [HAttrs.style "width" "30px", HAttrs.style "height" "30px", HAttrs.style "background-color" "red"] []
-              , E.el [ Font.size 14
-                     , Font.color <| shiroIro
-                     , centerX
-                     ] <|
-                  E.text "Border Color"
-              , E.el [ E.width <| px 90 
-                     , centerX
-                     ] <|
-                  html <|
-                      H.input [ onInput BorderColorValue 
-                              , HAttrs.style "height" "14px"
-                              , HAttrs.style "font-size" "0.7em"
-                              ] 
-                              [H.text model.colorValue]
-              , el [ centerX ] <|
-                  if isColor<|model.borderColorValue then
-                      Input.button [ htmlAttribute <| HAttrs.style "color" "white"
-                                   ] 
-                                   { onPress = Just (UpdateCampusSetting model.colorValue)
-                                   , label = E.text "Apply"
-                                   } 
-                  else
-                      E.el [htmlAttribute <| HAttrs.style "opacity" "0.6"] <|
-                      Input.button [ Region.description "disabled"
-                                   , htmlAttribute <| HAttrs.style "color" "white"
-                                   ] 
-                                   { onPress = Just ForDisabled
-                                   , label = E.el [Font.color <| shiroIro] <| E.text "disabled"
-                                   }
-              , E.el [] <|
-                  html <|
-                      selectStyle
-              , E.el [] <|
-                  settingWidthHeight model
-              , E.el [] <|
-                  if ((Maybe.withDefault 0 (String.toInt model.campusSetting.tempWidth )) > 2) && ((Maybe.withDefault 0 (String.toInt model.campusSetting.tempHeight)) > 2) then
-                      Input.button [ htmlAttribute <| HAttrs.style "color" "white"
-                                   ]
-                                   { onPress = Just (ChangePixelSize model.campusSetting.tempWidth model.campusSetting.tempHeight)
-                                   , label = E.text "Apply"
-                                   }
-                  else
-                      Input.button [ htmlAttribute <| HAttrs.style "opacity" "0.6" 
-                                   ]
-                                   { onPress = Just (ForDisabled)
-                                   , label = E.text "Disabled"
-                                   }
+                        E.text "Setting"
+              , panelHr
+              -- Border Color --
+              , column [ centerX
+                       , spacing 5
+                       , padding 3
+                       ] 
+                       [ E.el [ Font.size 14
+                              , Font.color <| shiroIro
+                              , centerX
+                              ] <|
+                                  E.text "Border Color"
+                       , panelHr
+                       , E.el [ E.width <| px 90 
+                              ] <|
+                                  html <|
+                                      H.input [ onInput BorderColorValue 
+                                              , HAttrs.style "width" "80px"
+                                              , HAttrs.style "height" "14px"
+                                              , HAttrs.style "font-size" "0.7em"
+                                              , HAttrs.placeholder "black"
+                                              , HAttrs.style "margin" "0 auto"
+                                              ]  
+                                              [ H.text model.campusSetting.borderColor ]
+                       , el [ centerX 
+                            , E.height <| px 15
+                            ] <|
+                                if isColor<|model.borderColorValue then
+                                    Input.button [ htmlAttribute <| HAttrs.style "color" "white"
+                                                 ] 
+                                                 { onPress = Just (UpdateCampusSetting model.colorValue)
+                                                 , label = E.el [ Font.color <| shiroIro
+                                                                , Font.size <| 14
+                                                                ] <|
+                                                                    E.text "Apply"
+                                                 } 
+                                else
+                                    Input.button [ Region.description "disabled"
+                                                 , htmlAttribute <| HAttrs.style "color" "white"
+                                                 , htmlAttribute <| HAttrs.style "opacity" "0.6"
+                                                 ] 
+                                                 { onPress = Just ForDisabled
+                                                 , label = E.el [ Font.color <| shiroIro
+                                                                , Font.size <| 14
+                                                                ] <| 
+                                                                    E.text "disabled"
+                                                 }
+                       ]
+              -- Border Style --
+              , column [ centerX
+                       , padding 3
+                       , spacing 5
+                       ]
+                       [ E.el [ Font.size 14 
+                              , Font.color <| shiroIro
+                              ] <| 
+                          E.text "Border Style"
+                       , panelHr
+                       , E.el [centerX, E.height <| px 14
+                              , Font.size <| 14
+                              ] <|
+                                  html <|
+                                      selectStyle
+                       ]
+              -- Pixel Size --
+              , column [ centerX
+                       , padding 3
+                       , spacing 5
+                       ] 
+                       [ E.el [ Font.size 14
+                              , Font.color <| shiroIro
+                              , centerX
+                              ] <|
+                                  E.text "Pixel Size"
+                       , panelHr
+                       , E.el [] <|
+                            settingWidthHeight model
+                       , E.el [centerX] <|
+                          if ((Maybe.withDefault 0 (String.toInt model.campusSetting.tempWidth )) > 2) && ((Maybe.withDefault 0 (String.toInt model.campusSetting.tempHeight)) > 2) then
+                              Input.button [ htmlAttribute <| HAttrs.style "color" "white"
+                                           ]
+                                           { onPress = Just (ChangePixelSize model.campusSetting.tempWidth model.campusSetting.tempHeight)
+                                           , label = E.el [ Font.color <| shiroIro
+                                                          , Font.size <| 14
+                                                          ] <|
+                                                              E.text "Apply"
+                                           }
+                          else
+                              Input.button [ htmlAttribute <| HAttrs.style "opacity" "0.6" 
+                                           , htmlAttribute <| HAttrs.style "color" "white"
+                                           ]
+                                           { onPress = Just ForDisabled
+                                           , label = E.el [ Font.color <| shiroIro
+                                                          , Font.size <| 14
+                                                          ] <| 
+                                                              E.text "disabled"
+                                           }
+                       ]
+              -- Positon --           
               , Input.button [ alignBottom 
                              , Font.color <| shiroIro
                              ]
@@ -513,6 +612,7 @@ settingPosition model bool  =
                              , label = E.text <| changePositionText model.settingPosition
                              }
               ]
+              
     else
         E.none
 
@@ -524,7 +624,7 @@ selectStyle =
         tempOption value_ text_ =
             option [ value value_ ] [ H.text text_ ]
     in
-        div []
+        div [ HAttrs.style "height" "14px", HAttrs.style "font-size" "14px" ]
             [ H.select [ onChange handler ]
                        [ tempOption "solid 1px" "solid"
                        , tempOption "none" "none"
@@ -544,7 +644,7 @@ settingWidthHeight model =
                 [ div [ HAttrs.style "color" "white" 
                       , HAttrs.style "font-size" "14px"
                       ]
-                      [ H.text "width: "
+                      [ H.text "width : "
                       , H.input [ HAttrs.style "" ""
                                 , HAttrs.style "width" "30px"
                                 , HAttrs.style "height" "14px"
@@ -555,7 +655,7 @@ settingWidthHeight model =
                 , div [ HAttrs.style "color" "white" 
                       , HAttrs.style "font-size" "14px"
                       ]
-                      [ H.text "height: "
+                      [ H.text "height : "
                       , H.input [ HAttrs.style "width" "30px" 
                                 , HAttrs.style "height" "14px"
                                 , onInput SetPixelHeight
@@ -570,21 +670,21 @@ createCampusWindow model =
                     [ BModal.config CloseModal
                         |> BModal.hideOnBackdropClick False
                         |> BModal.small
-                        |> BModal.h5 [ HAttrs.style "margin" "auto"
-                                         ] 
-                                         [ H.text "Enter Campus Size" ]
+                        |> BModal.h5 [ HAttrs.style "margin" "0 auto"
+                                     ] 
+                                     [ H.text "Enter Campus Size" ]
                         |> BModal.body []
                                        [ BGrid.containerFluid []
                                                               [ BGrid.row []
-                                                                          [ BGrid.col [ BCol.xs5 ]
-                                                                                      [ div [HAttrs.style "margin" "5px"] 
+                                                                          [ BGrid.col [ BCol.xs6 ]
+                                                                                      [ div [HAttrs.style "margin" "0 auto"] 
                                                                                             [H.text "Width"]
                                                                                       , BInput.number [ BInput.small
                                                                                                       , BInput.onInput SetCampusWidth
                                                                                                       ]
                                                                                       ] 
                                                                           , BGrid.col [ BCol.xs5 ]
-                                                                                      [ div [HAttrs.style "margin" "5px"] 
+                                                                                      [ div [HAttrs.style "margin" "0 auto"] 
                                                                                             [H.text "Height"]
                                                                           , BInput.number [ BInput.small
                                                                                           , BInput.onInput SetCampusHeight
