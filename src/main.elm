@@ -1,4 +1,4 @@
-module Main exposing(main)
+port module Main exposing (..)
 import Browser
 import Html as H exposing (..)
 import Html.Attributes as HAttrs exposing(..)
@@ -120,6 +120,7 @@ type Msg
     | ChangePixelSize String String
     | SetPixelWidth String
     | SetPixelHeight String
+    | CreateCampusPicture
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -275,6 +276,9 @@ update msg model =
             , Cmd.none
             )
 
+        CreateCampusPicture ->
+            ( model, toH2c ())
+
 
 
 
@@ -334,7 +338,10 @@ view model =
                                , E.height fill
                                , Background.color <| shironezuIro
                                ] 
-                               [ E.text "campus"
+                               [ E.text "campus"{-
+                               , html <| H.button [onClick CreateCampusPicture] [H.text "aaa"]
+                               , html <| H.a [ href "", id "dl", HAttrs.download "ss.png" ] [H.text "bbb"]
+                               -}
                                , el [ centerX, centerY ] <| 
                                   html <| 
                                       makeTable model model.campusSize.width model.campusSize.height
@@ -744,8 +751,8 @@ getCampusInt model n =
 
 makeTable : Model -> Int -> Int -> Html Msg
 makeTable model width height =
-    div []
-        [ H.table [ HAttrs.style "table-layout" "fixed", HAttrs.style "border-collapse" "collapse"] <| 
+    div [ id "campus" ]
+        [ H.table [ HAttrs.style "table-layout" "fixed", HAttrs.style "border-collapse" "collapse"{-, HAttrs.style "border" "solid 1px black"-}] <| 
             List.map( \y -> tr [] <| 
                 List.map( \x -> td [ HAttrs.style "width" (model.campusSetting.width ++ "px")
                                    , HAttrs.style "height" (model.campusSetting.height ++ "px")
@@ -892,6 +899,8 @@ subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.none
 
+port toH2c : () -> Cmd msg
+--port fromH2c -> 
 --ColorSet--
 rouIro = rgb255 43 43 43
 sumiIro = rgb255 89 88 87
