@@ -8,13 +8,20 @@
 </head>
 
 <body>
-  <div id="elm">
-   <script>
-      var app = Elm.Main.init({
-        node: document.getElementById("elm")
+  <div id="elm"></div>
+  <script src="html2canvas.min.js"></script>
+  <script>
+    var app = Elm.Main.init({
+      node: document.getElementById("elm")
       });
-    </script>
-  </div>
+
+    app.ports.toH2c.subscribe(function () {
+      html2canvas(document.getElementById("campus")).then(canvas => {
+          var imgData = canvas.toDataURL();
+          document.getElementById("dl").href = imgData;
+        });
+    });
+  </script>
 </body>
 
 </html>
