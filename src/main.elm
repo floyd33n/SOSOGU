@@ -3,6 +3,7 @@ import Browser
 import Html as H exposing (..)
 import Html.Attributes as HAttrs exposing(..)
 import Html.Events as HEvents exposing (..)
+import Html.Lazy as HLazy exposing (..)
 import Array exposing (..)
 import Debug exposing (..)
 import Svg exposing (..)
@@ -21,13 +22,13 @@ import Bootstrap.Grid as BGrid
 import Bootstrap.Grid.Col as BCol
 import Bootstrap.Grid.Row as BRow
 import Bootstrap.Form.Input as BInput
-import Json.Decode as Json
+import Json.Decode as JD
 css path =
   H.node "link" [rel "stylesheet", href path] []
 
 onChange : (String -> msg) -> H.Attribute msg
 onChange handler =
-    on "change" (Json.map handler HEvents.targetValue)
+    on "change" (JD.map handler HEvents.targetValue)
 
 --MODEL--
 type alias Model = 
@@ -43,6 +44,7 @@ type alias Model =
     , openingModalWindow : BModal.Visibility
     , campusSetting : CampusSetting
     , borderColorValue : String
+    , toolsSetting : ToolsSetting
     }
 
 type alias TempCampusSize =
@@ -82,6 +84,14 @@ initCampusSetting =
     , tempHeight = ""
     }
 
+type alias ToolsSetting =
+    { isDisplayDlButton : Bool
+    }
+
+initToolsSetting : ToolsSetting
+initToolsSetting =
+    { isDisplayDlButton = False
+    }
 --INIT--
 init : () -> (Model, Cmd Msg)
 init _ =
@@ -97,6 +107,7 @@ init _ =
       , openingModalWindow = BModal.shown
       , campusSetting = initCampusSetting
       , borderColorValue = ""
+      , toolsSetting = initToolsSetting
       } 
     , Cmd.none
     )
@@ -121,6 +132,7 @@ type Msg
     | SetPixelWidth String
     | SetPixelHeight String
     | CreateCampusPicture
+    | DisplayDlButton
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -279,6 +291,13 @@ update msg model =
         CreateCampusPicture ->
             ( model, toH2c ())
 
+        DisplayDlButton ->
+            ( { model | toolsSetting = { isDisplayDlButton = True
+                                       } 
+              }
+            , toH2c ()
+            )
+
 
 
 
@@ -364,12 +383,37 @@ toolsPanel model bool =
             [ E.el [ Font.color <| shiroIro
                    , Font.size <| 17
                    , padding 2
+                   , centerY
                    ] <|
                       E.text "Tools"
+            , Input.button [ htmlAttribute <| HAttrs.style "color" "white"
+                           ] 
+                           { onPress = Just DisplayDlButton
+                           , label = E.el [ Font.color <| shiroIro
+                                          , Font.size <| 14
+                                          ] <|
+                                              E.text "Gen"
+                           } 
+            , dlButton model
             ]
     else
         E.none
 
+dlButton : Model -> Element Msg
+dlButton model =
+    if model.toolsSetting.isDisplayDlButton then
+        E.el [] <|
+            html <|
+                H.a [ href ""
+                    , id "dl"
+                    , target "_blank"
+                    , HAttrs.style "color" "white"
+                    , HAttrs.style "font-size" "14px"
+                    ]
+                    [ H.text "DL"
+                    ]
+    else
+        E.none
 changePositionText : Position -> String
 changePositionText position =
     case position of
