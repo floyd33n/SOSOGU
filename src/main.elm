@@ -402,24 +402,34 @@ toolsPanel model bool =
 dlButton : Model -> Element Msg
 dlButton model =
     if model.toolsSetting.isDisplayDlButton then
-        E.el [] <|
-            html <|
-                H.button [ href ""
-                    , id "dl"
-                    , target "_blank"
-                    , HAttrs.style "color" "white"
-                    , HAttrs.style "font-size" "14px"
-                    ]
-                    [ H.text "DL"
-                    ]
+        Input.button [ htmlAttribute <| HAttrs.style "color" "white"
+                     ]
+                     { onPress = Just ForDisabled
+                     , label = E.el [
+                                    ] <|
+                        html <|
+                            H.a [ href ""
+                                , id "dl" 
+                                , HAttrs.style "color" "white"
+                                , HAttrs.style "font-size" "14px"
+                                ] 
+                                [ H.text "DL" ]
+                     }
     else
-        E.el [ htmlAttribute <| HAttrs.style "opacity" "0.6" ] <|
-            html <|
-                H.a [ HAttrs.style "color" "white"
-                    , HAttrs.style "font-size" "14px"
-                    , HAttrs.style "text-decoration" "line-through"
-                    ]  
-                    [ H.text "DL" ]
+        Input.button [ htmlAttribute <| HAttrs.style "color" "white"
+                     ]
+                     { onPress = Just ForDisabled
+                     , label = E.el [
+                                    ] <|
+                        html <|
+                            H.s [ href ""
+                                , id "dl" 
+                                , HAttrs.style "color" "white"
+                                , HAttrs.style "font-size" "14px"
+                                , HAttrs.style "opacity" "0.6"
+                                ] 
+                                [ H.text "DL" ]
+                     }
 
 changePositionText : Position -> String
 changePositionText position =
