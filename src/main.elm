@@ -338,19 +338,37 @@ view model =
                                , E.height fill
                                , Background.color <| shironezuIro
                                ] 
-                               [ E.text "campus"{-
-                               , html <| H.button [onClick CreateCampusPicture] [H.text "aaa"]
+                               [ toolsPanel model True
+                               {-, html <| H.button [onClick CreateCampusPicture] [H.text "aaa"]
                                , html <| H.a [ href "", id "dl", HAttrs.download "ss.png" ] [H.text "bbb"]
                                -}
                                , el [ centerX, centerY ] <| 
                                   html <| 
                                       makeTable model model.campusSize.width model.campusSize.height
                                ]  
-                               , palettePosition model (model.palettePosition == Right)
-                               , settingPosition model (model.settingPosition == Right)
+                      , palettePosition model (model.palettePosition == Right)
+                      , settingPosition model (model.settingPosition == Right)
                       ]
                 ]
         ]
+
+toolsPanel : Model -> Bool -> Element Msg
+toolsPanel model bool =
+    if bool then
+        row [ E.width fill
+            , E.height <| px 36
+            , Border.width 1
+            , Border.color <| shiroIro
+            , Background.color <| rouIro
+            ]
+            [ E.el [ Font.color <| shiroIro
+                   , Font.size <| 17
+                   , padding 2
+                   ] <|
+                      E.text "Tools"
+            ]
+    else
+        E.none
 
 changePositionText : Position -> String
 changePositionText position =
