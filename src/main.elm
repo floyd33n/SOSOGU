@@ -386,50 +386,46 @@ toolsPanel model bool =
                    , centerY
                    ] <|
                       E.text "Tools"
-            , Input.button [ htmlAttribute <| HAttrs.style "color" "white"
-                           ] 
-                           { onPress = Just DisplayDlButton
-                           , label = E.el [ Font.color <| shiroIro
-                                          , Font.size <| 14
-                                          ] <|
-                                              E.text "Gen"
-                           } 
-            , dlButton model
+            , gendlButton "Gen"model
+            , gendlButton "DL" model
             ]
     else
         E.none
 
-dlButton : Model -> Element Msg
-dlButton model =
-    if model.toolsSetting.isDisplayDlButton then
-        Input.button [ htmlAttribute <| HAttrs.style "color" "white"
-                     ]
-                     { onPress = Just ForDisabled
-                     , label = E.el [
-                                    ] <|
-                        html <|
-                            H.a [ href ""
-                                , id "dl" 
-                                , HAttrs.style "color" "white"
-                                , HAttrs.style "font-size" "14px"
-                                ] 
-                                [ H.text "DL" ]
-                     }
-    else
-        Input.button [ htmlAttribute <| HAttrs.style "color" "white"
-                     ]
-                     { onPress = Just ForDisabled
-                     , label = E.el [
-                                    ] <|
-                        html <|
-                            H.s [ href ""
-                                , id "dl" 
-                                , HAttrs.style "color" "white"
-                                , HAttrs.style "font-size" "14px"
-                                , HAttrs.style "opacity" "0.6"
-                                ] 
-                                [ H.text "DL" ]
-                     }
+gendlButton : String -> Model -> Element Msg
+gendlButton bText model =
+    let
+        tempButton : Maybe Msg -> String -> String -> String -> H.Attribute Msg -> H.Attribute Msg -> Element Msg
+        tempButton msg oValue dValue id_ attr1 attr2 =
+            Input.button []
+                         { onPress = msg
+                         , label = E.el [] <|
+                           html <|
+                                H.a [ HAttrs.style "color" "white"
+                                    , HAttrs.style "font-size" "14px"
+                                    , HAttrs.style "opacity" oValue
+                                    , HAttrs.style "text-decoration" dValue
+                                    , id id_
+                                    , attr1
+                                    , attr2
+                                    ]
+                                   [ H.text bText ]
+                          }
+    in
+        case bText of
+            "Gen" ->
+                if (List.length model.campus > 1) then
+                    tempButton (Just DisplayDlButton) "1" "none" "" (HAttrs.style "" "") (hidden False)
+                else
+                    tempButton Nothing "0.6" "line-through" "" (HAttrs.style "" "") (hidden False)
+            "DL" ->
+                if model.toolsSetting.isDisplayDlButton then
+                    tempButton Nothing "1" "none" "dl" (href "") (target "_blank")
+                else
+                    tempButton Nothing "0.6" "line-through" "" (HAttrs.style "" "") (hidden False)
+            _ ->
+                E.none
+
 
 changePositionText : Position -> String
 changePositionText position =
@@ -543,6 +539,9 @@ palettePosition model bool  =
                         ]
                , Input.button [ alignBottom
                               , Font.color <| shiroIro
+                              , Font.size <| 14
+                              , centerX
+                              , padding 3
                               ]
                               { onPress = Just <| ChangePosition PalettePanel
                               , label = E.text <| changePositionText model.palettePosition
@@ -586,6 +585,13 @@ settingPosition model bool  =
                , Border.width 1
                , Border.color <| shiroIro
                , Background.color <| rouIro
+               , Font.family [
+                  Font.external
+                      { name = "Roboto"
+                      , url = "" --"Inter-Medium.woff"
+                      }
+                      , Font.sansSerif
+                      ]
                ]
                [ el [ Font.color <| rgb255 255 255 255
                     , Font.size <| 17
@@ -693,6 +699,9 @@ settingPosition model bool  =
               -- Positon --           
               , Input.button [ alignBottom 
                              , Font.color <| shiroIro
+                             , Font.size <| 14
+                             , centerX
+                             , padding 3
                              ]
                              { onPress = Just <| ChangePosition SettingPanel
                              , label = E.text <| changePositionText model.settingPosition
@@ -735,6 +744,7 @@ settingWidthHeight model =
                                 , HAttrs.style "width" "30px"
                                 , HAttrs.style "height" "14px"
                                 , onInput SetPixelWidth
+                                , placeholder model.campusSetting.width
                                 ] 
                                 []
                       ] 
@@ -745,6 +755,7 @@ settingWidthHeight model =
                       , H.input [ HAttrs.style "width" "30px" 
                                 , HAttrs.style "height" "14px"
                                 , onInput SetPixelHeight
+                                , placeholder model.campusSetting.height
                                 ]
                                 []
                       ] 
