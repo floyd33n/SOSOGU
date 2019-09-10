@@ -719,6 +719,7 @@ settingPosition model bool  =
                                         , H.input [ type_ "radio"
                                                   , value ""
                                                   , name "settingpanel"
+                                                  , checked True
                                                   ]
                                                   []
                                         , H.text "L"
@@ -743,6 +744,7 @@ settingPosition model bool  =
                                         , H.input [ type_ "radio"
                                                   , value ""
                                                   , name "b"
+                                                  , checked True
                                                   ]
                                                   []
                                         ] 
