@@ -26,8 +26,8 @@ import Json.Decode as JD
 css path =
   H.node "link" [rel "stylesheet", href path] []
 
-onChange : (String -> msg) -> H.Attribute msg
-onChange handler =
+onChangeH : (String -> msg) -> H.Attribute msg
+onChangeH handler =
     on "change" (JD.map handler HEvents.targetValue)
 
 --MODEL--
@@ -696,6 +696,58 @@ settingPosition model bool  =
                                                               E.text "disabled"
                                            }
                        ]
+              --panel position--
+              , column [ centerX
+                       , padding 3
+                       , spacing 5
+                       ]
+                       [ E.el [ Font.size 14
+                              , Font.color <| shiroIro
+                              , centerX
+                              ] <|
+                                  E.text "Position"
+                       , panelHr
+                       , E.el [centerX] <|
+                          html <|
+                              div []
+                                  [ div [ HAttrs.style "color" "white"
+                                        , HAttrs.style "font-size" "14px"
+                                        ]
+                                        [ H.text "Setting"
+                                        , br [] []
+                                        , H.text "R"
+                                        , H.input [ type_ "radio"
+                                                  , value ""
+                                                  , name "settingpanel"
+                                                  ]
+                                                  []
+                                        , H.text "L"
+                                        , H.input [ type_ "radio"
+                                                  , value ""
+                                                  , name "settingpanel"
+                                                  ]
+                                                  []
+                                        ]
+                                  , div [ HAttrs.style "color" "white"
+                                        , HAttrs.style "font-size" "14px"
+                                        ] 
+                                        [ H.text "Palette"
+                                        , br [] []
+                                        , H.text "R"
+                                        , H.input [ type_ "radio"
+                                                  , value ""
+                                                  , name "b"
+                                                  ]
+                                                  []
+                                        , H.text "L"
+                                        , H.input [ type_ "radio"
+                                                  , value ""
+                                                  , name "b"
+                                                  ]
+                                                  []
+                                        ] 
+                                  ]
+                       ]
               -- Positon --           
               , Input.button [ alignBottom 
                              , Font.color <| shiroIro
@@ -720,7 +772,7 @@ selectStyle =
             option [ value value_ ] [ H.text text_ ]
     in
         div [ HAttrs.style "height" "14px", HAttrs.style "font-size" "14px" ]
-            [ H.select [ onChange handler ]
+            [ H.select [ onChangeH handler ]
                        [ tempOption "solid 1px" "solid"
                        , tempOption "none" "none"
                        , tempOption "double" "double"
