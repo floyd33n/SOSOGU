@@ -390,9 +390,6 @@ view model =
                                , Background.color <| shironezuIro
                                ] 
                                [ toolsPanel model True
-                               {-, html <| H.button [onClick CreateCampusPicture] [H.text "aaa"]
-                               , html <| H.a [ href "", id "dl", HAttrs.download "ss.png" ] [H.text "bbb"]
-                               -}
                                , el [] <| 
                                   html <|
                                       createCampus model model.campusSize.width model.campusSize.height
@@ -866,6 +863,7 @@ settingWidthHeight model =
                                 , HAttrs.style "height" "14px"
                                 , onInput SetPixelWidth
                                 , placeholder model.setting.width
+                                , HAttrs.style "font-size" "100%"
                                 ] 
                                 [ H.text model.tempSetting.width ]
                       ] 
