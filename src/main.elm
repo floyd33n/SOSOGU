@@ -531,6 +531,7 @@ palettePosition model bool  =
                         , panelHr
                         , showSubPalette model
                         ]
+               {-
                , Input.button [ alignBottom
                               , Font.color <| shiroIro
                               , Font.size <| 14
@@ -540,6 +541,7 @@ palettePosition model bool  =
                               { onPress = Just <| ChangePosition PalettePanel
                               , label = E.text <| changePositionText model.palettePosition
                               } 
+               -}
                ]
     else
         E.none
@@ -615,7 +617,7 @@ settingPosition model bool  =
                                               , HAttrs.placeholder "black"
                                               , HAttrs.style "margin" "0 auto"
                                               ]  
-                                              [ H.text model.setting.borderColor ]
+                                              [ H.text model.tempSetting.borderColor ]
                        {-
                        , el [ centerX 
                             , E.height <| px 15
@@ -768,7 +770,8 @@ settingPosition model bool  =
                                                   ] <| 
                                                       E.text "disabled"
                                    }
-              -- Positon --           
+              {-
+              -- Positon --     
               , Input.button [ alignBottom 
                              , Font.color <| shiroIro
                              , Font.size <| 14
@@ -778,6 +781,7 @@ settingPosition model bool  =
                              { onPress = Just <| ChangePosition SettingPanel
                              , label = E.text <| changePositionText model.settingPosition
                              }
+              -}
               ]
               
     else
@@ -818,7 +822,7 @@ settingWidthHeight model =
                                 , onInput SetPixelWidth
                                 , placeholder model.setting.width
                                 ] 
-                                []
+                                [ H.text model.tempSetting.width ]
                       ] 
                 , div [ HAttrs.style "color" "white" 
                       , HAttrs.style "font-size" "14px"
