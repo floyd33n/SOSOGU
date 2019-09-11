@@ -1,6 +1,6 @@
-# Poured Masu
+# SOSOGU
 Pixel Art Editor.
-## How to Build
-```elm
+## Build
+```
 elm make src/main.elm --output=main.js
 ```
