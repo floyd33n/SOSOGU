@@ -707,8 +707,37 @@ settingPosition model bool  =
                               ] <|
                                   E.text "Pixel Size"
                        , panelHr
-                       , E.el [] <|
-                            settingWidthHeight model
+                       , column [ spacing 3 ] 
+                                [ html <|
+                                    div [ HAttrs.style "color" "white" 
+                                        , HAttrs.style "font-size" "14px"
+                                        , HAttrs.style "padding" "3px"
+                                        ]
+                                        [ H.text "width : "
+                                        , H.input [ HAttrs.style "" ""
+                                                  , HAttrs.style "width" "30px"
+                                                  , HAttrs.style "height" "14px"
+                                                  , HAttrs.style "font-size" "95%"
+                                                  , placeholder model.setting.width
+                                                  , onInput SetPixelWidth
+                                                  ]  
+                                                  [ H.text model.tempSetting.width ]
+                                        ]
+                                , html <|
+                                    div [ HAttrs.style "color" "white" 
+                                        , HAttrs.style "font-size" "14px"
+                                        , HAttrs.style "padding" "3px"
+                                        ]
+                                        [ H.text "height : "
+                                        , H.input [ HAttrs.style "width" "30px" 
+                                                  , HAttrs.style "height" "14px"
+                                                  , HAttrs.style "font-size" "95%"
+                                                  , placeholder model.setting.height
+                                                  , onInput SetPixelHeight
+                                                  ]
+                                                  []
+                                        ]
+                                ]
                        {-
                        , E.el [centerX] <|
                           if ((Maybe.withDefault 0 (String.toInt model.setting.width )) > 2) && ((Maybe.withDefault 0 (String.toInt model.setting.height)) > 2) then
@@ -875,6 +904,7 @@ settingWidthHeight model =
                                 , HAttrs.style "height" "14px"
                                 , onInput SetPixelHeight
                                 , placeholder model.setting.height
+                                , HAttrs.style "font-size" "100%"
                                 ]
                                 []
                       ] 
