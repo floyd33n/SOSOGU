@@ -38,8 +38,8 @@ type alias Model =
     , mainPalette : String
     , campusSize : CampusSize
     , tempCampusSize : TempCampusSize
-    , palettePosition : Position
-    , settingPosition : Position
+    --, palettePosition : Position
+    --, settingPosition : Position
     , modalVisibility : BModal.Visibility
     , openingModalWindow : BModal.Visibility
     , setting : Setting
@@ -71,14 +71,25 @@ type alias Setting =
     , borderStyle : String
     , width : String
     , height : String
+    , panelPosition : PanelPosition
     }
 
+type alias PanelPosition =
+    { settingPanel : Position
+    , palettePanel : Position
+    }
+initPanelPosition : PanelPosition
+initPanelPosition =
+    { settingPanel = Left
+    , palettePanel = Right
+    }
 initSetting : Setting
 initSetting =
     { borderColor = "black"
     , borderStyle = "solid 1px"
     , width = "10"
     , height = "10"
+    , panelPosition = initPanelPosition
     }
 
 type alias ToolsSetting =
@@ -98,8 +109,8 @@ init _ =
       , mainPalette = "white"
       , campusSize = (CampusSize 0 0)
       , tempCampusSize = (TempCampusSize "" "")
-      , palettePosition = Right
-      , settingPosition = Left
+      --, palettePosition = Right
+      --, settingPosition = Left
       , modalVisibility = BModal.hidden
       , openingModalWindow = BModal.shown
       , setting = initSetting
@@ -122,15 +133,15 @@ type Msg
     | ForDisabled
     | ShowModal
     | CloseModal
-    | ChangePosition Panel
+    --| ChangePosition Panel
     | BorderColorValue String
-    | UpdateCampusSetting String
     | Change String
     | ChangePixelSize String String
     | SetPixelWidth String
     | SetPixelHeight String
     | CreateCampusPicture
     | DisplayDlButton
+    | ChangePanelPosition Panel Position
     | ApplySetting
 
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -196,7 +207,7 @@ update msg model =
             ( { model | openingModalWindow = BModal.hidden }
             , Cmd.none
             )
-
+{-
         ChangePosition panel ->
             case panel of
                 PalettePanel ->
@@ -219,18 +230,14 @@ update msg model =
                       }
                     , Cmd.none
                     )
-        
+-}       
         BorderColorValue value ->
-            ( { model | borderColorValue = (String.toLower value) }
-            , Cmd.none
-            )
-
-        UpdateCampusSetting color ->
-            ( { model | tempSetting = { borderColor = model.borderColorValue 
-                                        , borderStyle = model.setting.borderStyle  
-                                        , width = model.setting.width
-                                        , height = model.setting.height
-                                        }
+            ( { model | tempSetting = { borderColor = (String.toLower value)
+                                      , borderStyle = model.tempSetting.borderStyle
+                                      , width = model.tempSetting.width
+                                      , height = model.tempSetting.height
+                                      , panelPosition = model.tempSetting.panelPosition
+                                      }
               }
             , Cmd.none
             )
@@ -240,6 +247,7 @@ update msg model =
                                         , borderStyle = str
                                         , width = model.tempSetting.width
                                         , height = model.tempSetting.height
+                                        , panelPosition = model.tempSetting.panelPosition
                                         }
               }
             , Cmd.none
@@ -251,6 +259,7 @@ update msg model =
                                             , borderStyle = model.tempSetting.borderStyle
                                             , width = width_
                                             , height = height_
+                                            , panelPosition = model.tempSetting.panelPosition
                                             } 
                   } 
                 , Cmd.none
@@ -263,6 +272,7 @@ update msg model =
                                         , borderStyle = model.tempSetting.borderStyle
                                         , width = tempWidth_
                                         , height = model.tempSetting.height
+                                        , panelPosition = model.tempSetting.panelPosition
                                         }
               }
             , Cmd.none
@@ -272,6 +282,7 @@ update msg model =
                                         , borderStyle = model.tempSetting.borderStyle
                                         , width = model.tempSetting.width
                                         , height = tempHeight_
+                                        , panelPosition = model.tempSetting.panelPosition
                                         }
               }
             , Cmd.none
@@ -286,6 +297,61 @@ update msg model =
               }
             , toH2c ()
             )
+        
+        ChangePanelPosition panel_ position_ ->
+            case panel_ of
+                SettingPanel ->
+                    case position_ of
+                        Right ->
+                            ( { model | tempSetting = { borderColor = model.tempSetting.borderColor
+                                                      , borderStyle = model.tempSetting.borderStyle
+                                                      , width = model.tempSetting.width
+                                                      , height = model.tempSetting.height
+                                                      , panelPosition =  { settingPanel = Right
+                                                                         , palettePanel = model.tempSetting.panelPosition.palettePanel
+                                                                         }
+                                                      } 
+                              } 
+                            , Cmd.none
+                            )
+                        Left ->
+                            ( { model | tempSetting = { borderColor = model.tempSetting.borderColor
+                                                      , borderStyle = model.tempSetting.borderStyle
+                                                      , width = model.tempSetting.width
+                                                      , height = model.tempSetting.height
+                                                      , panelPosition =  { settingPanel = Left
+                                                                         , palettePanel = model.tempSetting.panelPosition.palettePanel
+                                                                         }
+                                                      } 
+                              } 
+                            , Cmd.none
+                            )
+                PalettePanel ->
+                    case position_ of
+                        Right ->
+                            ( { model | tempSetting = { borderColor = model.tempSetting.borderColor
+                                                      , borderStyle = model.tempSetting.borderStyle
+                                                      , width = model.tempSetting.width
+                                                      , height = model.tempSetting.height
+                                                      , panelPosition =  { settingPanel = model.tempSetting.panelPosition.settingPanel
+                                                                         , palettePanel = Right
+                                                                         }
+                                                      } 
+                              } 
+                            , Cmd.none
+                            )
+                        Left ->
+                            ( { model | tempSetting = { borderColor = model.tempSetting.borderColor
+                                                      , borderStyle = model.tempSetting.borderStyle
+                                                      , width = model.tempSetting.width
+                                                      , height = model.tempSetting.height
+                                                      , panelPosition =  { settingPanel = model.tempSetting.panelPosition.settingPanel
+                                                                         , palettePanel = Left
+                                                                         }
+                                                      } 
+                              } 
+                            , Cmd.none
+                            )
 
         ApplySetting ->
             ( { model | setting = model.tempSetting }
@@ -345,8 +411,8 @@ view model =
                       , E.height fill
                       , debugLine False 
                       ] 
-                      [ settingPosition model (model.settingPosition == Left)
-                      , palettePosition model (model.palettePosition == Left)
+                      [ settingPosition model (model.setting.panelPosition.settingPanel == Left)
+                      , palettePosition model (model.setting.panelPosition.palettePanel == Left)
                       , column [ E.width fill
                                , E.height fill
                                , Background.color <| shironezuIro
@@ -359,8 +425,8 @@ view model =
                                   html <| 
                                       makeTable model model.campusSize.width model.campusSize.height
                                ]  
-                      , palettePosition model (model.palettePosition == Right)
-                      , settingPosition model (model.settingPosition == Right)
+                      , palettePosition model (model.setting.panelPosition.palettePanel == Right)
+                      , settingPosition model (model.setting.panelPosition.settingPanel == Right)
                       ]
                 ]
         ]
@@ -610,7 +676,7 @@ settingPosition model bool  =
                        , E.el [ E.width <| px 90 
                               ] <|
                                   html <|
-                                      H.input [ onInput BorderColorValue 
+                                      H.input [ onInput BorderColorValue
                                               , HAttrs.style "width" "80px"
                                               , HAttrs.style "height" "14px"
                                               , HAttrs.style "font-size" "0.7em"
@@ -717,15 +783,18 @@ settingPosition model bool  =
                                         , br [] []
                                         , H.text "R"
                                         , H.input [ type_ "radio"
-                                                  , value ""
+                                                  , value "right"
                                                   , name "settingpanel"
-                                                  , checked True
+                                                  , onClick <| ChangePanelPosition SettingPanel Right
+                                                  , checked <| model.tempSetting.panelPosition.settingPanel == Right
                                                   ]
                                                   []
                                         , H.text "L"
                                         , H.input [ type_ "radio"
                                                   , value ""
                                                   , name "settingpanel"
+                                                  , onClick <| ChangePanelPosition SettingPanel Left
+                                                  , checked <| model.tempSetting.panelPosition.settingPanel == Left
                                                   ]
                                                   []
                                         ]
@@ -737,14 +806,17 @@ settingPosition model bool  =
                                         , H.text "R"
                                         , H.input [ type_ "radio"
                                                   , value ""
-                                                  , name "b"
+                                                  , name "paletteposition"
+                                                  , onClick <| ChangePanelPosition PalettePanel Right
+                                                  , checked <| model.tempSetting.panelPosition.palettePanel == Right
                                                   ]
                                                   []
                                         , H.text "L"
                                         , H.input [ type_ "radio"
                                                   , value ""
-                                                  , name "b"
-                                                  , checked True
+                                                  , name "paletteposition"
+                                                  , onClick <| ChangePanelPosition PalettePanel Left
+                                                  , checked <| model.tempSetting.panelPosition.palettePanel == Left
                                                   ]
                                                   []
                                         ] 
@@ -754,7 +826,7 @@ settingPosition model bool  =
                   if True then
                       Input.button [ htmlAttribute <| HAttrs.style "color" "white"
                                    ]
-                                   { onPress = Nothing
+                                   { onPress = Just ApplySetting
                                    , label = E.el [ Font.color <| shiroIro
                                                   , Font.size <| 14
                                                   ] <|
