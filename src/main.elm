@@ -361,7 +361,7 @@ view model =
                             [ E.el [] <|
                                 E.image [ htmlAttribute <| HAttrs.style "filter" "invert(100%)"
                                         ]
-                                        { src = "svg/home.svg"
+                                        { src = "file/home.svg"
                                         , description = "Home"
                                         }
                             , E.el [ Font.color <| rgb255 255 255 255 
@@ -370,7 +370,7 @@ view model =
                                 E.text "Home"
                             , E.el [] <|
                                 E.image [ htmlAttribute <| HAttrs.style "filter" "invert(100%)" ]
-                                        { src = "svg/mark-github.svg"
+                                        { src = "file/mark-github.svg"
                                         , description = "GitHub"
                                         }
                             , E.el [ Font.color <| rgb255 255 255 255 
