@@ -38,8 +38,6 @@ type alias Model =
     , mainPalette : String
     , campusSize : CampusSize
     , tempCampusSize : TempCampusSize
-    --, palettePosition : Position
-    --, settingPosition : Position
     , modalVisibility : BModal.Visibility
     , openingModalWindow : BModal.Visibility
     , setting : Setting
@@ -109,8 +107,6 @@ init _ =
       , mainPalette = "white"
       , campusSize = (CampusSize 0 0)
       , tempCampusSize = (TempCampusSize "" "")
-      --, palettePosition = Right
-      --, settingPosition = Left
       , modalVisibility = BModal.hidden
       , openingModalWindow = BModal.shown
       , setting = initSetting
@@ -133,7 +129,6 @@ type Msg
     | ForDisabled
     | ShowModal
     | CloseModal
-    --| ChangePosition Panel
     | BorderColorValue String
     | Change String
     | ChangePixelSize String String
@@ -207,30 +202,7 @@ update msg model =
             ( { model | openingModalWindow = BModal.hidden }
             , Cmd.none
             )
-{-
-        ChangePosition panel ->
-            case panel of
-                PalettePanel ->
-                    ( { model | palettePosition =
-                                    case model.palettePosition of
-                                        Right ->
-                                            Left
-                                        Left ->
-                                            Right
-                      }
-                    , Cmd.none
-                    )
-                SettingPanel ->    
-                    ( { model | settingPosition =
-                                    case model.settingPosition of
-                                        Right ->
-                                            Left
-                                        Left ->
-                                            Right
-                      }
-                    , Cmd.none
-                    )
--}       
+
         BorderColorValue value ->
             ( { model | tempSetting = { borderColor = (String.toLower value)
                                       , borderStyle = model.tempSetting.borderStyle
@@ -421,9 +393,10 @@ view model =
                                {-, html <| H.button [onClick CreateCampusPicture] [H.text "aaa"]
                                , html <| H.a [ href "", id "dl", HAttrs.download "ss.png" ] [H.text "bbb"]
                                -}
-                               , el [ centerX, centerY ] <| 
-                                  html <| 
-                                      makeTable model model.campusSize.width model.campusSize.height
+                               , el [] <| 
+                                  html <|
+                                      createCampus model model.campusSize.width model.campusSize.height
+                                      --makeTable model model.campusSize.width model.campusSize.height
                                ]  
                       , palettePosition model (model.setting.panelPosition.palettePanel == Right)
                       , settingPosition model (model.setting.panelPosition.settingPanel == Right)
@@ -986,10 +959,10 @@ getCampusInt model n =
         |> Array.get n
         |> Maybe.withDefault (0, "")
         |> Tuple.first
-
+{-
 makeTable : Model -> Int -> Int -> Html Msg
 makeTable model width height =
-    div [ id "campus" ]
+    div [ id "campu" ]
         [ H.table [ HAttrs.style "table-layout" "fixed", HAttrs.style "border-collapse" "collapse"{-, HAttrs.style "border" "solid 1px black"-}] <| 
             List.map( \y -> tr [] <| 
                 List.map( \x -> td [ HAttrs.style "width" (model.setting.width ++ "px")
@@ -1004,7 +977,44 @@ makeTable model width height =
                     ) <| 
                         List.range 0 (height-1) 
         ]
+-}
+createCampus : Model -> Int -> Int -> Html Msg
+createCampus model width height =
+    div [ id "campus" ]
+        [ div [] <|
+            List.map (\y -> div [] <|
+                List.map ( \x -> div [HAttrs.style "float" "left"
+                                     ] <|
+                    [ div [ HAttrs.style "width" (model.setting.width ++ "px")
+                          , HAttrs.style "height" (model.setting.height ++ "px")
+                          , HAttrs.style "border" (model.setting.borderColor ++ " " ++ model.setting.borderStyle)
+                          , HAttrs.style "background-color" (getCampusColor model y x)
+                          , HAttrs.style "margin" "-1px"
+                          , HEvents.onClick (ChangeColor y x model.mainPalette)
+                          ]
+                          []
+                    ]
+                         ) <|
+                            List.range 0 (width-1)
+                      ) <|
+                          List.range 0 (height-1)
+        ]
 
+{-
+    div []
+        [ div [] <|
+            List.map( \y -> div [] <|
+                List.map( \x -> div [ HAttrs.style "border" "solid 1px black"
+                                    , HAttrs.style "width" "30px"
+                                    , HAttrs.style "height" "30px"
+                                    ]
+                                    []
+                        ) <|
+                            List.range 0 5
+                    ) <|
+                        List.range 0 5
+        ]
+-}
 updateCampus : Model -> Int -> Int -> String -> List(List (Int, String))
 updateCampus model x y color =
     List.append
