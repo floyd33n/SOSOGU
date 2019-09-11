@@ -1,52 +1,12 @@
 @import url("https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css");
-
-.masu {
-  float: left;
-  height: 100%;
-  width: 100%;
-  border: 0px solid #000;
-  padding: 0px;
+@font-face {
+  font-family: 'InterMedium';
+  src: url('file/Inter-Medium.woff') format('woff');
+}
+body {
+  font-family: InterMedium;
 }
 
-table {
-  border-collapse: collapse;
-}
-
-td {
-  height: 30px;
-  width: 30px;
-  padding: 0px;
-  border: 1px solid #000;
-}
-
-tr {
-  padding: 0px;
-}
-
-#palette_square {
-  height: 30px;
-  width: 30px;
-  padding 0px;
-  border: 1px solid #000;
-  margin-bottom: -1px;
-}
-
-#main_palette {
-    height: 35px;
-    width: 35px;
-    padding: 0px;
-    border: 1px solid #000;
-    margin-bottom: -1px;
-}
-
-#setting-bak {
-  background-color: white;
-}
-
-#palette-bak {
-  background-color: white;
-}
-
-#campus-bak {
-  background-color: white;
+th {
+  display: none;
 }
