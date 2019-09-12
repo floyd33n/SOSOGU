@@ -694,7 +694,28 @@ settingPosition model bool  =
                               , Font.size <| 14
                               ] <|
                                   html <|
-                                      selectStyle
+                                      let
+                                          handler selectedValue =
+                                              Change selectedValue
+
+                                          option_ : String -> String -> Html Msg
+                                          option_ value_ text_ =
+                                              option [ value value_ ] 
+                                                     [ H.text text_ ]
+                                      in
+                                          div [ HAttrs.style "height" "14px"
+                                              , HAttrs.style "font-size" "14px" 
+                                              ]
+                                              [ H.select [ onChangeH handler ]
+                                                         [ option_ "solid 1px" "solid"
+                                                         , option_ "none" "none"
+                                                         , option_ "double" "double"
+                                                         , option_ "groove" "groove"
+                                                         , option_ "ridge" "ridge"
+                                                         , option_ "dashed 1px" "dashed"
+                                                         , option_ "dotted 1px" "dotted"
+                                                         ]
+                                              ]
                        ]
               -- Pixel Size --
               , column [ centerX
@@ -858,25 +879,6 @@ settingPosition model bool  =
     else
         E.none
 
-selectStyle =
-    let
-        handler selectedValue =
-            Change selectedValue
-        tempOption : String -> String -> Html Msg
-        tempOption value_ text_ =
-            option [ value value_ ] [ H.text text_ ]
-    in
-        div [ HAttrs.style "height" "14px", HAttrs.style "font-size" "14px" ]
-            [ H.select [ onChangeH handler ]
-                       [ tempOption "solid 1px" "solid"
-                       , tempOption "none" "none"
-                       , tempOption "double" "double"
-                       , tempOption "groove" "groove"
-                       , tempOption "ridge" "ridge"
-                       , tempOption "dashed 1px" "dashed"
-                       , tempOption "dotted 1px" "dotted"
-                       ]
-            ]
 
 settingWidthHeight : Model -> Element Msg
 settingWidthHeight model =
