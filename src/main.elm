@@ -843,7 +843,7 @@ settingPosition model bool  =
                                   ]
                        ]
               , E.el [centerX] <|
-                  if True then
+                  if isCorrectSetting model.tempSetting then
                       Input.button [ htmlAttribute <| HAttrs.style "color" "white"
                                    ]
                                    { onPress = Just ApplySetting
@@ -879,6 +879,9 @@ settingPosition model bool  =
     else
         E.none
 
+isCorrectSetting : Setting -> Bool
+isCorrectSetting setting =
+    (isColor setting.borderColor) && (isCorrectWidthHeight setting.width setting.height)
 
 settingWidthHeight : Model -> Element Msg
 settingWidthHeight model =
@@ -943,9 +946,9 @@ createCampusWindow model =
                                        ]
                         |> BModal.footer [HAttrs.style "margin" "auto"]
                                          [ BBtn.button [ BBtn.outlinePrimary
-                                                       , if not <| (isCorrectWidthHeight model) then BBtn.primary else BBtn.secondary
+                                                       , if (isCorrectWidthHeight model.tempCampusSize.width model.tempCampusSize.height) then BBtn.primary else BBtn.secondary
                                                        , BBtn.attrs [ onClick CreateCampus ]
-                                                       , BBtn.disabled <| isCorrectWidthHeight model
+                                                       , BBtn.disabled <| (not (isCorrectWidthHeight model.tempCampusSize.width model.tempCampusSize.height))
                                                        ]
                                                        [ H.text "Create!" ]
                                          ]                                             
@@ -1130,27 +1133,27 @@ isColor exValue =
                 isColorName
 
         
-isCorrectWidthHeight : Model -> Bool
-isCorrectWidthHeight model =
+isCorrectWidthHeight : String -> String -> Bool
+isCorrectWidthHeight width_ height_ =
     let
         chkInt : Bool
         chkInt =
-            Maybe.withDefault 0 (String.toInt model.tempCampusSize.width)
+            Maybe.withDefault 0 (String.toInt width_)
             * 
-            Maybe.withDefault 0 (String.toInt model.tempCampusSize.height) 
+            Maybe.withDefault 0 (String.toInt height_) 
             > 0
 
         chkLength : Bool
         chkLength =
-            Maybe.withDefault 0 (String.toInt model.tempCampusSize.width) <= 64 
+            Maybe.withDefault 0 (String.toInt width_) <= 64 
             && 
-            Maybe.withDefault 0 (String.toInt model.tempCampusSize.height) <= 64
+            Maybe.withDefault 0 (String.toInt height_) <= 64
     in
-        not <| 
+        --not <| 
             chkInt && chkLength
-
+{-
 createCampusButton model =
-    if (isCorrectWidthHeight model) then
+    if (isCorrectWidthHeight model.tempCampusSize.width model.tempCampusSize.height) then
         Input.button [] 
                      { onPress = Just CreateCampus
                      , label = (E.text "Create!")
@@ -1162,7 +1165,7 @@ createCampusButton model =
                      { onPress = Just ForDisabled
                      , label = (E.text "Create!")
                      }
-
+-}
 
 --MAIN--
 main =
