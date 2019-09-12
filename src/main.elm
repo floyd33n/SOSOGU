@@ -911,8 +911,6 @@ displayIncorrectSetting setting =
                                 Err "greater than 64"
                             else
                                 Ok ""
-
-                    
             in
                 (errColor <| setting.borderColor) :: (ExResult.merge <| errWidthHeight setting.width) :: (ExResult.merge <| errWidthHeight setting.height) :: []
     in
@@ -921,7 +919,7 @@ displayIncorrectSetting setting =
                                [ H.text (Maybe.withDefault "" (List.head (List.drop (n-1) errsList))) ]
                     ) <|
                         List.range 1 ((List.length errsList))
-
+{-
 settingWidthHeight : Model -> Element Msg
 settingWidthHeight model =
     E.el [] <|
@@ -953,7 +951,7 @@ settingWidthHeight model =
                                 []
                       ] 
                 ]
-
+-}
 createCampusWindow : Model -> Html Msg
 createCampusWindow model =
     BGrid.container [] 
