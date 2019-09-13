@@ -102,7 +102,7 @@ initToolsSetting =
 init : () -> (Model, Cmd Msg)
 init _ =
     ( { campus =  [[(0, "")]]
-      , colorValue = ""
+      , colorValue = "white"
       , palette = []
       , mainPalette = "white"
       , campusSize = (CampusSize 0 0)
@@ -333,19 +333,6 @@ update msg model =
             else
                 (model, Cmd.none)
 
-errSetting : Setting -> Result String Setting
-errSetting setting =
-    case String.toInt setting.width of
-        Nothing ->
-            Err "is not"
-
-        Just width_ ->
-            if width_ < 0 then
-                Err "less than 0"
-            else
-                Ok setting
-
-
 --VIEW--
 view : Model -> Html Msg
 view model =
@@ -547,6 +534,14 @@ palettePosition model bool  =
                                                                   ] <| 
                                                                       E.text "disabled"
                                                     }
+                        , el [] <|
+                            html <|
+                                div []
+                                    [ H.text <| if isColor model.colorValue then
+                                                    ""
+                                                else
+                                                    "isnt color"
+                                    ]
                         ]
                , column [ centerX
                         , padding 3
