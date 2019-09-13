@@ -401,7 +401,6 @@ view model =
                                , el [] <| 
                                   html <|
                                       createCampus model model.campusSize.width model.campusSize.height
-                                      --makeTable model model.campusSize.width model.campusSize.height
                                ]  
                       , palettePosition model (model.setting.panelPosition.palettePanel == Right)
                       , settingPosition model (model.setting.panelPosition.settingPanel == Right)
@@ -499,8 +498,6 @@ palettePosition model bool  =
                     ] <| 
                         E.text "Palette"
                , panelHr
-               {-
-               -}
                , column [ centerX
                         , padding 3
                         , spacing 5
@@ -610,17 +607,6 @@ palettePosition model bool  =
                                                 List.range 1 (List.length model.palette)
                                 ]
                         ]
-               {-
-               , Input.button [ alignBottom
-                              , Font.color <| shiroIro
-                              , Font.size <| 14
-                              , centerX
-                              , padding 3
-                              ]
-                              { onPress = Just <| ChangePosition PalettePanel
-                              , label = E.text <| changePositionText model.palettePosition
-                              } 
-               -}
                ]
     else
         E.none
@@ -633,13 +619,6 @@ settingPosition model bool  =
                , Border.width 1
                , Border.color <| shiroIro
                , Background.color <| rouIro
-               , Font.family [
-                  Font.external
-                      { name = "Roboto"
-                      , url = "" --"Inter-Medium.woff"
-                      }
-                      , Font.sansSerif
-                      ]
                ]
                [ el [ Font.color <| rgb255 255 255 255
                     , Font.size <| 17
@@ -670,31 +649,6 @@ settingPosition model bool  =
                                               , HAttrs.style "margin" "0 auto"
                                               ]  
                                               [ H.text model.tempSetting.borderColor ]
-                       {-
-                       , el [ centerX 
-                            , E.height <| px 15
-                            ] <|
-                                if isColor<|model.borderColorValue then
-                                    Input.button [ htmlAttribute <| HAttrs.style "color" "white"
-                                                 ] 
-                                                 { onPress = Just (UpdateCampusSetting model.colorValue)
-                                                 , label = E.el [ Font.color <| shiroIro
-                                                                , Font.size <| 14
-                                                                ] <|
-                                                                    E.text "Apply"
-                                                 } 
-                                else
-                                    Input.button [ Region.description "disabled"
-                                                 , htmlAttribute <| HAttrs.style "color" "white"
-                                                 , htmlAttribute <| HAttrs.style "opacity" "0.6"
-                                                 ] 
-                                                 { onPress = Just ForDisabled
-                                                 , label = E.el [ Font.color <| shiroIro
-                                                                , Font.size <| 14
-                                                                ] <| 
-                                                                    E.text "disabled"
-                                                 }
-                       -}
                        ]
               -- Border Style --
               , column [ centerX
@@ -775,28 +729,6 @@ settingPosition model bool  =
                                                   []
                                         ]
                                 ]
-                       {-
-                       , E.el [centerX] <|
-                          if ((Maybe.withDefault 0 (String.toInt model.setting.width )) > 2) && ((Maybe.withDefault 0 (String.toInt model.setting.height)) > 2) then
-                              Input.button [ htmlAttribute <| HAttrs.style "color" "white"
-                                           ]
-                                           { onPress = Just (ChangePixelSize model.tempSetting.width model.tempSetting.height)
-                                           , label = E.el [ Font.color <| shiroIro
-                                                          , Font.size <| 14
-                                                          ] <|
-                                                              E.text "Apply"
-                                           }
-                          else
-                              Input.button [ htmlAttribute <| HAttrs.style "opacity" "0.6" 
-                                           , htmlAttribute <| HAttrs.style "color" "white"
-                                           ]
-                                           { onPress = Just ForDisabled
-                                           , label = E.el [ Font.color <| shiroIro
-                                                          , Font.size <| 14
-                                                          ] <| 
-                                                              E.text "disabled"
-                                           }
-                       -}
                        ]
               --panel position--
               , column [ centerX
@@ -880,18 +812,6 @@ settingPosition model bool  =
                                    }
               , html <|
                   displayIncorrectSetting model.tempSetting
-              {-
-              -- Positon --     
-              , Input.button [ alignBottom 
-                             , Font.color <| shiroIro
-                             , Font.size <| 14
-                             , centerX
-                             , padding 3
-                             ]
-                             { onPress = Just <| ChangePosition SettingPanel
-                             , label = E.text <| changePositionText model.settingPosition
-                             }
-              -}
               ]
               
     else
@@ -942,39 +862,7 @@ displayIncorrectSetting setting =
                                ]
                     ) <|
                         List.range 1 <| List.length errsList
-{-
-settingWidthHeight : Model -> Element Msg
-settingWidthHeight model =
-    E.el [] <|
-        html <|
-            div []
-                [ div [ HAttrs.style "color" "white" 
-                      , HAttrs.style "font-size" "14px"
-                      ]
-                      [ H.text "width : "
-                      , H.input [ HAttrs.style "" ""
-                                , HAttrs.style "width" "30px"
-                                , HAttrs.style "height" "14px"
-                                , onInput SetPixelWidth
-                                , placeholder model.setting.width
-                                , HAttrs.style "font-size" "100%"
-                                ] 
-                                [ H.text model.tempSetting.width ]
-                      ] 
-                , div [ HAttrs.style "color" "white" 
-                      , HAttrs.style "font-size" "14px"
-                      ]
-                      [ H.text "height : "
-                      , H.input [ HAttrs.style "width" "30px" 
-                                , HAttrs.style "height" "14px"
-                                , onInput SetPixelHeight
-                                , placeholder model.setting.height
-                                , HAttrs.style "font-size" "100%"
-                                ]
-                                []
-                      ] 
-                ]
--}
+
 createCampusWindow : Model -> Html Msg
 createCampusWindow model =
     BGrid.container [] 
@@ -1052,25 +940,7 @@ getCampusInt model n =
         |> Array.get n
         |> Maybe.withDefault (0, "")
         |> Tuple.first
-{-
-makeTable : Model -> Int -> Int -> Html Msg
-makeTable model width height =
-    div [ id "campu" ]
-        [ H.table [ HAttrs.style "table-layout" "fixed", HAttrs.style "border-collapse" "collapse"{-, HAttrs.style "border" "solid 1px black"-}] <| 
-            List.map( \y -> tr [] <| 
-                List.map( \x -> td [ HAttrs.style "width" (model.setting.width ++ "px")
-                                   , HAttrs.style "height" (model.setting.height ++ "px")
-                                   , HAttrs.style "border" (model.setting.borderColor ++ " " ++ model.setting.borderStyle)--model.setting.border
-                                   , HEvents.onClick (ChangeColor y x model.mainPalette)
-                                   , HAttrs.style "background-color" (getCampusColor model y x)
-                                   ] 
-                                   [] 
-                        ) <| 
-                            List.range 0 (width-1)
-                    ) <| 
-                        List.range 0 (height-1) 
-        ]
--}
+
 createCampus : Model -> Int -> Int -> Html Msg
 createCampus model width height =
     div [ id "campus" ]
@@ -1094,21 +964,6 @@ createCampus model width height =
                           List.range 0 (height-1)
         ]
 
-{-
-    div []
-        [ div [] <|
-            List.map( \y -> div [] <|
-                List.map( \x -> div [ HAttrs.style "border" "solid 1px black"
-                                    , HAttrs.style "width" "30px"
-                                    , HAttrs.style "height" "30px"
-                                    ]
-                                    []
-                        ) <|
-                            List.range 0 5
-                    ) <|
-                        List.range 0 5
-        ]
--}
 updateCampus : Model -> Int -> Int -> String -> List(List (Int, String))
 updateCampus model x y color =
     List.append
@@ -1140,8 +995,6 @@ updateCampus model x y color =
 addColorToPalette : Model -> String -> List String
 addColorToPalette model color =
     List.append [color] model.palette
-
---setBorderColor : Model -> String -> 
 
 displayPalette : Model -> Html Msg
 displayPalette model =
@@ -1210,23 +1063,7 @@ isCorrectWidthHeight width_ height_ =
             && 
             Maybe.withDefault 0 (String.toInt height_) <= 64
     in
-        --not <| 
             chkInt && chkLength
-{-
-createCampusButton model =
-    if (isCorrectWidthHeight model.tempCampusSize.width model.tempCampusSize.height) then
-        Input.button [] 
-                     { onPress = Just CreateCampus
-                     , label = (E.text "Create!")
-                     }
-    else
-        Input.button [ Region.description "fuck you"
-                     , Background.color (rgb255 84 84 84)
-                     ]
-                     { onPress = Just ForDisabled
-                     , label = (E.text "Create!")
-                     }
--}
 
 --MAIN--
 main =
