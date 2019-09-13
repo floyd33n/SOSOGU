@@ -326,11 +326,24 @@ update msg model =
                             )
 
         ApplySetting ->
-            ( { model | setting = model.tempSetting }
-            , Cmd.none
-            )
+            if isCorrectSetting model.tempSetting then
+                ( { model | setting = model.tempSetting }
+                , Cmd.none
+                )
+            else
+                (model, Cmd.none)
 
+errSetting : Setting -> Result String Setting
+errSetting setting =
+    case String.toInt setting.width of
+        Nothing ->
+            Err "is not"
 
+        Just width_ ->
+            if width_ < 0 then
+                Err "less than 0"
+            else
+                Ok setting
 
 
 --VIEW--
@@ -912,13 +925,20 @@ displayIncorrectSetting setting =
                             else
                                 Ok ""
             in
-                (errColor <| setting.borderColor) :: (ExResult.merge <| errWidthHeight setting.width) :: (ExResult.merge <| errWidthHeight setting.height) :: []
+                (errColor <| setting.borderColor) 
+                    :: (ExResult.merge <| errWidthHeight setting.width) 
+                        :: (ExResult.merge <| errWidthHeight setting.height) 
+                            :: []
     in
         div [] <|
             List.map(\n -> div []
-                               [ H.text (Maybe.withDefault "" (List.head (List.drop (n-1) errsList))) ]
+                               [ H.text <|
+                                    Maybe.withDefault "" <|
+                                        List.head <|
+                                            List.drop (n-1) errsList
+                               ]
                     ) <|
-                        List.range 1 ((List.length errsList))
+                        List.range 1 <| List.length errsList
 {-
 settingWidthHeight : Model -> Element Msg
 settingWidthHeight model =
