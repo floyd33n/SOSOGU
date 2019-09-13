@@ -518,10 +518,19 @@ palettePosition model bool  =
                                   Input.button [ htmlAttribute <| HAttrs.style "color" "white"
                                                ] 
                                                { onPress = Just (AddColorToPalette model.colorValue)
-                                               , label = E.el [ Font.color <| shiroIro
-                                                              , Font.size <| 14
-                                                              ] <|
-                                                                  E.text "Add"
+                                               , label = row []
+                                                             [ E.el [ Font.color <| shiroIro
+                                                                    , Font.size <| 14
+                                                                    ] <|
+                                                                        E.text "Add "
+                                                             , html <|
+                                                                div [ HAttrs.style "width" "14px"
+                                                                    , HAttrs.style "height" "14px"
+                                                                    , HAttrs.style "background-color" model.colorValue
+                                                                    ]
+                                                                    []
+                                                             ] 
+
                                                } 
                               else
                                   E.el [ htmlAttribute <| HAttrs.style "opacity" "0.6"] <|
@@ -540,7 +549,10 @@ palettePosition model bool  =
                                     [ H.text <| if isColor model.colorValue then
                                                     ""
                                                 else
-                                                    "isnt color"
+                                                    if String.isEmpty model.colorValue then
+                                                        "is empty"
+                                                    else
+                                                        "isnt color"
                                     ]
                         ]
                , column [ centerX
