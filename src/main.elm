@@ -593,7 +593,22 @@ palettePosition model bool  =
                                ] <|
                                   E.text "Sub Palette"
                         , panelHr
-                        , showSubPalette model
+                        , column [ centerX
+                                ]
+                                [ wrappedRow [ spacing 3 ] <|
+                                    List.map (\plt -> E.el [] <|
+                                                          html <|
+                                                              div [ HAttrs.style "width" "25px"
+                                                                  , HAttrs.style "height" "25px"
+                                                                  , HAttrs.style "background-color" <| getPaletteColor model (plt-1)
+                                                                  , HAttrs.style "border" "solid 1px black"
+                                                                  , onClick (SetMainPalette (plt-1))
+                                                                  , onDoubleClick (DeleteSubPalette plt)
+                                                                  ]  
+                                                                  []
+                                             ) <|
+                                                List.range 1 (List.length model.palette)
+                                ]
                         ]
                {-
                , Input.button [ alignBottom
@@ -609,35 +624,6 @@ palettePosition model bool  =
                ]
     else
         E.none
-
-showSubPalette : Model -> Element Msg
-showSubPalette model =
-    column [ centerX
-           ]
-           [ wrappedRow [spacing 3] <| List.map (\plt -> E.el [] <|
-                                                          html <|
-                                                              div [ HAttrs.style "width" "25px"
-                                                                  , HAttrs.style "height" "25px"
-                                                                  , HAttrs.style "background-color" <| getPaletteColor model (plt-1)
-                                                                  , HAttrs.style "border" "solid 1px black"
-                                                                  , onClick (SetMainPalette (plt-1))
-                                                                  , onDoubleClick (DeleteSubPalette (plt))
-                                                                  ] 
-                                                                  []
-                                                ) <| List.range 1 (List.length model.palette)
-           ]
-
-showPalette : Element Msg
-showPalette =
-    E.el [  
-         ] <|
-        html <|
-            div [ HAttrs.style "width" "25px"
-                , HAttrs.style "height" "25px"
-                , HAttrs.style "background-color" "white"
-                , HAttrs.style "border" "solid 1px black"
-                ] 
-                [] 
 
 settingPosition : Model -> Bool -> Element Msg
 settingPosition model bool  =
