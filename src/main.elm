@@ -123,6 +123,7 @@ type Msg
     | ColorValue String
     | AddColorToPalette String
     | SetMainPalette Int
+    | DeleteSubPalette Int
     | SetCampusWidth String
     | SetCampusHeight String
     | CreateCampus
@@ -163,7 +164,14 @@ update msg model =
             ( { model | mainPalette = getPaletteColor model n }
             , Cmd.none
             )
-        
+       
+        DeleteSubPalette n ->
+            ( { model | palette = List.append (List.take (n-1) model.palette) (List.drop n model.palette) 
+                      , mainPalette = "white"
+              }
+            , Cmd.none
+            )
+
         SetCampusWidth width ->
             ( { model | tempCampusSize = { width = width, height = model.tempCampusSize.height } }
             , Cmd.none
@@ -613,6 +621,7 @@ showSubPalette model =
                                                                   , HAttrs.style "background-color" <| getPaletteColor model (plt-1)
                                                                   , HAttrs.style "border" "solid 1px black"
                                                                   , onClick (SetMainPalette (plt-1))
+                                                                  , onDoubleClick (DeleteSubPalette (plt))
                                                                   ] 
                                                                   []
                                                 ) <| List.range 1 (List.length model.palette)
