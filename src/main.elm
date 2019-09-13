@@ -612,6 +612,7 @@ showSubPalette model =
                                                                   , HAttrs.style "height" "25px"
                                                                   , HAttrs.style "background-color" <| getPaletteColor model (plt-1)
                                                                   , HAttrs.style "border" "solid 1px black"
+                                                                  , onClick (SetMainPalette (plt-1))
                                                                   ] 
                                                                   []
                                                 ) <| List.range 1 (List.length model.palette)
