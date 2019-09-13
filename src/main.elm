@@ -1088,6 +1088,7 @@ createCampus model width height =
                           , HAttrs.style "background-color" (getCampusColor model y x)
                           , HAttrs.style "margin" "-1px"
                           , HEvents.onClick (ChangeColor y x model.mainPalette)
+                          , HEvents.onDoubleClick (ChangeColor y x "white")
                           ]
                           []
                     ]
