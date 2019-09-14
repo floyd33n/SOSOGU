@@ -398,33 +398,9 @@ view model =
                                , Background.color <| shironezuIro
                                ] 
                                [ toolsPanel model True
-                               , el [] <| 
+                               , el [centerX] <| 
                                   html <|
-                                      {-
-                                      div [ HAttrs.style "border" "1px solid blue"
-                                          , HAttrs.style "width" "100px"
-                                          , HAttrs.style "height" "100px"
-                                          , HAttrs.style "background-color" "red"
-                                          , id "campus"
-                                          , HAttrs.style "margin" "0 auto"
-                                          ]
-                                          [ div [ HAttrs.style "border" "1px solid black"
-                                                , HAttrs.style "width" "20px"
-                                                , HAttrs.style "height" "20px"
-                                                , HAttrs.style "background-color" "white"
-                                                , HAttrs.style "margin" "0"
-                                                ]
-                                                []
-                                          , div [ HAttrs.style "border" "1px solid black"
-                                                , HAttrs.style "width" "20px"
-                                                , HAttrs.style "height" "20px"
-                                                , HAttrs.style "background-color" "white"
-                                                , HAttrs.style "margin" "0"
-                                                ]
-                                                []
-                                          ]
-                                          -}
-                                         createCampus model model.campusSize.width model.campusSize.height 
+                                      createCampus model model.campusSize.width model.campusSize.height
                                ]  
                       , palettePosition model (model.setting.panelPosition.palettePanel == Right)
                       , settingPosition model (model.setting.panelPosition.settingPanel == Right)
@@ -542,6 +518,19 @@ palettePosition model bool  =
                                                , HAttrs.style "margin" "0 auto"
                                                ] 
                                                [H.text model.colorValue]
+                        , el [centerX] <|
+                            html <|
+                                div [ HAttrs.style "color" "#e2041b" 
+                                    , HAttrs.style "font-size" "13px"
+                                    ]
+                                    [ H.text <| if isColor model.colorValue then
+                                                    ""
+                                                else
+                                                    if String.isEmpty model.colorValue then
+                                                        "Is Empty"
+                                                    else
+                                                        "Isn't Color"
+                                    ]
                         , el [ centerX ] <|
                               if isColor <| model.colorValue then
                                   Input.button [ htmlAttribute <| HAttrs.style "color" "white"
@@ -572,17 +561,6 @@ palettePosition model bool  =
                                                                   ] <| 
                                                                       E.text "disabled"
                                                     }
-                        , el [] <|
-                            html <|
-                                div []
-                                    [ H.text <| if isColor model.colorValue then
-                                                    ""
-                                                else
-                                                    if String.isEmpty model.colorValue then
-                                                        "is empty"
-                                                    else
-                                                        "isnt color"
-                                    ]
                         ]
                , column [ centerX
                         , padding 3
@@ -673,6 +651,19 @@ settingPosition model bool  =
                                               , HAttrs.style "margin" "0 auto"
                                               ]  
                                               [ H.text model.tempSetting.borderColor ]
+                       , el [centerX] <|
+                           html <|
+                               div [ HAttrs.style "color" "#e2041b" 
+                                   , HAttrs.style "font-size" "13px"
+                                   ]
+                                   [ H.text <| if isColor model.tempSetting.borderColor then
+                                                   ""
+                                               else
+                                                   if String.isEmpty model.tempSetting.borderColor then
+                                                       "Is Empty"
+                                                   else
+                                                       "Isn't Color"
+                                   ]
                        ]
               -- Border Style --
               , column [ centerX
@@ -722,7 +713,22 @@ settingPosition model bool  =
                               ] <|
                                   E.text "Pixel Size"
                        , panelHr
-                       , column [ spacing 3 ] 
+                       , column [ spacing 3 ] <|
+                            let
+                                pixelSizeErr : String -> String
+                                pixelSizeErr value_ =
+                                   case String.toInt value_ of
+                                       Nothing ->
+                                           if String.isEmpty value_ then
+                                               "Is empty"
+                                           else
+                                               "Isn't Integer"
+                                       Just n ->
+                                           if n <= 0 then
+                                               "Is 0 or less"
+                                           else
+                                               ""
+                            in
                                 [ html <|
                                     div [ HAttrs.style "color" "white" 
                                         , HAttrs.style "font-size" "14px"
@@ -737,6 +743,10 @@ settingPosition model bool  =
                                                   , onInput SetPixelWidth
                                                   ]  
                                                   [ H.text model.tempSetting.width ]
+                                        , div [ HAttrs.style "color" "#e2041b"
+                                              , HAttrs.style "font-size" "13px"
+                                              ] 
+                                              [ H.text <| pixelSizeErr model.tempSetting.width ]
                                         ]
                                 , html <|
                                     div [ HAttrs.style "color" "white" 
@@ -751,6 +761,10 @@ settingPosition model bool  =
                                                   , onInput SetPixelHeight
                                                   ]
                                                   []
+                                        , div [ HAttrs.style "color" "#e2041b"
+                                              , HAttrs.style "font-size" "13px"
+                                              ] 
+                                              [ H.text <| pixelSizeErr model.tempSetting.height ]
                                         ]
                                 ]
                        ]
