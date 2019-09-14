@@ -356,7 +356,7 @@ view model =
                       , E.height <| px 50
                       , Background.color <| rouIro
                       , paddingXY 15 0
-                      , Border.width 1
+                      , Border.widthEach { top = 1, right = 1, left = 1, bottom = 0 }
                       , Border.color <| rgb255 255 255 255
                       ]
                       [ E.el [alignLeft
