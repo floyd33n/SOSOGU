@@ -7815,8 +7815,8 @@ var author$project$Main$debugLine = function (bool) {
 		_Debug_todo(
 			'Main',
 			{
-				start: {line: 909, column: 17},
-				end: {line: 909, column: 27}
+				start: {line: 952, column: 17},
+				end: {line: 952, column: 27}
 			})) : mdgriffith$elm_ui$Element$htmlAttribute(
 		A2(elm$html$Html$Attributes$style, '', ''));
 };
@@ -13907,6 +13907,23 @@ var author$project$Main$palettePosition = F2(
 							mdgriffith$elm_ui$Element$el,
 							_List_fromArray(
 								[mdgriffith$elm_ui$Element$centerX]),
+							mdgriffith$elm_ui$Element$html(
+								A2(
+									elm$html$Html$div,
+									_List_fromArray(
+										[
+											A2(elm$html$Html$Attributes$style, 'color', '#e2041b'),
+											A2(elm$html$Html$Attributes$style, 'font-size', '13px')
+										]),
+									_List_fromArray(
+										[
+											elm$html$Html$text(
+											author$project$Main$isColor(model.colorValue) ? '' : (elm$core$String$isEmpty(model.colorValue) ? 'Is Empty' : 'Isn\'t Color'))
+										])))),
+							A2(
+							mdgriffith$elm_ui$Element$el,
+							_List_fromArray(
+								[mdgriffith$elm_ui$Element$centerX]),
 							author$project$Main$isColor(model.colorValue) ? A2(
 								mdgriffith$elm_ui$Element$Input$button,
 								_List_fromArray(
@@ -13966,19 +13983,7 @@ var author$project$Main$palettePosition = F2(
 												]),
 											mdgriffith$elm_ui$Element$text('disabled')),
 										onPress: elm$core$Maybe$Just(author$project$Main$ForDisabled)
-									}))),
-							A2(
-							mdgriffith$elm_ui$Element$el,
-							_List_Nil,
-							mdgriffith$elm_ui$Element$html(
-								A2(
-									elm$html$Html$div,
-									_List_Nil,
-									_List_fromArray(
-										[
-											elm$html$Html$text(
-											author$project$Main$isColor(model.colorValue) ? '' : (elm$core$String$isEmpty(model.colorValue) ? 'is empty' : 'isnt color'))
-										]))))
+									})))
 						])),
 					A2(
 					mdgriffith$elm_ui$Element$column,
@@ -14101,75 +14106,6 @@ var author$project$Main$SetPixelWidth = function (a) {
 	return {$: 'SetPixelWidth', a: a};
 };
 var author$project$Main$SettingPanel = {$: 'SettingPanel'};
-var elm$core$List$head = function (list) {
-	if (list.b) {
-		var x = list.a;
-		var xs = list.b;
-		return elm$core$Maybe$Just(x);
-	} else {
-		return elm$core$Maybe$Nothing;
-	}
-};
-var elm_community$result_extra$Result$Extra$merge = function (r) {
-	if (r.$ === 'Ok') {
-		var rr = r.a;
-		return rr;
-	} else {
-		var rr = r.a;
-		return rr;
-	}
-};
-var author$project$Main$displayIncorrectSetting = function (setting) {
-	var errsList = function () {
-		var errWidthHeight = function (value_) {
-			var _n0 = elm$core$String$toInt(value_);
-			if (_n0.$ === 'Nothing') {
-				return elm$core$Result$Err('not int');
-			} else {
-				var value__ = _n0.a;
-				return (value__ < 0) ? elm$core$Result$Err('less than 0') : ((value__ > 64) ? elm$core$Result$Err('greater than 64') : elm$core$Result$Ok(''));
-			}
-		};
-		var errColor = function (value_) {
-			return author$project$Main$isColor(value_) ? '' : 'isnt color';
-		};
-		return A2(
-			elm$core$List$cons,
-			errColor(setting.borderColor),
-			A2(
-				elm$core$List$cons,
-				elm_community$result_extra$Result$Extra$merge(
-					errWidthHeight(setting.width)),
-				A2(
-					elm$core$List$cons,
-					elm_community$result_extra$Result$Extra$merge(
-						errWidthHeight(setting.height)),
-					_List_Nil)));
-	}();
-	return A2(
-		elm$html$Html$div,
-		_List_Nil,
-		A2(
-			elm$core$List$map,
-			function (n) {
-				return A2(
-					elm$html$Html$div,
-					_List_Nil,
-					_List_fromArray(
-						[
-							elm$html$Html$text(
-							A2(
-								elm$core$Maybe$withDefault,
-								'',
-								elm$core$List$head(
-									A2(elm$core$List$drop, n - 1, errsList))))
-						]));
-			},
-			A2(
-				elm$core$List$range,
-				1,
-				elm$core$List$length(errsList))));
-};
 var author$project$Main$onChangeH = function (handler) {
 	return A2(
 		elm$html$Html$Events$on,
@@ -14250,6 +14186,23 @@ var author$project$Main$settingPosition = F2(
 									_List_fromArray(
 										[
 											elm$html$Html$text(model.tempSetting.borderColor)
+										])))),
+							A2(
+							mdgriffith$elm_ui$Element$el,
+							_List_fromArray(
+								[mdgriffith$elm_ui$Element$centerX]),
+							mdgriffith$elm_ui$Element$html(
+								A2(
+									elm$html$Html$div,
+									_List_fromArray(
+										[
+											A2(elm$html$Html$Attributes$style, 'color', '#e2041b'),
+											A2(elm$html$Html$Attributes$style, 'font-size', '13px')
+										]),
+									_List_fromArray(
+										[
+											elm$html$Html$text(
+											author$project$Main$isColor(model.tempSetting.borderColor) ? '' : (elm$core$String$isEmpty(model.tempSetting.borderColor) ? 'Is Empty' : 'Isn\'t Color'))
 										]))))
 						])),
 					A2(
@@ -14352,61 +14305,96 @@ var author$project$Main$settingPosition = F2(
 								[
 									mdgriffith$elm_ui$Element$spacing(3)
 								]),
-							_List_fromArray(
-								[
-									mdgriffith$elm_ui$Element$html(
-									A2(
-										elm$html$Html$div,
-										_List_fromArray(
-											[
-												A2(elm$html$Html$Attributes$style, 'color', 'white'),
-												A2(elm$html$Html$Attributes$style, 'font-size', '14px'),
-												A2(elm$html$Html$Attributes$style, 'padding', '3px')
-											]),
-										_List_fromArray(
-											[
-												elm$html$Html$text('width : '),
-												A2(
-												elm$html$Html$input,
-												_List_fromArray(
-													[
-														A2(elm$html$Html$Attributes$style, '', ''),
-														A2(elm$html$Html$Attributes$style, 'width', '30px'),
-														A2(elm$html$Html$Attributes$style, 'height', '14px'),
-														A2(elm$html$Html$Attributes$style, 'font-size', '95%'),
-														elm$html$Html$Attributes$placeholder(model.setting.width),
-														elm$html$Html$Events$onInput(author$project$Main$SetPixelWidth)
-													]),
-												_List_fromArray(
-													[
-														elm$html$Html$text(model.tempSetting.width)
-													]))
-											]))),
-									mdgriffith$elm_ui$Element$html(
-									A2(
-										elm$html$Html$div,
-										_List_fromArray(
-											[
-												A2(elm$html$Html$Attributes$style, 'color', 'white'),
-												A2(elm$html$Html$Attributes$style, 'font-size', '14px'),
-												A2(elm$html$Html$Attributes$style, 'padding', '3px')
-											]),
-										_List_fromArray(
-											[
-												elm$html$Html$text('height : '),
-												A2(
-												elm$html$Html$input,
-												_List_fromArray(
-													[
-														A2(elm$html$Html$Attributes$style, 'width', '30px'),
-														A2(elm$html$Html$Attributes$style, 'height', '14px'),
-														A2(elm$html$Html$Attributes$style, 'font-size', '95%'),
-														elm$html$Html$Attributes$placeholder(model.setting.height),
-														elm$html$Html$Events$onInput(author$project$Main$SetPixelHeight)
-													]),
-												_List_Nil)
-											])))
-								]))
+							function () {
+								var pixelSizeErr = function (value_) {
+									var _n0 = elm$core$String$toInt(value_);
+									if (_n0.$ === 'Nothing') {
+										return elm$core$String$isEmpty(value_) ? 'Is empty' : 'Isn\'t Integer';
+									} else {
+										var n = _n0.a;
+										return (n <= 0) ? 'Is 0 or less' : '';
+									}
+								};
+								return _List_fromArray(
+									[
+										mdgriffith$elm_ui$Element$html(
+										A2(
+											elm$html$Html$div,
+											_List_fromArray(
+												[
+													A2(elm$html$Html$Attributes$style, 'color', 'white'),
+													A2(elm$html$Html$Attributes$style, 'font-size', '14px'),
+													A2(elm$html$Html$Attributes$style, 'padding', '3px')
+												]),
+											_List_fromArray(
+												[
+													elm$html$Html$text('width : '),
+													A2(
+													elm$html$Html$input,
+													_List_fromArray(
+														[
+															A2(elm$html$Html$Attributes$style, '', ''),
+															A2(elm$html$Html$Attributes$style, 'width', '30px'),
+															A2(elm$html$Html$Attributes$style, 'height', '14px'),
+															A2(elm$html$Html$Attributes$style, 'font-size', '95%'),
+															elm$html$Html$Attributes$placeholder(model.setting.width),
+															elm$html$Html$Events$onInput(author$project$Main$SetPixelWidth)
+														]),
+													_List_fromArray(
+														[
+															elm$html$Html$text(model.tempSetting.width)
+														])),
+													A2(
+													elm$html$Html$div,
+													_List_fromArray(
+														[
+															A2(elm$html$Html$Attributes$style, 'color', '#e2041b'),
+															A2(elm$html$Html$Attributes$style, 'font-size', '13px')
+														]),
+													_List_fromArray(
+														[
+															elm$html$Html$text(
+															pixelSizeErr(model.tempSetting.width))
+														]))
+												]))),
+										mdgriffith$elm_ui$Element$html(
+										A2(
+											elm$html$Html$div,
+											_List_fromArray(
+												[
+													A2(elm$html$Html$Attributes$style, 'color', 'white'),
+													A2(elm$html$Html$Attributes$style, 'font-size', '14px'),
+													A2(elm$html$Html$Attributes$style, 'padding', '3px')
+												]),
+											_List_fromArray(
+												[
+													elm$html$Html$text('height : '),
+													A2(
+													elm$html$Html$input,
+													_List_fromArray(
+														[
+															A2(elm$html$Html$Attributes$style, 'width', '30px'),
+															A2(elm$html$Html$Attributes$style, 'height', '14px'),
+															A2(elm$html$Html$Attributes$style, 'font-size', '95%'),
+															elm$html$Html$Attributes$placeholder(model.setting.height),
+															elm$html$Html$Events$onInput(author$project$Main$SetPixelHeight)
+														]),
+													_List_Nil),
+													A2(
+													elm$html$Html$div,
+													_List_fromArray(
+														[
+															A2(elm$html$Html$Attributes$style, 'color', '#e2041b'),
+															A2(elm$html$Html$Attributes$style, 'font-size', '13px')
+														]),
+													_List_fromArray(
+														[
+															elm$html$Html$text(
+															pixelSizeErr(model.tempSetting.height))
+														]))
+												])))
+									]);
+							}())
 						])),
 					A2(
 					mdgriffith$elm_ui$Element$column,
@@ -14560,9 +14548,7 @@ var author$project$Main$settingPosition = F2(
 									]),
 								mdgriffith$elm_ui$Element$text('disabled')),
 							onPress: elm$core$Maybe$Nothing
-						})),
-					mdgriffith$elm_ui$Element$html(
-					author$project$Main$displayIncorrectSetting(model.tempSetting))
+						}))
 				])) : mdgriffith$elm_ui$Element$none;
 	});
 var author$project$Main$shironezuIro = A3(mdgriffith$elm_ui$Element$rgb255, 220, 221, 221);
@@ -14978,6 +14964,40 @@ var mdgriffith$elm_ui$Element$layoutWith = F3(
 	});
 var mdgriffith$elm_ui$Element$layout = mdgriffith$elm_ui$Element$layoutWith(
 	{options: _List_Nil});
+var mdgriffith$elm_ui$Element$newTabLink = F2(
+	function (attrs, _n0) {
+		var url = _n0.url;
+		var label = _n0.label;
+		return A4(
+			mdgriffith$elm_ui$Internal$Model$element,
+			mdgriffith$elm_ui$Internal$Model$asEl,
+			mdgriffith$elm_ui$Internal$Model$NodeName('a'),
+			A2(
+				elm$core$List$cons,
+				mdgriffith$elm_ui$Internal$Model$Attr(
+					elm$html$Html$Attributes$href(url)),
+				A2(
+					elm$core$List$cons,
+					mdgriffith$elm_ui$Internal$Model$Attr(
+						elm$html$Html$Attributes$rel('noopener noreferrer')),
+					A2(
+						elm$core$List$cons,
+						mdgriffith$elm_ui$Internal$Model$Attr(
+							elm$html$Html$Attributes$target('_blank')),
+						A2(
+							elm$core$List$cons,
+							mdgriffith$elm_ui$Element$width(mdgriffith$elm_ui$Element$shrink),
+							A2(
+								elm$core$List$cons,
+								mdgriffith$elm_ui$Element$height(mdgriffith$elm_ui$Element$shrink),
+								A2(
+									elm$core$List$cons,
+									mdgriffith$elm_ui$Internal$Model$htmlClass(mdgriffith$elm_ui$Internal$Style$classes.contentCenterX + (' ' + (mdgriffith$elm_ui$Internal$Style$classes.contentCenterY + (' ' + mdgriffith$elm_ui$Internal$Style$classes.link)))),
+									attrs)))))),
+			mdgriffith$elm_ui$Internal$Model$Unkeyed(
+				_List_fromArray(
+					[label])));
+	});
 var mdgriffith$elm_ui$Element$paddingXY = F2(
 	function (x, y) {
 		return _Utils_eq(x, y) ? A2(
@@ -15037,7 +15057,8 @@ var author$project$Main$view = function (model) {
 									mdgriffith$elm_ui$Element$px(50)),
 									mdgriffith$elm_ui$Element$Background$color(author$project$Main$rouIro),
 									A2(mdgriffith$elm_ui$Element$paddingXY, 15, 0),
-									mdgriffith$elm_ui$Element$Border$width(1),
+									mdgriffith$elm_ui$Element$Border$widthEach(
+									{bottom: 0, left: 1, right: 1, top: 1}),
 									mdgriffith$elm_ui$Element$Border$color(
 									A3(mdgriffith$elm_ui$Element$rgb255, 255, 255, 255))
 								]),
@@ -15057,50 +15078,72 @@ var author$project$Main$view = function (model) {
 									_List_fromArray(
 										[
 											mdgriffith$elm_ui$Element$alignRight,
-											mdgriffith$elm_ui$Element$spacing(5)
+											mdgriffith$elm_ui$Element$spacing(6)
 										]),
 									_List_fromArray(
 										[
 											A2(
-											mdgriffith$elm_ui$Element$el,
+											mdgriffith$elm_ui$Element$newTabLink,
 											_List_Nil,
+											{
+												label: A2(
+													mdgriffith$elm_ui$Element$row,
+													_List_fromArray(
+														[
+															mdgriffith$elm_ui$Element$spacing(3)
+														]),
+													_List_fromArray(
+														[
+															A2(
+															mdgriffith$elm_ui$Element$image,
+															_List_fromArray(
+																[
+																	mdgriffith$elm_ui$Element$htmlAttribute(
+																	A2(elm$html$Html$Attributes$style, 'filter', 'invert(100%)'))
+																]),
+															{description: '', src: 'file/home.svg'}),
+															A2(
+															mdgriffith$elm_ui$Element$el,
+															_List_fromArray(
+																[
+																	mdgriffith$elm_ui$Element$Font$color(author$project$Main$shiroIro),
+																	mdgriffith$elm_ui$Element$Font$size(16)
+																]),
+															mdgriffith$elm_ui$Element$text('Home'))
+														])),
+												url: ''
+											}),
 											A2(
-												mdgriffith$elm_ui$Element$image,
-												_List_fromArray(
-													[
-														mdgriffith$elm_ui$Element$htmlAttribute(
-														A2(elm$html$Html$Attributes$style, 'filter', 'invert(100%)'))
-													]),
-												{description: 'Home', src: 'file/home.svg'})),
-											A2(
-											mdgriffith$elm_ui$Element$el,
-											_List_fromArray(
-												[
-													mdgriffith$elm_ui$Element$Font$color(
-													A3(mdgriffith$elm_ui$Element$rgb255, 255, 255, 255)),
-													mdgriffith$elm_ui$Element$Font$size(16)
-												]),
-											mdgriffith$elm_ui$Element$text('Home')),
-											A2(
-											mdgriffith$elm_ui$Element$el,
+											mdgriffith$elm_ui$Element$newTabLink,
 											_List_Nil,
-											A2(
-												mdgriffith$elm_ui$Element$image,
-												_List_fromArray(
-													[
-														mdgriffith$elm_ui$Element$htmlAttribute(
-														A2(elm$html$Html$Attributes$style, 'filter', 'invert(100%)'))
-													]),
-												{description: 'GitHub', src: 'file/mark-github.svg'})),
-											A2(
-											mdgriffith$elm_ui$Element$el,
-											_List_fromArray(
-												[
-													mdgriffith$elm_ui$Element$Font$color(
-													A3(mdgriffith$elm_ui$Element$rgb255, 255, 255, 255)),
-													mdgriffith$elm_ui$Element$Font$size(16)
-												]),
-											mdgriffith$elm_ui$Element$text('GitHub'))
+											{
+												label: A2(
+													mdgriffith$elm_ui$Element$row,
+													_List_fromArray(
+														[
+															mdgriffith$elm_ui$Element$spacing(3)
+														]),
+													_List_fromArray(
+														[
+															A2(
+															mdgriffith$elm_ui$Element$image,
+															_List_fromArray(
+																[
+																	mdgriffith$elm_ui$Element$htmlAttribute(
+																	A2(elm$html$Html$Attributes$style, 'filter', 'invert(100%)'))
+																]),
+															{description: '', src: 'file/mark-github.svg'}),
+															A2(
+															mdgriffith$elm_ui$Element$el,
+															_List_fromArray(
+																[
+																	mdgriffith$elm_ui$Element$Font$color(author$project$Main$shiroIro),
+																	mdgriffith$elm_ui$Element$Font$size(16)
+																]),
+															mdgriffith$elm_ui$Element$text('Repository'))
+														])),
+												url: 'https://github.com/floyd33n/SOSOGU'
+											})
 										]))
 								])),
 							A2(
