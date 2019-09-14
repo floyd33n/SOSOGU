@@ -400,7 +400,31 @@ view model =
                                [ toolsPanel model True
                                , el [] <| 
                                   html <|
-                                      createCampus model model.campusSize.width model.campusSize.height
+                                      {-
+                                      div [ HAttrs.style "border" "1px solid blue"
+                                          , HAttrs.style "width" "100px"
+                                          , HAttrs.style "height" "100px"
+                                          , HAttrs.style "background-color" "red"
+                                          , id "campus"
+                                          , HAttrs.style "margin" "0 auto"
+                                          ]
+                                          [ div [ HAttrs.style "border" "1px solid black"
+                                                , HAttrs.style "width" "20px"
+                                                , HAttrs.style "height" "20px"
+                                                , HAttrs.style "background-color" "white"
+                                                , HAttrs.style "margin" "0"
+                                                ]
+                                                []
+                                          , div [ HAttrs.style "border" "1px solid black"
+                                                , HAttrs.style "width" "20px"
+                                                , HAttrs.style "height" "20px"
+                                                , HAttrs.style "background-color" "white"
+                                                , HAttrs.style "margin" "0"
+                                                ]
+                                                []
+                                          ]
+                                          -}
+                                         createCampus model model.campusSize.width model.campusSize.height 
                                ]  
                       , palettePosition model (model.setting.panelPosition.palettePanel == Right)
                       , settingPosition model (model.setting.panelPosition.settingPanel == Right)
@@ -946,12 +970,13 @@ createCampus model width height =
     div [ id "campus" ]
         [ div [] <|
             List.map (\y -> div [] <|
-                List.map ( \x -> div [HAttrs.style "float" "left"
+                List.map ( \x -> div [ HAttrs.style "float" "left"
                                      ] <|
                     [ div [ HAttrs.style "width" (model.setting.width ++ "px")
                           , HAttrs.style "height" (model.setting.height ++ "px")
                           , HAttrs.style "border" (model.setting.borderColor ++ " " ++ model.setting.borderStyle)
                           , HAttrs.style "background-color" (getCampusColor model y x)
+                          , HAttrs.style "padding" "0px"
                           , HAttrs.style "margin" "-1px"
                           , HEvents.onClick (ChangeColor y x model.mainPalette)
                           , HEvents.onDoubleClick (ChangeColor y x "white")
