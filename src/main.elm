@@ -364,28 +364,35 @@ view model =
                              ] <| 
                                 E.text "SOSOGU"
                       , row [ alignRight 
-                            , spacing 5
+                            , spacing 6
                             ]
-                            [ E.el [] <|
-                                E.image [ htmlAttribute <| HAttrs.style "filter" "invert(100%)"
-                                        ]
-                                        { src = "file/home.svg"
-                                        , description = "Home"
-                                        }
-                            , E.el [ Font.color <| rgb255 255 255 255 
-                                   , Font.size 16 
-                                   ] <|
-                                E.text "Home"
-                            , E.el [] <|
-                                E.image [ htmlAttribute <| HAttrs.style "filter" "invert(100%)" ]
-                                        { src = "file/mark-github.svg"
-                                        , description = "GitHub"
-                                        }
-                            , E.el [ Font.color <| rgb255 255 255 255 
-                                   , Font.size 16
-                                   ] <|
-                                E.text "GitHub"
-                            ]
+                            [ newTabLink []
+                                         { url = ""
+                                         , label = E.row [ spacing 3 ]
+                                                         [ E.image [ htmlAttribute <| HAttrs.style "filter" "invert(100%)" ]
+                                                                   { src = "file/home.svg"
+                                                                   , description = ""
+                                                                   }
+                                                         , E.el [ Font.color <| shiroIro 
+                                                                , Font.size <| 16
+                                                                ] <|
+                                                            E.text "Home"
+                                                         ]
+                                         }
+                            , newTabLink []
+                                         { url = "https://github.com/floyd33n/SOSOGU"
+                                         , label = E.row [ spacing 3 ]
+                                                         [ E.image [ htmlAttribute <| HAttrs.style "filter" "invert(100%)" ]
+                                                                   { src = "file/mark-github.svg"
+                                                                   , description = ""
+                                                                   }
+                                                         , E.el [ Font.color <| shiroIro
+                                                                , Font.size <| 16
+                                                                ] <|
+                                                            E.text "Repository"
+                                                         ]
+                                         }
+                            ] 
                       ]
                 , row [ E.width fill
                       , E.height fill
