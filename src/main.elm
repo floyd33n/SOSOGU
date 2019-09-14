@@ -848,8 +848,6 @@ settingPosition model bool  =
                                                   ] <| 
                                                       E.text "disabled"
                                    }
-              , html <|
-                  displayIncorrectSetting model.tempSetting
               ]
               
     else
@@ -858,7 +856,7 @@ settingPosition model bool  =
 isCorrectSetting : Setting -> Bool
 isCorrectSetting setting =
     (isColor setting.borderColor) && (isCorrectWidthHeight setting.width setting.height)
-
+{-
 displayIncorrectSetting : Setting -> Html Msg
 displayIncorrectSetting setting =
     let
@@ -900,7 +898,7 @@ displayIncorrectSetting setting =
                                ]
                     ) <|
                         List.range 1 <| List.length errsList
-
+-}
 createCampusWindow : Model -> Html Msg
 createCampusWindow model =
     BGrid.container [] 
