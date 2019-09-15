@@ -88,8 +88,8 @@ initSetting : Setting
 initSetting =
     { borderColor = "black"
     , borderStyle = "solid 1px"
-    , width = "30"
-    , height = "30"
+    , width = "20"
+    , height = "20"
     , panelPosition = initPanelPosition
     }
 
@@ -110,7 +110,7 @@ init _ =
       , palette = []
       , mainPalette = "white"
       , campusSize = (CampusSize 0 0)
-      , tempCampusSize = (TempCampusSize "10" "10")
+      , tempCampusSize = (TempCampusSize "" "")
       , modalVisibility = BModal.hidden
       , openingModalWindow = BModal.shown
       , setting = initSetting
@@ -473,7 +473,7 @@ toolsPanel model bool =
             ]
     else
         E.none
---, Tuple.first (Maybe.withDefault ("", (0, 0)) <| Array.get x <| Array.fromList model.history)
+
 gendlButton : String -> Model -> Element Msg
 gendlButton bText model =
     let
@@ -901,49 +901,7 @@ settingPosition model bool  =
 isCorrectSetting : Setting -> Bool
 isCorrectSetting setting =
     (isColor setting.borderColor) && (isCorrectWidthHeight setting.width setting.height)
-{-
-displayIncorrectSetting : Setting -> Html Msg
-displayIncorrectSetting setting =
-    let
-        errsList : List String
-        errsList =
-            let
-                errColor : String -> String
-                errColor value_ =
-                    if (isColor value_) then
-                        ""
-                    else
-                        "isnt color"
 
-                errWidthHeight : String -> Result String String
-                errWidthHeight value_ =
-                    case String.toInt value_ of
-                        Nothing ->
-                            Err "not int"
-
-                        Just value__ ->
-                            if value__ < 0 then
-                                Err "less than 0"
-                            else if value__ > 64 then
-                                Err "greater than 64"
-                            else
-                                Ok ""
-            in
-                (errColor <| setting.borderColor) 
-                    :: (ExResult.merge <| errWidthHeight setting.width) 
-                        :: (ExResult.merge <| errWidthHeight setting.height) 
-                            :: []
-    in
-        div [] <|
-            List.map(\n -> div []
-                               [ H.text <|
-                                    Maybe.withDefault "" <|
-                                        List.head <|
-                                            List.drop (n-1) errsList
-                               ]
-                    ) <|
-                        List.range 1 <| List.length errsList
--}
 createCampusWindow : Model -> Html Msg
 createCampusWindow model =
     BGrid.container [] 
