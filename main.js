@@ -80,271 +80,6 @@ function A9(fun, a, b, c, d, e, f, g, h, i) {
 console.warn('Compiled in DEV mode. Follow the advice at https://elm-lang.org/0.19.0/optimize for better performance and smaller assets.');
 
 
-var _List_Nil_UNUSED = { $: 0 };
-var _List_Nil = { $: '[]' };
-
-function _List_Cons_UNUSED(hd, tl) { return { $: 1, a: hd, b: tl }; }
-function _List_Cons(hd, tl) { return { $: '::', a: hd, b: tl }; }
-
-
-var _List_cons = F2(_List_Cons);
-
-function _List_fromArray(arr)
-{
-	var out = _List_Nil;
-	for (var i = arr.length; i--; )
-	{
-		out = _List_Cons(arr[i], out);
-	}
-	return out;
-}
-
-function _List_toArray(xs)
-{
-	for (var out = []; xs.b; xs = xs.b) // WHILE_CONS
-	{
-		out.push(xs.a);
-	}
-	return out;
-}
-
-var _List_map2 = F3(function(f, xs, ys)
-{
-	for (var arr = []; xs.b && ys.b; xs = xs.b, ys = ys.b) // WHILE_CONSES
-	{
-		arr.push(A2(f, xs.a, ys.a));
-	}
-	return _List_fromArray(arr);
-});
-
-var _List_map3 = F4(function(f, xs, ys, zs)
-{
-	for (var arr = []; xs.b && ys.b && zs.b; xs = xs.b, ys = ys.b, zs = zs.b) // WHILE_CONSES
-	{
-		arr.push(A3(f, xs.a, ys.a, zs.a));
-	}
-	return _List_fromArray(arr);
-});
-
-var _List_map4 = F5(function(f, ws, xs, ys, zs)
-{
-	for (var arr = []; ws.b && xs.b && ys.b && zs.b; ws = ws.b, xs = xs.b, ys = ys.b, zs = zs.b) // WHILE_CONSES
-	{
-		arr.push(A4(f, ws.a, xs.a, ys.a, zs.a));
-	}
-	return _List_fromArray(arr);
-});
-
-var _List_map5 = F6(function(f, vs, ws, xs, ys, zs)
-{
-	for (var arr = []; vs.b && ws.b && xs.b && ys.b && zs.b; vs = vs.b, ws = ws.b, xs = xs.b, ys = ys.b, zs = zs.b) // WHILE_CONSES
-	{
-		arr.push(A5(f, vs.a, ws.a, xs.a, ys.a, zs.a));
-	}
-	return _List_fromArray(arr);
-});
-
-var _List_sortBy = F2(function(f, xs)
-{
-	return _List_fromArray(_List_toArray(xs).sort(function(a, b) {
-		return _Utils_cmp(f(a), f(b));
-	}));
-});
-
-var _List_sortWith = F2(function(f, xs)
-{
-	return _List_fromArray(_List_toArray(xs).sort(function(a, b) {
-		var ord = A2(f, a, b);
-		return ord === elm$core$Basics$EQ ? 0 : ord === elm$core$Basics$LT ? -1 : 1;
-	}));
-});
-
-
-
-// EQUALITY
-
-function _Utils_eq(x, y)
-{
-	for (
-		var pair, stack = [], isEqual = _Utils_eqHelp(x, y, 0, stack);
-		isEqual && (pair = stack.pop());
-		isEqual = _Utils_eqHelp(pair.a, pair.b, 0, stack)
-		)
-	{}
-
-	return isEqual;
-}
-
-function _Utils_eqHelp(x, y, depth, stack)
-{
-	if (depth > 100)
-	{
-		stack.push(_Utils_Tuple2(x,y));
-		return true;
-	}
-
-	if (x === y)
-	{
-		return true;
-	}
-
-	if (typeof x !== 'object' || x === null || y === null)
-	{
-		typeof x === 'function' && _Debug_crash(5);
-		return false;
-	}
-
-	/**/
-	if (x.$ === 'Set_elm_builtin')
-	{
-		x = elm$core$Set$toList(x);
-		y = elm$core$Set$toList(y);
-	}
-	if (x.$ === 'RBNode_elm_builtin' || x.$ === 'RBEmpty_elm_builtin')
-	{
-		x = elm$core$Dict$toList(x);
-		y = elm$core$Dict$toList(y);
-	}
-	//*/
-
-	/**_UNUSED/
-	if (x.$ < 0)
-	{
-		x = elm$core$Dict$toList(x);
-		y = elm$core$Dict$toList(y);
-	}
-	//*/
-
-	for (var key in x)
-	{
-		if (!_Utils_eqHelp(x[key], y[key], depth + 1, stack))
-		{
-			return false;
-		}
-	}
-	return true;
-}
-
-var _Utils_equal = F2(_Utils_eq);
-var _Utils_notEqual = F2(function(a, b) { return !_Utils_eq(a,b); });
-
-
-
-// COMPARISONS
-
-// Code in Generate/JavaScript.hs, Basics.js, and List.js depends on
-// the particular integer values assigned to LT, EQ, and GT.
-
-function _Utils_cmp(x, y, ord)
-{
-	if (typeof x !== 'object')
-	{
-		return x === y ? /*EQ*/ 0 : x < y ? /*LT*/ -1 : /*GT*/ 1;
-	}
-
-	/**/
-	if (x instanceof String)
-	{
-		var a = x.valueOf();
-		var b = y.valueOf();
-		return a === b ? 0 : a < b ? -1 : 1;
-	}
-	//*/
-
-	/**_UNUSED/
-	if (typeof x.$ === 'undefined')
-	//*/
-	/**/
-	if (x.$[0] === '#')
-	//*/
-	{
-		return (ord = _Utils_cmp(x.a, y.a))
-			? ord
-			: (ord = _Utils_cmp(x.b, y.b))
-				? ord
-				: _Utils_cmp(x.c, y.c);
-	}
-
-	// traverse conses until end of a list or a mismatch
-	for (; x.b && y.b && !(ord = _Utils_cmp(x.a, y.a)); x = x.b, y = y.b) {} // WHILE_CONSES
-	return ord || (x.b ? /*GT*/ 1 : y.b ? /*LT*/ -1 : /*EQ*/ 0);
-}
-
-var _Utils_lt = F2(function(a, b) { return _Utils_cmp(a, b) < 0; });
-var _Utils_le = F2(function(a, b) { return _Utils_cmp(a, b) < 1; });
-var _Utils_gt = F2(function(a, b) { return _Utils_cmp(a, b) > 0; });
-var _Utils_ge = F2(function(a, b) { return _Utils_cmp(a, b) >= 0; });
-
-var _Utils_compare = F2(function(x, y)
-{
-	var n = _Utils_cmp(x, y);
-	return n < 0 ? elm$core$Basics$LT : n ? elm$core$Basics$GT : elm$core$Basics$EQ;
-});
-
-
-// COMMON VALUES
-
-var _Utils_Tuple0_UNUSED = 0;
-var _Utils_Tuple0 = { $: '#0' };
-
-function _Utils_Tuple2_UNUSED(a, b) { return { a: a, b: b }; }
-function _Utils_Tuple2(a, b) { return { $: '#2', a: a, b: b }; }
-
-function _Utils_Tuple3_UNUSED(a, b, c) { return { a: a, b: b, c: c }; }
-function _Utils_Tuple3(a, b, c) { return { $: '#3', a: a, b: b, c: c }; }
-
-function _Utils_chr_UNUSED(c) { return c; }
-function _Utils_chr(c) { return new String(c); }
-
-
-// RECORDS
-
-function _Utils_update(oldRecord, updatedFields)
-{
-	var newRecord = {};
-
-	for (var key in oldRecord)
-	{
-		newRecord[key] = oldRecord[key];
-	}
-
-	for (var key in updatedFields)
-	{
-		newRecord[key] = updatedFields[key];
-	}
-
-	return newRecord;
-}
-
-
-// APPEND
-
-var _Utils_append = F2(_Utils_ap);
-
-function _Utils_ap(xs, ys)
-{
-	// append Strings
-	if (typeof xs === 'string')
-	{
-		return xs + ys;
-	}
-
-	// append Lists
-	if (!xs.b)
-	{
-		return ys;
-	}
-	var root = _List_Cons(xs.a, ys);
-	xs = xs.b
-	for (var curr = root; xs.b; xs = xs.b) // WHILE_CONS
-	{
-		curr = curr.b = _List_Cons(xs.a, ys);
-	}
-	return root;
-}
-
-
-
 var _JsArray_empty = [];
 
 function _JsArray_singleton(value)
@@ -493,6 +228,87 @@ var _JsArray_appendN = F3(function(n, dest, source)
     }
 
     return result;
+});
+
+
+
+var _List_Nil_UNUSED = { $: 0 };
+var _List_Nil = { $: '[]' };
+
+function _List_Cons_UNUSED(hd, tl) { return { $: 1, a: hd, b: tl }; }
+function _List_Cons(hd, tl) { return { $: '::', a: hd, b: tl }; }
+
+
+var _List_cons = F2(_List_Cons);
+
+function _List_fromArray(arr)
+{
+	var out = _List_Nil;
+	for (var i = arr.length; i--; )
+	{
+		out = _List_Cons(arr[i], out);
+	}
+	return out;
+}
+
+function _List_toArray(xs)
+{
+	for (var out = []; xs.b; xs = xs.b) // WHILE_CONS
+	{
+		out.push(xs.a);
+	}
+	return out;
+}
+
+var _List_map2 = F3(function(f, xs, ys)
+{
+	for (var arr = []; xs.b && ys.b; xs = xs.b, ys = ys.b) // WHILE_CONSES
+	{
+		arr.push(A2(f, xs.a, ys.a));
+	}
+	return _List_fromArray(arr);
+});
+
+var _List_map3 = F4(function(f, xs, ys, zs)
+{
+	for (var arr = []; xs.b && ys.b && zs.b; xs = xs.b, ys = ys.b, zs = zs.b) // WHILE_CONSES
+	{
+		arr.push(A3(f, xs.a, ys.a, zs.a));
+	}
+	return _List_fromArray(arr);
+});
+
+var _List_map4 = F5(function(f, ws, xs, ys, zs)
+{
+	for (var arr = []; ws.b && xs.b && ys.b && zs.b; ws = ws.b, xs = xs.b, ys = ys.b, zs = zs.b) // WHILE_CONSES
+	{
+		arr.push(A4(f, ws.a, xs.a, ys.a, zs.a));
+	}
+	return _List_fromArray(arr);
+});
+
+var _List_map5 = F6(function(f, vs, ws, xs, ys, zs)
+{
+	for (var arr = []; vs.b && ws.b && xs.b && ys.b && zs.b; vs = vs.b, ws = ws.b, xs = xs.b, ys = ys.b, zs = zs.b) // WHILE_CONSES
+	{
+		arr.push(A5(f, vs.a, ws.a, xs.a, ys.a, zs.a));
+	}
+	return _List_fromArray(arr);
+});
+
+var _List_sortBy = F2(function(f, xs)
+{
+	return _List_fromArray(_List_toArray(xs).sort(function(a, b) {
+		return _Utils_cmp(f(a), f(b));
+	}));
+});
+
+var _List_sortWith = F2(function(f, xs)
+{
+	return _List_fromArray(_List_toArray(xs).sort(function(a, b) {
+		var ord = A2(f, a, b);
+		return ord === elm$core$Basics$EQ ? 0 : ord === elm$core$Basics$LT ? -1 : 1;
+	}));
 });
 
 
@@ -789,6 +605,190 @@ function _Debug_regionToString(region)
 		return 'on line ' + region.start.line;
 	}
 	return 'on lines ' + region.start.line + ' through ' + region.end.line;
+}
+
+
+
+// EQUALITY
+
+function _Utils_eq(x, y)
+{
+	for (
+		var pair, stack = [], isEqual = _Utils_eqHelp(x, y, 0, stack);
+		isEqual && (pair = stack.pop());
+		isEqual = _Utils_eqHelp(pair.a, pair.b, 0, stack)
+		)
+	{}
+
+	return isEqual;
+}
+
+function _Utils_eqHelp(x, y, depth, stack)
+{
+	if (depth > 100)
+	{
+		stack.push(_Utils_Tuple2(x,y));
+		return true;
+	}
+
+	if (x === y)
+	{
+		return true;
+	}
+
+	if (typeof x !== 'object' || x === null || y === null)
+	{
+		typeof x === 'function' && _Debug_crash(5);
+		return false;
+	}
+
+	/**/
+	if (x.$ === 'Set_elm_builtin')
+	{
+		x = elm$core$Set$toList(x);
+		y = elm$core$Set$toList(y);
+	}
+	if (x.$ === 'RBNode_elm_builtin' || x.$ === 'RBEmpty_elm_builtin')
+	{
+		x = elm$core$Dict$toList(x);
+		y = elm$core$Dict$toList(y);
+	}
+	//*/
+
+	/**_UNUSED/
+	if (x.$ < 0)
+	{
+		x = elm$core$Dict$toList(x);
+		y = elm$core$Dict$toList(y);
+	}
+	//*/
+
+	for (var key in x)
+	{
+		if (!_Utils_eqHelp(x[key], y[key], depth + 1, stack))
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
+var _Utils_equal = F2(_Utils_eq);
+var _Utils_notEqual = F2(function(a, b) { return !_Utils_eq(a,b); });
+
+
+
+// COMPARISONS
+
+// Code in Generate/JavaScript.hs, Basics.js, and List.js depends on
+// the particular integer values assigned to LT, EQ, and GT.
+
+function _Utils_cmp(x, y, ord)
+{
+	if (typeof x !== 'object')
+	{
+		return x === y ? /*EQ*/ 0 : x < y ? /*LT*/ -1 : /*GT*/ 1;
+	}
+
+	/**/
+	if (x instanceof String)
+	{
+		var a = x.valueOf();
+		var b = y.valueOf();
+		return a === b ? 0 : a < b ? -1 : 1;
+	}
+	//*/
+
+	/**_UNUSED/
+	if (typeof x.$ === 'undefined')
+	//*/
+	/**/
+	if (x.$[0] === '#')
+	//*/
+	{
+		return (ord = _Utils_cmp(x.a, y.a))
+			? ord
+			: (ord = _Utils_cmp(x.b, y.b))
+				? ord
+				: _Utils_cmp(x.c, y.c);
+	}
+
+	// traverse conses until end of a list or a mismatch
+	for (; x.b && y.b && !(ord = _Utils_cmp(x.a, y.a)); x = x.b, y = y.b) {} // WHILE_CONSES
+	return ord || (x.b ? /*GT*/ 1 : y.b ? /*LT*/ -1 : /*EQ*/ 0);
+}
+
+var _Utils_lt = F2(function(a, b) { return _Utils_cmp(a, b) < 0; });
+var _Utils_le = F2(function(a, b) { return _Utils_cmp(a, b) < 1; });
+var _Utils_gt = F2(function(a, b) { return _Utils_cmp(a, b) > 0; });
+var _Utils_ge = F2(function(a, b) { return _Utils_cmp(a, b) >= 0; });
+
+var _Utils_compare = F2(function(x, y)
+{
+	var n = _Utils_cmp(x, y);
+	return n < 0 ? elm$core$Basics$LT : n ? elm$core$Basics$GT : elm$core$Basics$EQ;
+});
+
+
+// COMMON VALUES
+
+var _Utils_Tuple0_UNUSED = 0;
+var _Utils_Tuple0 = { $: '#0' };
+
+function _Utils_Tuple2_UNUSED(a, b) { return { a: a, b: b }; }
+function _Utils_Tuple2(a, b) { return { $: '#2', a: a, b: b }; }
+
+function _Utils_Tuple3_UNUSED(a, b, c) { return { a: a, b: b, c: c }; }
+function _Utils_Tuple3(a, b, c) { return { $: '#3', a: a, b: b, c: c }; }
+
+function _Utils_chr_UNUSED(c) { return c; }
+function _Utils_chr(c) { return new String(c); }
+
+
+// RECORDS
+
+function _Utils_update(oldRecord, updatedFields)
+{
+	var newRecord = {};
+
+	for (var key in oldRecord)
+	{
+		newRecord[key] = oldRecord[key];
+	}
+
+	for (var key in updatedFields)
+	{
+		newRecord[key] = updatedFields[key];
+	}
+
+	return newRecord;
+}
+
+
+// APPEND
+
+var _Utils_append = F2(_Utils_ap);
+
+function _Utils_ap(xs, ys)
+{
+	// append Strings
+	if (typeof xs === 'string')
+	{
+		return xs + ys;
+	}
+
+	// append Lists
+	if (!xs.b)
+	{
+		return ys;
+	}
+	var root = _List_Cons(xs.a, ys);
+	xs = xs.b
+	for (var curr = root; xs.b; xs = xs.b) // WHILE_CONS
+	{
+		curr = curr.b = _List_Cons(xs.a, ys);
+	}
+	return root;
 }
 
 
@@ -4463,20 +4463,37 @@ var author$project$Main$TempCampusSize = F2(
 var author$project$Main$Left = {$: 'Left'};
 var author$project$Main$Right = {$: 'Right'};
 var author$project$Main$initPanelPosition = {palettePanel: author$project$Main$Right, settingPanel: author$project$Main$Left};
-var author$project$Main$initSetting = {borderColor: 'black', borderStyle: 'solid 1px', height: '10', panelPosition: author$project$Main$initPanelPosition, width: '10'};
+var author$project$Main$initSetting = {borderColor: 'black', borderStyle: 'solid 1px', height: '20', panelPosition: author$project$Main$initPanelPosition, width: '20'};
 var elm$core$Basics$False = {$: 'False'};
 var author$project$Main$initToolsSetting = {isDisplayDlButton: false};
-var elm$core$Basics$True = {$: 'True'};
-var elm$core$Result$isOk = function (result) {
-	if (result.$ === 'Ok') {
-		return true;
-	} else {
-		return false;
-	}
-};
+var elm$core$Elm$JsArray$foldr = _JsArray_foldr;
+var elm$core$Array$foldr = F3(
+	function (func, baseCase, _n0) {
+		var tree = _n0.c;
+		var tail = _n0.d;
+		var helper = F2(
+			function (node, acc) {
+				if (node.$ === 'SubTree') {
+					var subTree = node.a;
+					return A3(elm$core$Elm$JsArray$foldr, helper, acc, subTree);
+				} else {
+					var values = node.a;
+					return A3(elm$core$Elm$JsArray$foldr, func, acc, values);
+				}
+			});
+		return A3(
+			elm$core$Elm$JsArray$foldr,
+			helper,
+			A3(elm$core$Elm$JsArray$foldr, func, baseCase, tail),
+			tree);
+	});
 var elm$core$Basics$EQ = {$: 'EQ'};
-var elm$core$Basics$GT = {$: 'GT'};
 var elm$core$Basics$LT = {$: 'LT'};
+var elm$core$List$cons = _List_cons;
+var elm$core$Array$toList = function (array) {
+	return A3(elm$core$Array$foldr, elm$core$List$cons, _List_Nil, array);
+};
+var elm$core$Basics$GT = {$: 'GT'};
 var elm$core$Dict$foldr = F3(
 	function (func, acc, t) {
 		foldr:
@@ -4502,7 +4519,6 @@ var elm$core$Dict$foldr = F3(
 			}
 		}
 	});
-var elm$core$List$cons = _List_cons;
 var elm$core$Dict$toList = function (dict) {
 	return A3(
 		elm$core$Dict$foldr,
@@ -4530,29 +4546,36 @@ var elm$core$Set$toList = function (_n0) {
 	var dict = _n0.a;
 	return elm$core$Dict$keys(dict);
 };
-var elm$core$Elm$JsArray$foldr = _JsArray_foldr;
-var elm$core$Array$foldr = F3(
-	function (func, baseCase, _n0) {
-		var tree = _n0.c;
-		var tail = _n0.d;
-		var helper = F2(
-			function (node, acc) {
-				if (node.$ === 'SubTree') {
-					var subTree = node.a;
-					return A3(elm$core$Elm$JsArray$foldr, helper, acc, subTree);
+var elm$core$Basics$le = _Utils_le;
+var elm$core$Basics$sub = _Basics_sub;
+var elm$core$List$drop = F2(
+	function (n, list) {
+		drop:
+		while (true) {
+			if (n <= 0) {
+				return list;
+			} else {
+				if (!list.b) {
+					return list;
 				} else {
-					var values = node.a;
-					return A3(elm$core$Elm$JsArray$foldr, func, acc, values);
+					var x = list.a;
+					var xs = list.b;
+					var $temp$n = n - 1,
+						$temp$list = xs;
+					n = $temp$n;
+					list = $temp$list;
+					continue drop;
 				}
-			});
-		return A3(
-			elm$core$Elm$JsArray$foldr,
-			helper,
-			A3(elm$core$Elm$JsArray$foldr, func, baseCase, tail),
-			tree);
+			}
+		}
 	});
-var elm$core$Array$toList = function (array) {
-	return A3(elm$core$Array$foldr, elm$core$List$cons, _List_Nil, array);
+var elm$core$Basics$True = {$: 'True'};
+var elm$core$Result$isOk = function (result) {
+	if (result.$ === 'Ok') {
+		return true;
+	} else {
+		return false;
+	}
 };
 var elm$core$Array$branchFactor = 32;
 var elm$core$Array$Array_elm_builtin = F4(
@@ -4658,7 +4681,6 @@ var elm$core$Basics$max = F2(
 		return (_Utils_cmp(x, y) > 0) ? x : y;
 	});
 var elm$core$Basics$mul = _Basics_mul;
-var elm$core$Basics$sub = _Basics_sub;
 var elm$core$Elm$JsArray$length = _JsArray_length;
 var elm$core$Array$builderToArray = F2(
 	function (reverseNodeList, builder) {
@@ -4712,7 +4734,6 @@ var elm$core$Array$initializeHelp = F5(
 			}
 		}
 	});
-var elm$core$Basics$le = _Utils_le;
 var elm$core$Basics$remainderBy = _Basics_remainderBy;
 var elm$core$Array$initialize = F2(
 	function (len, fn) {
@@ -4955,6 +4976,15 @@ var author$project$Main$init = function (_n0) {
 				]),
 			campusSize: A2(author$project$Main$CampusSize, 0, 0),
 			colorValue: 'white',
+			history: A2(
+				elm$core$List$drop,
+				1,
+				_List_fromArray(
+					[
+						_Utils_Tuple2(
+						'white',
+						_Utils_Tuple2(0, 0))
+					])),
 			mainPalette: 'white',
 			modalVisibility: EdutainmentLIVE$elm_bootstrap$Bootstrap$Modal$hidden,
 			openingModalWindow: EdutainmentLIVE$elm_bootstrap$Bootstrap$Modal$shown,
@@ -5128,6 +5158,30 @@ var elm$core$Maybe$withDefault = F2(
 			return _default;
 		}
 	});
+var elm$core$Tuple$second = function (_n0) {
+	var y = _n0.b;
+	return y;
+};
+var author$project$Main$getCampusColor = F3(
+	function (model, x, y) {
+		return A2(
+			elm$core$Maybe$withDefault,
+			_Utils_Tuple2(0, ''),
+			A2(
+				elm$core$Array$get,
+				y,
+				elm$core$Array$fromList(
+					A2(
+						elm$core$Maybe$withDefault,
+						_List_fromArray(
+							[
+								_Utils_Tuple2(0, '')
+							]),
+						A2(
+							elm$core$Array$get,
+							x,
+							elm$core$Array$fromList(model.campus)))))).b;
+	});
 var author$project$Main$getPaletteColor = F2(
 	function (model, n) {
 		return A2(
@@ -5236,6 +5290,11 @@ var author$project$Main$isCorrectSetting = function (setting) {
 	return author$project$Main$isColor(setting.borderColor) && A2(author$project$Main$isCorrectWidthHeight, setting.width, setting.height);
 };
 var elm$json$Json$Encode$null = _Json_encodeNull;
+var author$project$Main$toClickJudge = _Platform_outgoingPort(
+	'toClickJudge',
+	function ($) {
+		return elm$json$Json$Encode$null;
+	});
 var author$project$Main$toH2c = _Platform_outgoingPort(
 	'toH2c',
 	function ($) {
@@ -5260,27 +5319,6 @@ var author$project$Main$getCampusInt = F2(
 							elm$core$Array$get,
 							n,
 							elm$core$Array$fromList(model.campus)))))).a;
-	});
-var elm$core$List$drop = F2(
-	function (n, list) {
-		drop:
-		while (true) {
-			if (n <= 0) {
-				return list;
-			} else {
-				if (!list.b) {
-					return list;
-				} else {
-					var x = list.a;
-					var xs = list.b;
-					var $temp$n = n - 1,
-						$temp$list = xs;
-					n = $temp$n;
-					list = $temp$list;
-					continue drop;
-				}
-			}
-		}
 	});
 var elm$core$List$singleton = function (value) {
 	return _List_fromArray(
@@ -5455,10 +5493,6 @@ var author$project$Main$updateCampus = F4(
 									elm$core$Array$fromList(model.campus))))))),
 			A2(elm$core$List$drop, x + 1, model.campus));
 	});
-var elm$core$Tuple$second = function (_n0) {
-	var y = _n0.b;
-	return y;
-};
 var elm$core$Array$toIndexedList = function (array) {
 	var len = array.a;
 	var helper = F2(
@@ -5511,7 +5545,16 @@ var author$project$Main$update = F2(
 					_Utils_update(
 						model,
 						{
-							campus: A4(author$project$Main$updateCampus, model, x, y, color)
+							campus: A4(author$project$Main$updateCampus, model, x, y, color),
+							history: A2(
+								elm$core$List$append,
+								model.history,
+								_List_fromArray(
+									[
+										_Utils_Tuple2(
+										A3(author$project$Main$getCampusColor, model, x, y),
+										_Utils_Tuple2(y, x))
+									]))
 						}),
 					elm$core$Platform$Cmd$none);
 			case 'ColorValue':
@@ -5758,37 +5801,50 @@ var author$project$Main$update = F2(
 							elm$core$Platform$Cmd$none);
 					}
 				}
-			default:
+			case 'ApplySetting':
 				return author$project$Main$isCorrectSetting(model.tempSetting) ? _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{setting: model.tempSetting}),
 					elm$core$Platform$Cmd$none) : _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
+			case 'Undo':
+				var x = msg.a;
+				var y = msg.b;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							campus: A4(
+								author$project$Main$updateCampus,
+								model,
+								x,
+								y,
+								A2(
+									elm$core$Maybe$withDefault,
+									_Utils_Tuple2(
+										'',
+										_Utils_Tuple2(0, 0)),
+									A2(
+										elm$core$Array$get,
+										0,
+										elm$core$Array$fromList(
+											A2(
+												elm$core$List$drop,
+												elm$core$List$length(model.history) - 1,
+												model.history)))).a),
+							history: A2(
+								elm$core$List$take,
+								elm$core$List$length(model.history) - 1,
+								model.history)
+						}),
+					author$project$Main$toClickJudge(_Utils_Tuple0));
+			default:
+				return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
 		}
 	});
 var author$project$Main$ChangeColor = F3(
 	function (a, b, c) {
 		return {$: 'ChangeColor', a: a, b: b, c: c};
-	});
-var author$project$Main$getCampusColor = F3(
-	function (model, x, y) {
-		return A2(
-			elm$core$Maybe$withDefault,
-			_Utils_Tuple2(0, ''),
-			A2(
-				elm$core$Array$get,
-				y,
-				elm$core$Array$fromList(
-					A2(
-						elm$core$Maybe$withDefault,
-						_List_fromArray(
-							[
-								_Utils_Tuple2(0, '')
-							]),
-						A2(
-							elm$core$Array$get,
-							x,
-							elm$core$Array$fromList(model.campus)))))).b;
 	});
 var elm$core$List$map = F2(
 	function (f, xs) {
@@ -5851,12 +5907,6 @@ var elm$html$Html$Events$onClick = function (msg) {
 		'click',
 		elm$json$Json$Decode$succeed(msg));
 };
-var elm$html$Html$Events$onDoubleClick = function (msg) {
-	return A2(
-		elm$html$Html$Events$on,
-		'dblclick',
-		elm$json$Json$Decode$succeed(msg));
-};
 var author$project$Main$createCampus = F3(
 	function (model, width, height) {
 		return A2(
@@ -5901,9 +5951,7 @@ var author$project$Main$createCampus = F3(
 															A2(elm$html$Html$Attributes$style, 'padding', '0px'),
 															A2(elm$html$Html$Attributes$style, 'margin', '-1px'),
 															elm$html$Html$Events$onClick(
-															A3(author$project$Main$ChangeColor, y, x, model.mainPalette)),
-															elm$html$Html$Events$onDoubleClick(
-															A3(author$project$Main$ChangeColor, y, x, 'white'))
+															A3(author$project$Main$ChangeColor, y, x, model.mainPalette))
 														]),
 													_List_Nil)
 												]));
@@ -7815,8 +7863,8 @@ var author$project$Main$debugLine = function (bool) {
 		_Debug_todo(
 			'Main',
 			{
-				start: {line: 952, column: 17},
-				end: {line: 952, column: 27}
+				start: {line: 948, column: 17},
+				end: {line: 948, column: 27}
 			})) : mdgriffith$elm_ui$Element$htmlAttribute(
 		A2(elm$html$Html$Attributes$style, '', ''));
 };
@@ -13393,6 +13441,12 @@ var author$project$Main$rouIro = A3(mdgriffith$elm_ui$Element$rgb255, 43, 43, 43
 var elm$core$String$isEmpty = function (string) {
 	return string === '';
 };
+var elm$html$Html$Events$onDoubleClick = function (msg) {
+	return A2(
+		elm$html$Html$Events$on,
+		'dblclick',
+		elm$json$Json$Decode$succeed(msg));
+};
 var mdgriffith$elm_ui$Internal$Model$AsColumn = {$: 'AsColumn'};
 var mdgriffith$elm_ui$Internal$Model$asColumn = mdgriffith$elm_ui$Internal$Model$AsColumn;
 var mdgriffith$elm_ui$Element$column = F2(
@@ -14072,10 +14126,10 @@ var author$project$Main$palettePosition = F2(
 																'background-color',
 																A2(author$project$Main$getPaletteColor, model, plt - 1)),
 																A2(elm$html$Html$Attributes$style, 'border', 'solid 1px black'),
-																elm$html$Html$Events$onClick(
-																author$project$Main$SetMainPalette(plt - 1)),
 																elm$html$Html$Events$onDoubleClick(
-																author$project$Main$DeleteSubPalette(plt))
+																author$project$Main$DeleteSubPalette(plt)),
+																elm$html$Html$Events$onClick(
+																author$project$Main$SetMainPalette(plt - 1))
 															]),
 														_List_Nil)));
 										},
@@ -14552,6 +14606,10 @@ var author$project$Main$settingPosition = F2(
 				])) : mdgriffith$elm_ui$Element$none;
 	});
 var author$project$Main$shironezuIro = A3(mdgriffith$elm_ui$Element$rgb255, 220, 221, 221);
+var author$project$Main$Undo = F2(
+	function (a, b) {
+		return {$: 'Undo', a: a, b: b};
+	});
 var author$project$Main$DisplayDlButton = {$: 'DisplayDlButton'};
 var elm$html$Html$a = _VirtualDom_node('a');
 var elm$html$Html$Attributes$hidden = elm$html$Html$Attributes$boolProperty('hidden');
@@ -14655,7 +14713,50 @@ var author$project$Main$toolsPanel = F2(
 						]),
 					mdgriffith$elm_ui$Element$text('Tools')),
 					A2(author$project$Main$gendlButton, 'Gen', model),
-					A2(author$project$Main$gendlButton, 'DL', model)
+					A2(author$project$Main$gendlButton, 'DL', model),
+					A2(
+					mdgriffith$elm_ui$Element$Input$button,
+					_List_Nil,
+					{
+						label: A2(
+							mdgriffith$elm_ui$Element$el,
+							_List_fromArray(
+								[
+									mdgriffith$elm_ui$Element$Font$color(author$project$Main$shiroIro),
+									mdgriffith$elm_ui$Element$Font$size(14)
+								]),
+							mdgriffith$elm_ui$Element$text('Undo')),
+						onPress: function () {
+							var y = A2(
+								elm$core$Maybe$withDefault,
+								_Utils_Tuple2(
+									'white',
+									_Utils_Tuple2(0, 0)),
+								A2(
+									elm$core$Array$get,
+									0,
+									elm$core$Array$fromList(
+										A2(
+											elm$core$List$drop,
+											elm$core$List$length(model.history) - 1,
+											model.history)))).b.b;
+							var x = A2(
+								elm$core$Maybe$withDefault,
+								_Utils_Tuple2(
+									'white',
+									_Utils_Tuple2(0, 0)),
+								A2(
+									elm$core$Array$get,
+									0,
+									elm$core$Array$fromList(
+										A2(
+											elm$core$List$drop,
+											elm$core$List$length(model.history) - 1,
+											model.history)))).b.a;
+							return elm$core$Maybe$Just(
+								A2(author$project$Main$Undo, y, x));
+						}()
+					})
 				])) : mdgriffith$elm_ui$Element$none;
 	});
 var mdgriffith$elm_ui$Internal$Model$Left = {$: 'Left'};
