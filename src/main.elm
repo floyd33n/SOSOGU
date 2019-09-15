@@ -7,6 +7,8 @@ import Html.Lazy as HLazy exposing (..)
 import Array exposing (..)
 import Debug exposing (..)
 import Svg exposing (..)
+import Process exposing (..)
+import Task exposing (..)
 import Regex exposing (..)
 import Result.Extra as ExResult exposing  (..)
 import Element as E exposing (..)
@@ -44,6 +46,7 @@ type alias Model =
     , tempSetting : Setting
     , borderColorValue : String
     , toolsSetting : ToolsSetting
+    , history : List (String, (Int, Int))
     }
 
 type alias TempCampusSize =
@@ -85,8 +88,8 @@ initSetting : Setting
 initSetting =
     { borderColor = "black"
     , borderStyle = "solid 1px"
-    , width = "10"
-    , height = "10"
+    , width = "30"
+    , height = "30"
     , panelPosition = initPanelPosition
     }
 
@@ -98,6 +101,7 @@ initToolsSetting : ToolsSetting
 initToolsSetting =
     { isDisplayDlButton = False
     }
+
 --INIT--
 init : () -> (Model, Cmd Msg)
 init _ =
@@ -106,13 +110,14 @@ init _ =
       , palette = []
       , mainPalette = "white"
       , campusSize = (CampusSize 0 0)
-      , tempCampusSize = (TempCampusSize "" "")
+      , tempCampusSize = (TempCampusSize "10" "10")
       , modalVisibility = BModal.hidden
       , openingModalWindow = BModal.shown
       , setting = initSetting
       , tempSetting = initSetting
       , borderColorValue = ""
       , toolsSetting = initToolsSetting
+      , history = List.drop 1 [("white", (0, 0))]
       } 
     , Cmd.none
     )
@@ -139,12 +144,17 @@ type Msg
     | DisplayDlButton
     | ChangePanelPosition Panel Position
     | ApplySetting
+    | Undo Int Int
+    | IsClick
+    --| AddHistory Int Int String
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
     case msg of
         ChangeColor x y color ->
-            ( { model | campus = updateCampus model x y color}
+            ( { model | campus = updateCampus model x y color
+                      , history = List.append model.history [((getCampusColor model x y), (y, x))]
+              }
             , Cmd.none
             )
 
@@ -161,7 +171,8 @@ update msg model =
             )
 
         SetMainPalette n ->
-            ( { model | mainPalette = getPaletteColor model n }
+            ( { model | mainPalette = getPaletteColor model n 
+              }
             , Cmd.none
             )
        
@@ -341,6 +352,21 @@ update msg model =
             else
                 (model, Cmd.none)
 
+        Undo x y ->
+            ( { model | campus = updateCampus model x y <| Tuple.first <| Maybe.withDefault ("", (0, 0)) <| Array.get 0 <| Array.fromList <| List.drop ((List.length model.history)-1) model.history
+                      , history = List.take ((List.length model.history)-1) model.history
+              }
+            , toClickJudge ()
+            ) 
+
+        IsClick ->
+            ( model, Cmd.none )
+
+tesT : Task Never Int
+tesT =
+  Process.sleep 5000
+      |> Task.map (always 2)
+
 --VIEW--
 view : Model -> Html Msg
 view model =
@@ -432,10 +458,22 @@ toolsPanel model bool =
                       E.text "Tools"
             , gendlButton "Gen"model
             , gendlButton "DL" model
+            , Input.button []
+                           { onPress = 
+                              let
+                                  x = Tuple.first (Tuple.second (Maybe.withDefault ("white", (0, 0)) <| Array.get 0 <| Array.fromList (List.drop ((List.length model.history)-1) model.history)))
+                                  y = Tuple.second (Tuple.second (Maybe.withDefault ("white", (0, 0)) <| Array.get 0 <| Array.fromList (List.drop ((List.length model.history)-1) model.history)))
+                              in
+                                  Just <| Undo y x
+                           , label = E.el [ Font.color <| shiroIro
+                                          , Font.size <| 14
+                                          ] <|
+                                      E.text <| "Undo"
+                           }
             ]
     else
         E.none
-
+--, Tuple.first (Maybe.withDefault ("", (0, 0)) <| Array.get x <| Array.fromList model.history)
 gendlButton : String -> Model -> Element Msg
 gendlButton bText model =
     let
@@ -608,8 +646,8 @@ palettePosition model bool  =
                                                                   , HAttrs.style "height" "25px"
                                                                   , HAttrs.style "background-color" <| getPaletteColor model (plt-1)
                                                                   , HAttrs.style "border" "solid 1px black"
-                                                                  , onClick (SetMainPalette (plt-1))
                                                                   , onDoubleClick (DeleteSubPalette plt)
+                                                                  , onClick (SetMainPalette (plt-1))
                                                                   ]  
                                                                   []
                                              ) <|
@@ -998,7 +1036,7 @@ createCampus model width height =
                           , HAttrs.style "padding" "0px"
                           , HAttrs.style "margin" "-1px"
                           , HEvents.onClick (ChangeColor y x model.mainPalette)
-                          , HEvents.onDoubleClick (ChangeColor y x "white")
+                          --, HEvents.onDoubleClick (ChangeColor y x "white")
                           ]
                           []
                     ]
@@ -1035,6 +1073,33 @@ updateCampus model x y color =
         )
         (List.drop (x+1) model.campus)
 
+undoCampus : Model -> Int -> Int -> List(List (Int, String))
+undoCampus model x y =
+    List.append
+        (List.append 
+                (List.take x model.campus) 
+                (List.singleton <|
+                    List.append
+                        ((++)
+                            (List.take y <| 
+                                Maybe.withDefault [(0, "")] <|
+                                    Array.get x <| 
+                                        Array.fromList model.campus
+                            )
+                            (List.singleton (getCampusInt model <| y
+                                            , "yellow"
+                                            --, Tuple.first (Maybe.withDefault ("", (0, 0)) <| Array.get ((List.length model.history)-1) <| Array.fromList model.history)
+                                            )
+                            )
+                        )
+                        (List.drop (y+1) <| 
+                                Maybe.withDefault [(0, "")] <| 
+                                    Array.get x <| 
+                                        Array.fromList model.campus
+                        )
+                ) 
+        )
+        (List.drop (x+1) model.campus)
 
 addColorToPalette : Model -> String -> List String
 addColorToPalette model color =
@@ -1123,6 +1188,7 @@ subscriptions model =
     Sub.none
 
 port toH2c : () -> Cmd msg
+port toClickJudge : () -> Cmd msg
 --port fromH2c -> 
 --ColorSet--
 rouIro = rgb255 43 43 43
