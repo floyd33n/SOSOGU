@@ -145,8 +145,6 @@ type Msg
     | ChangePanelPosition Panel Position
     | ApplySetting
     | Undo Int Int
-    | IsClick
-    --| AddHistory Int Int String
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -358,14 +356,6 @@ update msg model =
               }
             , toClickJudge ()
             ) 
-
-        IsClick ->
-            ( model, Cmd.none )
-
-tesT : Task Never Int
-tesT =
-  Process.sleep 5000
-      |> Task.map (always 2)
 
 --VIEW--
 view : Model -> Html Msg
