@@ -5,11 +5,13 @@ import Html.Attributes as HAttrs exposing(..)
 import Html.Events as HEvents exposing (..)
 import Html.Lazy as HLazy exposing (..)
 import Array exposing (..)
+import Dict exposing (..)
 import Debug exposing (..)
 import Svg exposing (..)
 import Process exposing (..)
 import Task exposing (..)
 import Regex exposing (..)
+import List.Extra as ExList exposing (..)
 import Result.Extra as ExResult exposing  (..)
 import Element as E exposing (..)
 import Element.Background as Background
@@ -34,7 +36,7 @@ onChangeH handler =
 
 --MODEL--
 type alias Model = 
-    { campus : List (List (Int, String))
+    { campus : Campus
     , colorValue : String
     , palette : List String
     , mainPalette : String
@@ -49,6 +51,19 @@ type alias Model =
     , history : List (String, (Int, Int))
     }
 
+--Campu Type--
+type alias Campus =
+    Dict Point CssColor 
+type alias Point =
+    (Int, Int)    
+type alias Points =
+    (Int, Int)
+type alias CssColor =
+    String
+initCampus : Campus
+initCampus =
+    Dict.fromList [((0, 0), "white")]
+--Campus Size Type--
 type alias TempCampusSize =
     { width : String
     , height : String
@@ -105,7 +120,7 @@ initToolsSetting =
 --INIT--
 init : () -> (Model, Cmd Msg)
 init _ =
-    ( { campus =  [[(0, "")]]
+    ( { campus = initCampus
       , colorValue = "white"
       , palette = []
       , mainPalette = "white"
@@ -150,7 +165,7 @@ update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
     case msg of
         ChangeColor x y color ->
-            ( { model | campus = updateCampus model x y color
+            ( { model | campus = Dict.update (x, y) (Maybe.map (\n -> color)) model.campus
                       , history = List.append model.history [((getCampusColor model x y), (y, x))]
               }
             , Cmd.none
@@ -193,15 +208,20 @@ update msg model =
        
         CreateCampus ->
             let
-                testFuncA : Model -> List (List (Int, String))
-                testFuncA tmodel =
-                    let
-                        temp = { width = (Maybe.withDefault 0 (String.toInt tmodel.tempCampusSize.width)), height = (Maybe.withDefault 0 (String.toInt tmodel.tempCampusSize.height)) }
-                    in
-                        List.repeat temp.height (Array.toIndexedList (Array.fromList (List.repeat temp.width "white")))
+                createCampusList : Points-> List ( ( Int, Int ), String )
+                createCampusList (width_, height_) =
+                    ExList.lift2 Tuple.pair (ExList.lift2 Tuple.pair (List.range 0 width_) (List.range 0 height_)) ["white"]
+                
+                convertTemp : String -> Int
+                convertTemp str =
+                    Maybe.withDefault 0 (String.toInt str)
             in
-                ( { model | campus = testFuncA model
-                          , campusSize = { width = (Maybe.withDefault 0 (String.toInt model.tempCampusSize.width)), height = (Maybe.withDefault 0 (String.toInt model.tempCampusSize.height)) }
+                ( { model | campus = Dict.fromList <| createCampusList ( convertTemp model.tempCampusSize.width
+                                                                       , convertTemp model.tempCampusSize.height
+                                                                       )
+                          , campusSize = { width = convertTemp model.tempCampusSize.width
+                                         , height = convertTemp model.tempCampusSize.height
+                                         }
                           , openingModalWindow = BModal.hidden
                   }
                 , Cmd.none
@@ -351,7 +371,7 @@ update msg model =
                 (model, Cmd.none)
 
         Undo x y ->
-            ( { model | campus = updateCampus model x y <| Tuple.first <| Maybe.withDefault ("white", (0, 0)) <| Array.get 0 <| Array.fromList <| List.drop ((List.length model.history)-1) model.history
+            ( { model | campus = Dict.update (0, 0) (Maybe.map (\n -> "yellow")) model.campus
                       , history = List.take ((List.length model.history)-1) model.history
               }
             , toClickJudge ()
@@ -423,7 +443,7 @@ view model =
                                [ toolsPanel model True
                                , el [centerX] <| 
                                   html <|
-                                      createCampus model model.campusSize.width model.campusSize.height
+                                      viewCampus model model.campusSize.width model.campusSize.height
                                ]  
                       , palettePosition model (model.setting.panelPosition.palettePanel == Right)
                       , settingPosition model (model.setting.panelPosition.settingPanel == Right)
@@ -456,7 +476,7 @@ toolsPanel model bool =
              in
                 case bText of
                     "Gen" ->
-                        if (List.length model.campus > 1) then
+                        if (Dict.size model.campus > 1) then
                             tempButton (Just DisplayDlButton) "1" "none" "" (HAttrs.style "" "") (hidden False)
                         else
                             tempButton Nothing "0.6" "line-through" "" (HAttrs.style "" "") (hidden False)
@@ -969,29 +989,10 @@ getPaletteColor model n =
 
 getCampusColor : Model -> Int -> Int -> String
 getCampusColor model x y =
-    model.campus
-        |> Array.fromList
-        |> Array.get x
-        |> Maybe.withDefault [(0, "")]
-        |> Array.fromList
-        |> Array.get y
-        |> Maybe.withDefault (0, "")
-        |> Tuple.second
+    Maybe.withDefault "white" (Dict.get (x, y) model.campus)
 
-
-getCampusInt : Model -> Int -> Int
-getCampusInt model n =
-    model.campus
-        |> Array.fromList
-        |> Array.get n
-        |> Maybe.withDefault [(0, "")]
-        |> Array.fromList
-        |> Array.get n
-        |> Maybe.withDefault (0, "")
-        |> Tuple.first
-
-createCampus : Model -> Int -> Int -> Html Msg
-createCampus model width height =
+viewCampus : Model -> Int -> Int -> Html Msg
+viewCampus model width height =
     div [ id "campus" ]
         [ div [] <|
             List.map (\y -> div [] <|
@@ -1013,7 +1014,7 @@ createCampus model width height =
                       ) <|
                           List.range 0 (height-1)
         ]
-
+{-
 updateCampus : Model -> Int -> Int -> String -> List(List (Int, String))
 updateCampus model x y color =
     List.append
@@ -1040,7 +1041,8 @@ updateCampus model x y color =
                 ) 
         )
         (List.drop (x+1) model.campus)
-
+-}
+{-
 undoCampus : Model -> Int -> Int -> List(List (Int, String))
 undoCampus model x y =
     List.append
@@ -1068,7 +1070,7 @@ undoCampus model x y =
                 ) 
         )
         (List.drop (x+1) model.campus)
-
+-}
 addColorToPalette : Model -> String -> List String
 addColorToPalette model color =
     List.append [color] model.palette
