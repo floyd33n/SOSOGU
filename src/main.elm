@@ -353,7 +353,7 @@ update msg model =
                 (model, Cmd.none)
 
         Undo x y ->
-            ( { model | campus = updateCampus model x y <| Tuple.first <| Maybe.withDefault ("", (0, 0)) <| Array.get 0 <| Array.fromList <| List.drop ((List.length model.history)-1) model.history
+            ( { model | campus = updateCampus model x y <| Tuple.first <| Maybe.withDefault ("white", (0, 0)) <| Array.get 0 <| Array.fromList <| List.drop ((List.length model.history)-1) model.history
                       , history = List.take ((List.length model.history)-1) model.history
               }
             , toClickJudge ()
@@ -443,10 +443,70 @@ view model =
 
 toolsPanel : Model -> Bool -> Element Msg
 toolsPanel model bool =
+    let
+        gendlButton : String -> Element Msg
+        gendlButton bText =
+             let
+                 tempButton : Maybe Msg -> String -> String -> String -> H.Attribute Msg -> H.Attribute Msg -> Element Msg
+                 tempButton msg oValue dValue id_ attr1 attr2 =
+                     Input.button []
+                                  { onPress = msg
+                                  , label = E.el [] <|
+                                      html <|
+                                         H.a [ HAttrs.style "color" "white"
+                                             , HAttrs.style "font-size" "14px"
+                                             , HAttrs.style "opacity" oValue
+                                             , HAttrs.style "text-decoration" dValue
+                                             , id id_
+                                             , attr1
+                                             , attr2
+                                             ]
+                                             [ H.text bText ]
+                                  }
+             in
+                case bText of
+                    "Gen" ->
+                        if (List.length model.campus > 1) then
+                            tempButton (Just DisplayDlButton) "1" "none" "" (HAttrs.style "" "") (hidden False)
+                        else
+                            tempButton Nothing "0.6" "line-through" "" (HAttrs.style "" "") (hidden False)
+                    "DL" ->
+                        if model.toolsSetting.isDisplayDlButton then
+                            tempButton Nothing "1" "none" "dl" (href "") (target "_blank")
+                        else
+                            tempButton Nothing "0.6" "line-through" "" (HAttrs.style "" "") (hidden False)
+                    _ ->
+                        E.none
+
+        viewUndoButton : Element Msg
+        viewUndoButton =
+            Input.button []
+                         { onPress =
+                             let
+                                 x = Tuple.first <|
+                                         Tuple.second <|
+                                             Maybe.withDefault ("white", (0, 0)) <| 
+                                                 Array.get 0 <|                                                       
+                                                     Array.fromList <|
+                                                          List.drop ((List.length model.history)-1) model.history
+                                 y = Tuple.second <|
+                                         Tuple.second <|
+                                              Maybe.withDefault ("white", (0, 0)) <| 
+                                                  Array.get 0 <| 
+                                                     Array.fromList <|
+                                                         List.drop ((List.length model.history)-1) model.history
+                             in
+                                 Just <| Undo y x
+                         , label = E.el [ Font.color <| shiroIro
+                                        , Font.size <| 14
+                                        ] <|
+                                            E.text <| "Undo"
+                         }
+    in
     if bool then
         row [ E.width fill
             , E.height <| px 36
-            , Border.width 1
+            , Border.widthEach { top = 1, right = 0, left = 0, bottom = 1 }
             , Border.color <| shiroIro
             , Background.color <| rouIro
             ]
@@ -456,57 +516,17 @@ toolsPanel model bool =
                    , centerY
                    ] <|
                       E.text "Tools"
-            , gendlButton "Gen"model
-            , gendlButton "DL" model
-            , Input.button []
-                           { onPress = 
-                              let
-                                  x = Tuple.first (Tuple.second (Maybe.withDefault ("white", (0, 0)) <| Array.get 0 <| Array.fromList (List.drop ((List.length model.history)-1) model.history)))
-                                  y = Tuple.second (Tuple.second (Maybe.withDefault ("white", (0, 0)) <| Array.get 0 <| Array.fromList (List.drop ((List.length model.history)-1) model.history)))
-                              in
-                                  Just <| Undo y x
-                           , label = E.el [ Font.color <| shiroIro
-                                          , Font.size <| 14
-                                          ] <|
-                                      E.text <| "Undo"
-                           }
+            , E.row [ alignRight
+                    , paddingXY 20 0
+                    , spacing 5
+                    ]
+                    [ gendlButton "Gen"
+                    , gendlButton "DL"
+                    , viewUndoButton
+                    ]
             ]
     else
         E.none
-
-gendlButton : String -> Model -> Element Msg
-gendlButton bText model =
-    let
-        tempButton : Maybe Msg -> String -> String -> String -> H.Attribute Msg -> H.Attribute Msg -> Element Msg
-        tempButton msg oValue dValue id_ attr1 attr2 =
-            Input.button []
-                         { onPress = msg
-                         , label = E.el [] <|
-                           html <|
-                                H.a [ HAttrs.style "color" "white"
-                                    , HAttrs.style "font-size" "14px"
-                                    , HAttrs.style "opacity" oValue
-                                    , HAttrs.style "text-decoration" dValue
-                                    , id id_
-                                    , attr1
-                                    , attr2
-                                    ]
-                                   [ H.text bText ]
-                          }
-    in
-        case bText of
-            "Gen" ->
-                if (List.length model.campus > 1) then
-                    tempButton (Just DisplayDlButton) "1" "none" "" (HAttrs.style "" "") (hidden False)
-                else
-                    tempButton Nothing "0.6" "line-through" "" (HAttrs.style "" "") (hidden False)
-            "DL" ->
-                if model.toolsSetting.isDisplayDlButton then
-                    tempButton Nothing "1" "none" "dl" (href "") (target "_blank")
-                else
-                    tempButton Nothing "0.6" "line-through" "" (HAttrs.style "" "") (hidden False)
-            _ ->
-                E.none
 
 
 changePositionText : Position -> String
