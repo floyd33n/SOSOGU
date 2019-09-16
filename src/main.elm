@@ -79,7 +79,7 @@ type alias TempCampusSize =
 type alias CampusSize =
     { width : Int
     , height : Int
-     }
+    }
 
 type Position
     = Right
@@ -192,7 +192,11 @@ update msg model =
             )
 
         ColorValue value ->
-            ( { model | colorValue = (String.toLower value) }
+            ( { model | colorValue = if String.isEmpty model.colorValue then
+                                        "white"
+                                     else
+                                        String.toLower value
+              }
             , Cmd.none
             )
 
@@ -261,7 +265,10 @@ update msg model =
             )
 
         BorderColorValue value ->
-            ( { model | tempSetting = { borderColor = (String.toLower value)
+            ( { model | tempSetting = { borderColor = if String.isEmpty value then
+                                                          model.setting.borderColor
+                                                      else
+                                                          String.toLower value
                                       , borderStyle = model.tempSetting.borderStyle
                                       , width = model.tempSetting.width
                                       , height = model.tempSetting.height
@@ -299,7 +306,10 @@ update msg model =
         SetPixelWidth tempWidth_ ->
             ( { model | tempSetting = { borderColor = model.tempSetting.borderColor
                                         , borderStyle = model.tempSetting.borderStyle
-                                        , width = tempWidth_
+                                        , width = if String.isEmpty tempWidth_ then
+                                                      model.setting.width
+                                                  else
+                                                      tempWidth_
                                         , height = model.tempSetting.height
                                         , panelPosition = model.tempSetting.panelPosition
                                         }
@@ -310,7 +320,10 @@ update msg model =
             ( { model | tempSetting = { borderColor = model.tempSetting.borderColor
                                         , borderStyle = model.tempSetting.borderStyle
                                         , width = model.tempSetting.width
-                                        , height = tempHeight_
+                                        , height = if String.isEmpty tempHeight_ then
+                                                      model.setting.height
+                                                  else
+                                                      tempHeight_
                                         , panelPosition = model.tempSetting.panelPosition
                                         }
               }
