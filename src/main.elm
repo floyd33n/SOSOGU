@@ -394,7 +394,7 @@ update msg model =
             let
                 getHistoryColor : Point -> String 
                 getHistoryColor (x_, y_) =
-                    Tuple.second <| Maybe.withDefault ((0, 0), "white") (Dict.get (Dict.size model.history) model.history)
+                    Tuple.second <| Maybe.withDefault ((0, 0), "white") (Dict.get ((Dict.size model.history)-1) model.history)
             in
             ( { model | campus = Dict.update (x, y) (Maybe.map (\n -> getHistoryColor (x, y))) model.campus
                       , history = Dict.remove ((Dict.size model.history)-1) model.history
