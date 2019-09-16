@@ -37,21 +37,20 @@ onChangeH handler =
 --MODEL--
 type alias Model = 
     { campus : Campus
-    , colorValue : String
-    , palette : List String
-    , mainPalette : String
+    , colorValue : CssColor
+    , subPalette : SubPalette
+    , mainPalette : CssColor
     , campusSize : CampusSize
     , tempCampusSize : TempCampusSize
     , modalVisibility : BModal.Visibility
     , openingModalWindow : BModal.Visibility
     , setting : Setting
     , tempSetting : Setting
-    , borderColorValue : String
+    , borderColorValue : CssColor
     , toolsSetting : ToolsSetting
     , history : List (String, (Int, Int))
     }
 
---Campu Type--
 type alias Campus =
     Dict Point CssColor 
 type alias Point =
@@ -63,7 +62,6 @@ type alias CssColor =
 initCampus : Campus
 initCampus =
     Dict.fromList [((0, 0), "white")]
---Campus Size Type--
 type alias TempCampusSize =
     { width : String
     , height : String
@@ -81,6 +79,11 @@ type Position
 type Panel
     = SettingPanel
     | PalettePanel
+
+type alias Serial =
+    Int
+type alias SubPalette =
+    Dict Serial CssColor
 
 type alias Setting =
     { borderColor : String
@@ -122,7 +125,7 @@ init : () -> (Model, Cmd Msg)
 init _ =
     ( { campus = initCampus
       , colorValue = "white"
-      , palette = []
+      , subPalette = Dict.fromList []
       , mainPalette = "white"
       , campusSize = (CampusSize 0 0)
       , tempCampusSize = (TempCampusSize "" "")
@@ -141,7 +144,7 @@ init _ =
 type Msg
     = ChangeColor Int Int String
     | ColorValue String
-    | AddColorToPalette String
+    | AddColorToSubPalette String
     | SetMainPalette Int
     | DeleteSubPalette Int
     | SetCampusWidth String
@@ -176,8 +179,8 @@ update msg model =
             , Cmd.none
             )
 
-        AddColorToPalette color ->
-            ( { model | palette = addColorToPalette model color
+        AddColorToSubPalette color ->
+            ( { model | subPalette = addColorToSubPalette model color
               ,         mainPalette = model.colorValue
               }
             , Cmd.none
@@ -190,7 +193,7 @@ update msg model =
             )
        
         DeleteSubPalette n ->
-            ( { model | palette = List.append (List.take (n-1) model.palette) (List.drop n model.palette) 
+            ( { model | subPalette = Dict.remove n model.subPalette
                       , mainPalette = "white"
               }
             , Cmd.none
@@ -610,7 +613,7 @@ palettePosition model bool  =
                               if isColor <| model.colorValue then
                                   Input.button [ htmlAttribute <| HAttrs.style "color" "white"
                                                ] 
-                                               { onPress = Just (AddColorToPalette model.colorValue)
+                                               { onPress = Just (AddColorToSubPalette model.colorValue)
                                                , label = row []
                                                              [ E.el [ Font.color <| shiroIro
                                                                     , Font.size <| 14
@@ -681,7 +684,7 @@ palettePosition model bool  =
                                                                   ]  
                                                                   []
                                              ) <|
-                                                List.range 1 (List.length model.palette)
+                                                List.range 1 (Dict.size model.subPalette)
                                 ]
                         ]
                ]
@@ -981,11 +984,7 @@ debugLine bool =
 --FUNC--
 getPaletteColor : Model -> Int -> String
 getPaletteColor model n =
-    model.palette
-        |> Array.fromList
-        |> Array.get n
-        |> Maybe.withDefault ""
-
+    Maybe.withDefault "white" (Dict.get n model.subPalette)
 
 getCampusColor : Model -> Int -> Int -> String
 getCampusColor model x y =
@@ -1071,9 +1070,9 @@ undoCampus model x y =
         )
         (List.drop (x+1) model.campus)
 -}
-addColorToPalette : Model -> String -> List String
-addColorToPalette model color =
-    List.append [color] model.palette
+addColorToSubPalette : Model -> CssColor -> SubPalette
+addColorToSubPalette model color =
+    Dict.insert (Dict.size model.subPalette) color model.subPalette
 
 displayPalette : Model -> Html Msg
 displayPalette model =
@@ -1088,7 +1087,7 @@ displayPalette model =
                                      []
                                ]
                  ) <| 
-                     List.range 1 (List.length model.palette)
+                     List.range 1 (Dict.size model.subPalette)
 
 isColor : String -> Bool
 isColor exValue =
