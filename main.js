@@ -5822,7 +5822,7 @@ var author$project$Main$update = F2(
 								A2(
 									elm$core$Maybe$withDefault,
 									_Utils_Tuple2(
-										'',
+										'white',
 										_Utils_Tuple2(0, 0)),
 									A2(
 										elm$core$Array$get,
@@ -7863,8 +7863,8 @@ var author$project$Main$debugLine = function (bool) {
 		_Debug_todo(
 			'Main',
 			{
-				start: {line: 948, column: 17},
-				end: {line: 948, column: 27}
+				start: {line: 968, column: 17},
+				end: {line: 968, column: 27}
 			})) : mdgriffith$elm_ui$Element$htmlAttribute(
 		A2(elm$html$Html$Attributes$style, '', ''));
 };
@@ -14606,89 +14606,155 @@ var author$project$Main$settingPosition = F2(
 				])) : mdgriffith$elm_ui$Element$none;
 	});
 var author$project$Main$shironezuIro = A3(mdgriffith$elm_ui$Element$rgb255, 220, 221, 221);
+var author$project$Main$DisplayDlButton = {$: 'DisplayDlButton'};
 var author$project$Main$Undo = F2(
 	function (a, b) {
 		return {$: 'Undo', a: a, b: b};
 	});
-var author$project$Main$DisplayDlButton = {$: 'DisplayDlButton'};
 var elm$html$Html$a = _VirtualDom_node('a');
 var elm$html$Html$Attributes$hidden = elm$html$Html$Attributes$boolProperty('hidden');
 var elm$html$Html$Attributes$target = elm$html$Html$Attributes$stringProperty('target');
-var author$project$Main$gendlButton = F2(
-	function (bText, model) {
-		var tempButton = F6(
-			function (msg, oValue, dValue, id_, attr1, attr2) {
-				return A2(
-					mdgriffith$elm_ui$Element$Input$button,
-					_List_Nil,
-					{
-						label: A2(
-							mdgriffith$elm_ui$Element$el,
-							_List_Nil,
-							mdgriffith$elm_ui$Element$html(
-								A2(
-									elm$html$Html$a,
-									_List_fromArray(
-										[
-											A2(elm$html$Html$Attributes$style, 'color', 'white'),
-											A2(elm$html$Html$Attributes$style, 'font-size', '14px'),
-											A2(elm$html$Html$Attributes$style, 'opacity', oValue),
-											A2(elm$html$Html$Attributes$style, 'text-decoration', dValue),
-											elm$html$Html$Attributes$id(id_),
-											attr1,
-											attr2
-										]),
-									_List_fromArray(
-										[
-											elm$html$Html$text(bText)
-										])))),
-						onPress: msg
-					});
-			});
-		switch (bText) {
-			case 'Gen':
-				return (elm$core$List$length(model.campus) > 1) ? A6(
-					tempButton,
-					elm$core$Maybe$Just(author$project$Main$DisplayDlButton),
-					'1',
-					'none',
-					'',
-					A2(elm$html$Html$Attributes$style, '', ''),
-					elm$html$Html$Attributes$hidden(false)) : A6(
-					tempButton,
-					elm$core$Maybe$Nothing,
-					'0.6',
-					'line-through',
-					'',
-					A2(elm$html$Html$Attributes$style, '', ''),
-					elm$html$Html$Attributes$hidden(false));
-			case 'DL':
-				return model.toolsSetting.isDisplayDlButton ? A6(
-					tempButton,
-					elm$core$Maybe$Nothing,
-					'1',
-					'none',
-					'dl',
-					elm$html$Html$Attributes$href(''),
-					elm$html$Html$Attributes$target('_blank')) : A6(
-					tempButton,
-					elm$core$Maybe$Nothing,
-					'0.6',
-					'line-through',
-					'',
-					A2(elm$html$Html$Attributes$style, '', ''),
-					elm$html$Html$Attributes$hidden(false));
-			default:
-				return mdgriffith$elm_ui$Element$none;
-		}
-	});
+var mdgriffith$elm_ui$Internal$Model$Right = {$: 'Right'};
+var mdgriffith$elm_ui$Element$alignRight = mdgriffith$elm_ui$Internal$Model$AlignX(mdgriffith$elm_ui$Internal$Model$Right);
 var mdgriffith$elm_ui$Internal$Model$AlignY = function (a) {
 	return {$: 'AlignY', a: a};
 };
 var mdgriffith$elm_ui$Internal$Model$CenterY = {$: 'CenterY'};
 var mdgriffith$elm_ui$Element$centerY = mdgriffith$elm_ui$Internal$Model$AlignY(mdgriffith$elm_ui$Internal$Model$CenterY);
+var mdgriffith$elm_ui$Element$paddingXY = F2(
+	function (x, y) {
+		return _Utils_eq(x, y) ? A2(
+			mdgriffith$elm_ui$Internal$Model$StyleClass,
+			mdgriffith$elm_ui$Internal$Flag$padding,
+			A5(
+				mdgriffith$elm_ui$Internal$Model$PaddingStyle,
+				'p-' + elm$core$String$fromInt(x),
+				x,
+				x,
+				x,
+				x)) : A2(
+			mdgriffith$elm_ui$Internal$Model$StyleClass,
+			mdgriffith$elm_ui$Internal$Flag$padding,
+			A5(
+				mdgriffith$elm_ui$Internal$Model$PaddingStyle,
+				'p-' + (elm$core$String$fromInt(x) + ('-' + elm$core$String$fromInt(y))),
+				y,
+				x,
+				y,
+				x));
+	});
 var author$project$Main$toolsPanel = F2(
 	function (model, bool) {
+		var viewUndoButton = A2(
+			mdgriffith$elm_ui$Element$Input$button,
+			_List_Nil,
+			{
+				label: A2(
+					mdgriffith$elm_ui$Element$el,
+					_List_fromArray(
+						[
+							mdgriffith$elm_ui$Element$Font$color(author$project$Main$shiroIro),
+							mdgriffith$elm_ui$Element$Font$size(14)
+						]),
+					mdgriffith$elm_ui$Element$text('Undo')),
+				onPress: function () {
+					var y = A2(
+						elm$core$Maybe$withDefault,
+						_Utils_Tuple2(
+							'white',
+							_Utils_Tuple2(0, 0)),
+						A2(
+							elm$core$Array$get,
+							0,
+							elm$core$Array$fromList(
+								A2(
+									elm$core$List$drop,
+									elm$core$List$length(model.history) - 1,
+									model.history)))).b.b;
+					var x = A2(
+						elm$core$Maybe$withDefault,
+						_Utils_Tuple2(
+							'white',
+							_Utils_Tuple2(0, 0)),
+						A2(
+							elm$core$Array$get,
+							0,
+							elm$core$Array$fromList(
+								A2(
+									elm$core$List$drop,
+									elm$core$List$length(model.history) - 1,
+									model.history)))).b.a;
+					return elm$core$Maybe$Just(
+						A2(author$project$Main$Undo, y, x));
+				}()
+			});
+		var gendlButton = function (bText) {
+			var tempButton = F6(
+				function (msg, oValue, dValue, id_, attr1, attr2) {
+					return A2(
+						mdgriffith$elm_ui$Element$Input$button,
+						_List_Nil,
+						{
+							label: A2(
+								mdgriffith$elm_ui$Element$el,
+								_List_Nil,
+								mdgriffith$elm_ui$Element$html(
+									A2(
+										elm$html$Html$a,
+										_List_fromArray(
+											[
+												A2(elm$html$Html$Attributes$style, 'color', 'white'),
+												A2(elm$html$Html$Attributes$style, 'font-size', '14px'),
+												A2(elm$html$Html$Attributes$style, 'opacity', oValue),
+												A2(elm$html$Html$Attributes$style, 'text-decoration', dValue),
+												elm$html$Html$Attributes$id(id_),
+												attr1,
+												attr2
+											]),
+										_List_fromArray(
+											[
+												elm$html$Html$text(bText)
+											])))),
+							onPress: msg
+						});
+				});
+			switch (bText) {
+				case 'Gen':
+					return (elm$core$List$length(model.campus) > 1) ? A6(
+						tempButton,
+						elm$core$Maybe$Just(author$project$Main$DisplayDlButton),
+						'1',
+						'none',
+						'',
+						A2(elm$html$Html$Attributes$style, '', ''),
+						elm$html$Html$Attributes$hidden(false)) : A6(
+						tempButton,
+						elm$core$Maybe$Nothing,
+						'0.6',
+						'line-through',
+						'',
+						A2(elm$html$Html$Attributes$style, '', ''),
+						elm$html$Html$Attributes$hidden(false));
+				case 'DL':
+					return model.toolsSetting.isDisplayDlButton ? A6(
+						tempButton,
+						elm$core$Maybe$Nothing,
+						'1',
+						'none',
+						'dl',
+						elm$html$Html$Attributes$href(''),
+						elm$html$Html$Attributes$target('_blank')) : A6(
+						tempButton,
+						elm$core$Maybe$Nothing,
+						'0.6',
+						'line-through',
+						'',
+						A2(elm$html$Html$Attributes$style, '', ''),
+						elm$html$Html$Attributes$hidden(false));
+				default:
+					return mdgriffith$elm_ui$Element$none;
+			}
+		};
 		return bool ? A2(
 			mdgriffith$elm_ui$Element$row,
 			_List_fromArray(
@@ -14696,7 +14762,8 @@ var author$project$Main$toolsPanel = F2(
 					mdgriffith$elm_ui$Element$width(mdgriffith$elm_ui$Element$fill),
 					mdgriffith$elm_ui$Element$height(
 					mdgriffith$elm_ui$Element$px(36)),
-					mdgriffith$elm_ui$Element$Border$width(1),
+					mdgriffith$elm_ui$Element$Border$widthEach(
+					{bottom: 1, left: 0, right: 0, top: 1}),
 					mdgriffith$elm_ui$Element$Border$color(author$project$Main$shiroIro),
 					mdgriffith$elm_ui$Element$Background$color(author$project$Main$rouIro)
 				]),
@@ -14712,57 +14779,24 @@ var author$project$Main$toolsPanel = F2(
 							mdgriffith$elm_ui$Element$centerY
 						]),
 					mdgriffith$elm_ui$Element$text('Tools')),
-					A2(author$project$Main$gendlButton, 'Gen', model),
-					A2(author$project$Main$gendlButton, 'DL', model),
 					A2(
-					mdgriffith$elm_ui$Element$Input$button,
-					_List_Nil,
-					{
-						label: A2(
-							mdgriffith$elm_ui$Element$el,
-							_List_fromArray(
-								[
-									mdgriffith$elm_ui$Element$Font$color(author$project$Main$shiroIro),
-									mdgriffith$elm_ui$Element$Font$size(14)
-								]),
-							mdgriffith$elm_ui$Element$text('Undo')),
-						onPress: function () {
-							var y = A2(
-								elm$core$Maybe$withDefault,
-								_Utils_Tuple2(
-									'white',
-									_Utils_Tuple2(0, 0)),
-								A2(
-									elm$core$Array$get,
-									0,
-									elm$core$Array$fromList(
-										A2(
-											elm$core$List$drop,
-											elm$core$List$length(model.history) - 1,
-											model.history)))).b.b;
-							var x = A2(
-								elm$core$Maybe$withDefault,
-								_Utils_Tuple2(
-									'white',
-									_Utils_Tuple2(0, 0)),
-								A2(
-									elm$core$Array$get,
-									0,
-									elm$core$Array$fromList(
-										A2(
-											elm$core$List$drop,
-											elm$core$List$length(model.history) - 1,
-											model.history)))).b.a;
-							return elm$core$Maybe$Just(
-								A2(author$project$Main$Undo, y, x));
-						}()
-					})
+					mdgriffith$elm_ui$Element$row,
+					_List_fromArray(
+						[
+							mdgriffith$elm_ui$Element$alignRight,
+							A2(mdgriffith$elm_ui$Element$paddingXY, 20, 0),
+							mdgriffith$elm_ui$Element$spacing(5)
+						]),
+					_List_fromArray(
+						[
+							gendlButton('Gen'),
+							gendlButton('DL'),
+							viewUndoButton
+						]))
 				])) : mdgriffith$elm_ui$Element$none;
 	});
 var mdgriffith$elm_ui$Internal$Model$Left = {$: 'Left'};
 var mdgriffith$elm_ui$Element$alignLeft = mdgriffith$elm_ui$Internal$Model$AlignX(mdgriffith$elm_ui$Internal$Model$Left);
-var mdgriffith$elm_ui$Internal$Model$Right = {$: 'Right'};
-var mdgriffith$elm_ui$Element$alignRight = mdgriffith$elm_ui$Internal$Model$AlignX(mdgriffith$elm_ui$Internal$Model$Right);
 var elm$html$Html$Attributes$alt = elm$html$Html$Attributes$stringProperty('alt');
 var elm$html$Html$Attributes$src = function (url) {
 	return A2(
@@ -15098,28 +15132,6 @@ var mdgriffith$elm_ui$Element$newTabLink = F2(
 			mdgriffith$elm_ui$Internal$Model$Unkeyed(
 				_List_fromArray(
 					[label])));
-	});
-var mdgriffith$elm_ui$Element$paddingXY = F2(
-	function (x, y) {
-		return _Utils_eq(x, y) ? A2(
-			mdgriffith$elm_ui$Internal$Model$StyleClass,
-			mdgriffith$elm_ui$Internal$Flag$padding,
-			A5(
-				mdgriffith$elm_ui$Internal$Model$PaddingStyle,
-				'p-' + elm$core$String$fromInt(x),
-				x,
-				x,
-				x,
-				x)) : A2(
-			mdgriffith$elm_ui$Internal$Model$StyleClass,
-			mdgriffith$elm_ui$Internal$Flag$padding,
-			A5(
-				mdgriffith$elm_ui$Internal$Model$PaddingStyle,
-				'p-' + (elm$core$String$fromInt(x) + ('-' + elm$core$String$fromInt(y))),
-				y,
-				x,
-				y,
-				x));
 	});
 var author$project$Main$view = function (model) {
 	return A2(
