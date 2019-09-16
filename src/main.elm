@@ -48,7 +48,7 @@ type alias Model =
     , tempSetting : Setting
     , borderColorValue : CssColor
     , toolsSetting : ToolsSetting
-    , history : List (String, (Int, Int))
+    , history : History
     }
 
 type alias Campus =
@@ -59,6 +59,15 @@ type alias Points =
     (Int, Int)
 type alias CssColor =
     String
+initMainPalette : CssColor
+initMainPalette =
+    "white"
+initColorValue : CssColor
+initColorValue =
+    "white"
+initBorderColorValue : CssColor
+initBorderColorValue =
+    "black"
 initCampus : Campus
 initCampus =
     Dict.fromList [((0, 0), "white")]
@@ -84,7 +93,15 @@ type alias Serial =
     Int
 type alias SubPalette =
     Dict Serial CssColor
-
+initSubPalette : SubPalette
+initSubPalette =
+    Dict.fromList [(0, "white")]
+type alias History =
+    Dict Serial ((Point), CssColor)
+initHistory : History
+initHistory =
+    Dict.fromList <| ExList.lift2 Tuple.pair (List.range 0 0) (ExList.lift2 Tuple.pair (ExList.lift2 Tuple.pair (List.range 0 0) (List.range 0 0)) ["white"])
+    
 type alias Setting =
     { borderColor : String
     , borderStyle : String
@@ -124,18 +141,18 @@ initToolsSetting =
 init : () -> (Model, Cmd Msg)
 init _ =
     ( { campus = initCampus
-      , colorValue = "white"
-      , subPalette = Dict.fromList []
-      , mainPalette = "white"
+      , colorValue = initColorValue
+      , subPalette = initSubPalette
+      , mainPalette = initMainPalette
       , campusSize = (CampusSize 0 0)
       , tempCampusSize = (TempCampusSize "" "")
       , modalVisibility = BModal.hidden
       , openingModalWindow = BModal.shown
       , setting = initSetting
       , tempSetting = initSetting
-      , borderColorValue = ""
+      , borderColorValue = initBorderColorValue
       , toolsSetting = initToolsSetting
-      , history = List.drop 1 [("white", (0, 0))]
+      , history = initHistory
       } 
     , Cmd.none
     )
@@ -162,14 +179,14 @@ type Msg
     | DisplayDlButton
     | ChangePanelPosition Panel Position
     | ApplySetting
-    | Undo Int Int
+    | Undo Point
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
     case msg of
         ChangeColor x y color ->
             ( { model | campus = Dict.update (x, y) (Maybe.map (\n -> color)) model.campus
-                      , history = List.append model.history [((getCampusColor model x y), (y, x))]
+                      , history = Dict.insert (Dict.size model.history) ((x, y), (getCampusColor model x y))  model.history
               }
             , Cmd.none
             )
@@ -373,9 +390,14 @@ update msg model =
             else
                 (model, Cmd.none)
 
-        Undo x y ->
-            ( { model | campus = Dict.update (0, 0) (Maybe.map (\n -> "yellow")) model.campus
-                      , history = List.take ((List.length model.history)-1) model.history
+        Undo (y, x) ->
+            let
+                getHistoryColor : Point -> String 
+                getHistoryColor (x_, y_) =
+                    Tuple.second <| Maybe.withDefault ((0, 0), "white") (Dict.get (Dict.size model.history) model.history)
+            in
+            ( { model | campus = Dict.update (x, y) (Maybe.map (\n -> getHistoryColor (x, y))) model.campus
+                      , history = Dict.remove ((Dict.size model.history)-1) model.history
               }
             , toClickJudge ()
             ) 
@@ -490,26 +512,15 @@ toolsPanel model bool =
                             tempButton Nothing "0.6" "line-through" "" (HAttrs.style "" "") (hidden False)
                     _ ->
                         E.none
-
         viewUndoButton : Element Msg
         viewUndoButton =
             Input.button []
                          { onPress =
                              let
-                                 x = Tuple.first <|
-                                         Tuple.second <|
-                                             Maybe.withDefault ("white", (0, 0)) <| 
-                                                 Array.get 0 <|                                                       
-                                                     Array.fromList <|
-                                                          List.drop ((List.length model.history)-1) model.history
-                                 y = Tuple.second <|
-                                         Tuple.second <|
-                                              Maybe.withDefault ("white", (0, 0)) <| 
-                                                  Array.get 0 <| 
-                                                     Array.fromList <|
-                                                         List.drop ((List.length model.history)-1) model.history
+                                 x =  Tuple.first (Tuple.first (Maybe.withDefault ((0, 0), "white") (Dict.get ((Dict.size model.history)-1) model.history)))
+                                 y =  Tuple.second (Tuple.first (Maybe.withDefault ((0, 0), "white") (Dict.get ((Dict.size model.history)-1) model.history)))
                              in
-                                 Just <| Undo y x
+                                 Just <| Undo (y, x)
                          , label = E.el [ Font.color <| shiroIro
                                         , Font.size <| 14
                                         ] <|
