@@ -493,29 +493,63 @@ view model =
                                          }
                             ] 
                       ]
-                , row [ E.width fill
-                      , E.height fill
-                      , debugLine False 
-                      ] 
-                      [ settingPosition model (model.setting.panelPosition.settingPanel == Left)
-                      , palettePosition model (model.setting.panelPosition.palettePanel == Left)
-                      , column [ E.width fill
-                               , E.height fill
-                               , Background.color <| shironezuIro
-                               ] 
-                               [ toolsPanel model True
-                               , el [centerX] <| 
-                                  html <|
-                                      viewCampus model (model.campusSize.width, model.campusSize.height)
-                               ]  
-                      , palettePosition model (model.setting.panelPosition.palettePanel == Right)
-                      , settingPosition model (model.setting.panelPosition.settingPanel == Right)
-                      ]
+                , viewPanels model
                 ]
         ]
 
-toolsPanel : Model -> Bool -> Element Msg
-toolsPanel model bool =
+viewPanels : Model -> Element Msg
+viewPanels model =
+    let
+        view_ : List (Element Msg)
+        view_ =
+            case ( model.setting.panelPosition.settingPanel
+                 , model.setting.panelPosition.palettePanel
+                 ) 
+            of
+                (Left, Right) ->
+                    [ viewSettingPanel model
+                    , viewCampusPanel model
+                    , viewPalettePanel model
+                    ]
+
+                (Right, Left) ->
+                    [ viewPalettePanel model
+                    , viewCampusPanel model
+                    , viewSettingPanel model
+                    ]
+
+                (Right, Right) ->
+                    [ viewCampusPanel model
+                    , viewPalettePanel model
+                    , viewSettingPanel model
+                    ]
+
+                (Left, Left) ->
+                    [ viewSettingPanel model
+                    , viewPalettePanel model
+                    , viewCampusPanel model
+                    ]
+
+    in
+        row [ E.width fill
+            , E.height fill
+            ]
+            view_
+
+viewCampusPanel : Model -> Element Msg
+viewCampusPanel model =
+    column [ E.width fill
+           , E.height fill
+           , Background.color <| shironezuIro
+           ] 
+           [ viewToolsPanel model
+           , el [centerX] <| 
+                            html <|
+                                   viewCampus model (model.campusSize.width, model.campusSize.height)
+           ] 
+
+viewToolsPanel : Model -> Element Msg
+viewToolsPanel model =
     let
         gendlButton : String -> Element Msg
         gendlButton bText =
@@ -565,7 +599,6 @@ toolsPanel model bool =
                                             E.text <| "Undo"
                          }
     in
-    if bool then
         row [ E.width fill
             , E.height <| px 36
             , Border.widthEach { top = 1, right = 0, left = 0, bottom = 1 }
@@ -587,17 +620,6 @@ toolsPanel model bool =
                     , viewUndoButton
                     ]
             ]
-    else
-        E.none
-
-
-changePositionText : Position -> String
-changePositionText position =
-    case position of
-        Right ->
-            "To Left"
-        Left ->
-            "To Right "
 
 panelHr : Element Msg
 panelHr =
@@ -608,141 +630,8 @@ panelHr =
          ] <|
          none
 
-palettePosition : Model -> Bool -> Element Msg
-palettePosition model bool  =
-    if bool then
-        column [ E.width <| px 100
-               , E.height fill
-               , Border.width 1
-               , Border.color<| shiroIro
-               , Background.color <| rouIro
-               , debugLine False
-               ]
-               [ el [ Font.color <| shiroIro
-                    , Font.size <| 17
-                    , centerX
-                    , padding 2
-                    ] <| 
-                        E.text "Palette"
-               , panelHr
-               , column [ centerX
-                        , padding 3
-                        , spacing 5
-                        ] 
-                        [ E.el [ Font.color <| shiroIro
-                               , Font.size <| 14
-                               , centerX
-                               ]  <|
-                                   E.text "Add Color"
-                        , panelHr
-                        , E.el [ E.width <| px 90
-                               ] <| 
-                                   html <|
-                                       H.input [ onInput ColorValue 
-                                               , HAttrs.style "width" "80px"
-                                               , HAttrs.style "height" "14px"
-                                               , HAttrs.style "font-size" "0.7em"
-                                               , HAttrs.style "margin" "0 auto"
-                                               ] 
-                                               [H.text model.colorValue]
-                        , el [centerX] <|
-                            html <|
-                                div [ HAttrs.style "color" "#e2041b" 
-                                    , HAttrs.style "font-size" "13px"
-                                    ]
-                                    [ H.text <| if isColor model.colorValue then
-                                                    ""
-                                                else
-                                                    if String.isEmpty model.colorValue then
-                                                        "Is Empty"
-                                                    else
-                                                        "Isn't Color"
-                                    ]
-                        , el [ centerX ] <|
-                              if isColor <| model.colorValue then
-                                  Input.button [ htmlAttribute <| HAttrs.style "color" "white"
-                                               ] 
-                                               { onPress = Just (AddColorToSubPalette model.colorValue)
-                                               , label = row []
-                                                             [ E.el [ Font.color <| shiroIro
-                                                                    , Font.size <| 14
-                                                                    ] <|
-                                                                        E.text "Add "
-                                                             , html <|
-                                                                div [ HAttrs.style "width" "14px"
-                                                                    , HAttrs.style "height" "14px"
-                                                                    , HAttrs.style "background-color" model.colorValue
-                                                                    ]
-                                                                    []
-                                                             ] 
-
-                                               } 
-                              else
-                                  E.el [ htmlAttribute <| HAttrs.style "opacity" "0.6"] <|
-                                      Input.button [ Region.description "disabled"
-                                                   , htmlAttribute <| HAttrs.style "color" "white"
-                                                   ] 
-                                                   { onPress = Just ForDisabled
-                                                   , label = E.el [ Font.color <| shiroIro
-                                                                  , Font.size <| 14
-                                                                  ] <| 
-                                                                      E.text "disabled"
-                                                    }
-                        ]
-               , column [ centerX
-                        , padding 3
-                        , spacing 5
-                        ]
-                        [ E.el [ Font.color <| shiroIro
-                               , Font.size <| 14
-                               , centerX
-                               ]  <|
-                                   E.text "Main Palette"
-                        , panelHr
-                        , E.el [ centerX
-                               ] <|
-                                   html <|
-                                       div [ HAttrs.style "width" "30px"
-                                           , HAttrs.style "height" "30px"
-                                           , HAttrs.style "border" "solid 1px black"
-                                           , HAttrs.style "background-color" model.mainPalette 
-                                           ] 
-                                           [] 
-                        ]
-               , column [ centerX
-                        , paddingEach { top = 2, right = 0, left = 0, bottom = 2 }
-                        , spacing 5
-                        ]
-                        [ E.el [ Font.color <| shiroIro
-                               , Font.size <| 14
-                               , centerX
-                               ] <|
-                                  E.text "Sub Palette"
-                        , panelHr
-                        , column [ centerX
-                                ]
-                                [ wrappedRow [ spacing 3 ] <|
-                                    List.map (\plt -> E.el [] <|
-                                                          html <|
-                                                              div [ HAttrs.style "width" "25px"
-                                                                  , HAttrs.style "height" "25px"
-                                                                  , HAttrs.style "background-color" <| getPaletteColor model (plt-1)
-                                                                  , HAttrs.style "border" "solid 1px black"
-                                                                  , onDoubleClick (DeleteSubPalette plt)
-                                                                  , onClick (SetMainPalette (plt-1))
-                                                                  ]  
-                                                                  []
-                                             ) <|
-                                                List.range 1 (Dict.size model.subPalette)
-                                ]
-                        ]
-               ]
-    else
-        E.none
-
-settingPosition : Model -> Bool -> Element Msg
-settingPosition model bool  =
-    if bool then
+viewSettingPanel : Model -> Element Msg
+viewSettingPanel model =
         column [ E.width <| px 100
                , E.height fill
                , Border.width 1
@@ -976,9 +865,135 @@ settingPosition model bool  =
                                                       E.text "disabled"
                                    }
               ]
-              
-    else
-        E.none
+
+viewPalettePanel : Model -> Element Msg
+viewPalettePanel model =
+        column [ E.width <| px 100
+               , E.height fill
+               , Border.width 1
+               , Border.color<| shiroIro
+               , Background.color <| rouIro
+               , debugLine False
+               ]
+               [ el [ Font.color <| shiroIro
+                    , Font.size <| 17
+                    , centerX
+                    , padding 2
+                    ] <| 
+                        E.text "Palette"
+               , panelHr
+               , column [ centerX
+                        , padding 3
+                        , spacing 5
+                        ] 
+                        [ E.el [ Font.color <| shiroIro
+                               , Font.size <| 14
+                               , centerX
+                               ]  <|
+                                   E.text "Add Color"
+                        , panelHr
+                        , E.el [ E.width <| px 90
+                               ] <| 
+                                   html <|
+                                       H.input [ onInput ColorValue 
+                                               , HAttrs.style "width" "80px"
+                                               , HAttrs.style "height" "14px"
+                                               , HAttrs.style "font-size" "0.7em"
+                                               , HAttrs.style "margin" "0 auto"
+                                               ] 
+                                               [H.text model.colorValue]
+                        , el [centerX] <|
+                            html <|
+                                div [ HAttrs.style "color" "#e2041b" 
+                                    , HAttrs.style "font-size" "13px"
+                                    ]
+                                    [ H.text <| if isColor model.colorValue then
+                                                    ""
+                                                else
+                                                    if String.isEmpty model.colorValue then
+                                                        "Is Empty"
+                                                    else
+                                                        "Isn't Color"
+                                    ]
+                        , el [ centerX ] <|
+                              if isColor <| model.colorValue then
+                                  Input.button [ htmlAttribute <| HAttrs.style "color" "white"
+                                               ] 
+                                               { onPress = Just (AddColorToSubPalette model.colorValue)
+                                               , label = row []
+                                                             [ E.el [ Font.color <| shiroIro
+                                                                    , Font.size <| 14
+                                                                    ] <|
+                                                                        E.text "Add "
+                                                             , html <|
+                                                                div [ HAttrs.style "width" "14px"
+                                                                    , HAttrs.style "height" "14px"
+                                                                    , HAttrs.style "background-color" model.colorValue
+                                                                    ]
+                                                                    []
+                                                             ] 
+
+                                               } 
+                              else
+                                  E.el [ htmlAttribute <| HAttrs.style "opacity" "0.6"] <|
+                                      Input.button [ Region.description "disabled"
+                                                   , htmlAttribute <| HAttrs.style "color" "white"
+                                                   ] 
+                                                   { onPress = Just ForDisabled
+                                                   , label = E.el [ Font.color <| shiroIro
+                                                                  , Font.size <| 14
+                                                                  ] <| 
+                                                                      E.text "disabled"
+                                                    }
+                        ]
+               , column [ centerX
+                        , padding 3
+                        , spacing 5
+                        ]
+                        [ E.el [ Font.color <| shiroIro
+                               , Font.size <| 14
+                               , centerX
+                               ]  <|
+                                   E.text "Main Palette"
+                        , panelHr
+                        , E.el [ centerX
+                               ] <|
+                                   html <|
+                                       div [ HAttrs.style "width" "30px"
+                                           , HAttrs.style "height" "30px"
+                                           , HAttrs.style "border" "solid 1px black"
+                                           , HAttrs.style "background-color" model.mainPalette 
+                                           ] 
+                                           [] 
+                        ]
+               , column [ centerX
+                        , paddingEach { top = 2, right = 0, left = 0, bottom = 2 }
+                        , spacing 5
+                        ]
+                        [ E.el [ Font.color <| shiroIro
+                               , Font.size <| 14
+                               , centerX
+                               ] <|
+                                  E.text "Sub Palette"
+                        , panelHr
+                        , column [ centerX
+                                ]
+                                [ wrappedRow [ spacing 3 ] <|
+                                    List.map (\plt -> E.el [] <|
+                                                          html <|
+                                                              div [ HAttrs.style "width" "25px"
+                                                                  , HAttrs.style "height" "25px"
+                                                                  , HAttrs.style "background-color" <| getPaletteColor model (plt-1)
+                                                                  , HAttrs.style "border" "solid 1px black"
+                                                                  , onDoubleClick (DeleteSubPalette plt)
+                                                                  , onClick (SetMainPalette (plt-1))
+                                                                  ]  
+                                                                  []
+                                             ) <|
+                                                List.range 1 (Dict.size model.subPalette)
+                                ]
+                        ]
+               ]
 
 isCorrectSetting : Setting -> Bool
 isCorrectSetting setting =
