@@ -456,10 +456,10 @@ view model =
                       , Background.color <| rouIro
                       , paddingXY 15 0
                       , Border.widthEach { top = 1, right = 1, left = 1, bottom = 0 }
-                      , Border.color <| rgb255 255 255 255
+                      , Border.color <| shiroIro
                       ]
                       [ E.el [alignLeft
-                             , Font.color <| rgb255 255 255 255
+                             , Font.color <| shiroIro
                              ] <| 
                                 E.text "SOSOGU"
                       , row [ alignRight 
@@ -618,7 +618,7 @@ palettePosition model bool  =
                , Background.color <| rouIro
                , debugLine False
                ]
-               [ el [ Font.color <| rgb255 255 255 255
+               [ el [ Font.color <| shiroIro
                     , Font.size <| 17
                     , centerX
                     , padding 2
@@ -749,7 +749,7 @@ settingPosition model bool  =
                , Border.color <| shiroIro
                , Background.color <| rouIro
                ]
-               [ el [ Font.color <| rgb255 255 255 255
+               [ el [ Font.color <| shiroIro
                     , Font.size <| 17
                     , centerX
                     , padding 2
