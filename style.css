@@ -1,5 +1,7 @@
 @import url("file/bootstrap.min.css");
 @import url("file/normalize.css");
+@import url("https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css");
+@import url("https://necolas.github.io/normalize.css/8.0.1/normalize.css");
 @font-face {
   font-family: 'InterMedium';
   src: url('file/Inter-Medium.woff') format('woff');
