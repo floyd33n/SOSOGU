@@ -159,11 +159,11 @@ init _ =
 
 --UPDATE--
 type Msg
-    = ChangeColor Int Int String
+    = ChangeColor Point CssColor
     | ColorValue String
-    | AddColorToSubPalette String
-    | SetMainPalette Int
-    | DeleteSubPalette Int
+    | AddColorToSubPalette CssColor
+    | SetMainPalette Serial
+    | DeleteSubPalette Serial
     | SetCampusWidth String
     | SetCampusHeight String
     | CreateCampus
@@ -184,9 +184,9 @@ type Msg
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
     case msg of
-        ChangeColor x y color ->
+        ChangeColor (x, y) color ->
             ( { model | campus = Dict.update (x, y) (Maybe.map (\n -> color)) model.campus
-                      , history = Dict.insert (Dict.size model.history) ((x, y), (getCampusColor model x y))  model.history
+                      , history = Dict.insert (Dict.size model.history) ((x, y), (getCampusColor model (x, y)))  model.history
               }
             , Cmd.none
             )
@@ -481,7 +481,7 @@ view model =
                                [ toolsPanel model True
                                , el [centerX] <| 
                                   html <|
-                                      viewCampus model model.campusSize.width model.campusSize.height
+                                      viewCampus model (model.campusSize.width, model.campusSize.height)
                                ]  
                       , palettePosition model (model.setting.panelPosition.palettePanel == Right)
                       , settingPosition model (model.setting.panelPosition.settingPanel == Right)
@@ -1010,12 +1010,12 @@ getPaletteColor : Model -> Int -> String
 getPaletteColor model n =
     Maybe.withDefault "white" (Dict.get n model.subPalette)
 
-getCampusColor : Model -> Int -> Int -> String
-getCampusColor model x y =
+getCampusColor : Model -> Point -> String
+getCampusColor model (x, y) =
     Maybe.withDefault "white" (Dict.get (x, y) model.campus)
 
-viewCampus : Model -> Int -> Int -> Html Msg
-viewCampus model width height =
+viewCampus : Model -> Points -> Html Msg
+viewCampus model (width, height) =
     div [ id "campus" ]
         [ div [] <|
             List.map (\y -> div [] <|
@@ -1024,10 +1024,10 @@ viewCampus model width height =
                     [ div [ HAttrs.style "width" (model.setting.width ++ "px")
                           , HAttrs.style "height" (model.setting.height ++ "px")
                           , HAttrs.style "border" (model.setting.borderColor ++ " " ++ model.setting.borderStyle)
-                          , HAttrs.style "background-color" (getCampusColor model y x)
+                          , HAttrs.style "background-color" (getCampusColor model (y, x) )
                           , HAttrs.style "padding" "0px"
                           , HAttrs.style "margin" "-1px"
-                          , HEvents.onClick (ChangeColor y x model.mainPalette)
+                          , HEvents.onClick (ChangeColor (y, x) model.mainPalette)
                           --, HEvents.onDoubleClick (ChangeColor y x "white")
                           ]
                           []
@@ -1037,63 +1037,7 @@ viewCampus model width height =
                       ) <|
                           List.range 0 (height-1)
         ]
-{-
-updateCampus : Model -> Int -> Int -> String -> List(List (Int, String))
-updateCampus model x y color =
-    List.append
-        (List.append 
-                (List.take x model.campus) 
-                (List.singleton <|
-                    List.append
-                        ((++)
-                            (List.take y <| 
-                                Maybe.withDefault [(0, "")] <|
-                                    Array.get x <| 
-                                        Array.fromList model.campus
-                            )
-                            (List.singleton (getCampusInt model <| y
-                                            , color
-                                            )
-                            )
-                        )
-                        (List.drop (y+1) <| 
-                                Maybe.withDefault [(0, "")] <| 
-                                    Array.get x <| 
-                                        Array.fromList model.campus
-                        )
-                ) 
-        )
-        (List.drop (x+1) model.campus)
--}
-{-
-undoCampus : Model -> Int -> Int -> List(List (Int, String))
-undoCampus model x y =
-    List.append
-        (List.append 
-                (List.take x model.campus) 
-                (List.singleton <|
-                    List.append
-                        ((++)
-                            (List.take y <| 
-                                Maybe.withDefault [(0, "")] <|
-                                    Array.get x <| 
-                                        Array.fromList model.campus
-                            )
-                            (List.singleton (getCampusInt model <| y
-                                            , "yellow"
-                                            --, Tuple.first (Maybe.withDefault ("", (0, 0)) <| Array.get ((List.length model.history)-1) <| Array.fromList model.history)
-                                            )
-                            )
-                        )
-                        (List.drop (y+1) <| 
-                                Maybe.withDefault [(0, "")] <| 
-                                    Array.get x <| 
-                                        Array.fromList model.campus
-                        )
-                ) 
-        )
-        (List.drop (x+1) model.campus)
--}
+
 addColorToSubPalette : Model -> CssColor -> SubPalette
 addColorToSubPalette model color =
     Dict.insert (Dict.size model.subPalette) color model.subPalette
