@@ -185,8 +185,16 @@ update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
     case msg of
         ChangeColor (x, y) color ->
-            ( { model | campus = Dict.update (x, y) (Maybe.map (\n -> color)) model.campus
-                      , history = Dict.insert (Dict.size model.history) ((x, y), (getCampusColor model (x, y)))  model.history
+            ( { model | campus = Dict.update 
+                                    (x, y) 
+                                        (Maybe.map (\n -> color))
+                                            model.campus
+                      , history = Dict.insert 
+                                      (Dict.size model.history)
+                                          ( (x, y)
+                                          , getCampusColor model (x, y)
+                                          )  
+                                                                        model.history
               }
             , Cmd.none
             )
@@ -221,12 +229,18 @@ update msg model =
             )
 
         SetCampusWidth width ->
-            ( { model | tempCampusSize = { width = width, height = model.tempCampusSize.height } }
+            ( { model | tempCampusSize = { width = width
+                                         , height = model.tempCampusSize.height 
+                                         } 
+              }
             , Cmd.none
             )
         
         SetCampusHeight height ->
-            ( { model | tempCampusSize = { height = height, width = model.tempCampusSize.width } }
+            ( { model | tempCampusSize = { height = height
+                                         , width = model.tempCampusSize.width 
+                                         } 
+              }
             , Cmd.none
             )
        
@@ -234,15 +248,21 @@ update msg model =
             let
                 createCampusList : Points-> List ( ( Int, Int ), String )
                 createCampusList (width_, height_) =
-                    ExList.lift2 Tuple.pair (ExList.lift2 Tuple.pair (List.range 0 width_) (List.range 0 height_)) ["white"]
+                    ExList.lift2 
+                        Tuple.pair ( ExList.lift2 
+                                       Tuple.pair (List.range 0 width_) 
+                                                  (List.range 0 height_)
+                                   ) 
+                                   ["white"]
                 
                 convertTemp : String -> Int
                 convertTemp str =
                     Maybe.withDefault 0 (String.toInt str)
             in
-                ( { model | campus = Dict.fromList <| createCampusList ( convertTemp model.tempCampusSize.width
-                                                                       , convertTemp model.tempCampusSize.height
-                                                                       )
+                ( { model | campus = Dict.fromList <| 
+                                        createCampusList ( convertTemp model.tempCampusSize.width
+                                                         , convertTemp model.tempCampusSize.height
+                                                         )
                           , campusSize = { width = convertTemp model.tempCampusSize.width
                                          , height = convertTemp model.tempCampusSize.height
                                          }
@@ -280,11 +300,11 @@ update msg model =
 
         Change str ->
             ( { model | tempSetting = { borderColor = model.tempSetting.borderColor
-                                        , borderStyle = str
-                                        , width = model.tempSetting.width
-                                        , height = model.tempSetting.height
-                                        , panelPosition = model.tempSetting.panelPosition
-                                        }
+                                      , borderStyle = str
+                                      , width = model.tempSetting.width
+                                      , height = model.tempSetting.height
+                                      , panelPosition = model.tempSetting.panelPosition
+                                      }
               }
             , Cmd.none
             )
@@ -292,11 +312,11 @@ update msg model =
         ChangePixelSize width_ height_ ->
             if (Maybe.withDefault 0 (String.toInt width_)) * (Maybe.withDefault 0 (String.toInt height_)) > 0 then
                 ( { model | tempSetting = { borderColor = model.tempSetting.borderColor
-                                            , borderStyle = model.tempSetting.borderStyle
-                                            , width = width_
-                                            , height = height_
-                                            , panelPosition = model.tempSetting.panelPosition
-                                            } 
+                                          , borderStyle = model.tempSetting.borderStyle
+                                          , width = width_
+                                          , height = height_
+                                          , panelPosition = model.tempSetting.panelPosition
+                                          } 
                   } 
                 , Cmd.none
                 )
@@ -305,33 +325,33 @@ update msg model =
 
         SetPixelWidth tempWidth_ ->
             ( { model | tempSetting = { borderColor = model.tempSetting.borderColor
-                                        , borderStyle = model.tempSetting.borderStyle
-                                        , width = if String.isEmpty tempWidth_ then
-                                                      model.setting.width
-                                                  else
-                                                      tempWidth_
-                                        , height = model.tempSetting.height
-                                        , panelPosition = model.tempSetting.panelPosition
-                                        }
+                                      , borderStyle = model.tempSetting.borderStyle
+                                      , width = if String.isEmpty tempWidth_ then
+                                                    model.setting.width
+                                                else
+                                                    tempWidth_
+                                      , height = model.tempSetting.height
+                                      , panelPosition = model.tempSetting.panelPosition
+                                      }
               }
             , Cmd.none
             )
         SetPixelHeight tempHeight_ ->
             ( { model | tempSetting = { borderColor = model.tempSetting.borderColor
-                                        , borderStyle = model.tempSetting.borderStyle
-                                        , width = model.tempSetting.width
-                                        , height = if String.isEmpty tempHeight_ then
-                                                      model.setting.height
-                                                  else
-                                                      tempHeight_
-                                        , panelPosition = model.tempSetting.panelPosition
-                                        }
+                                      , borderStyle = model.tempSetting.borderStyle
+                                      , width = model.tempSetting.width
+                                      , height = if String.isEmpty tempHeight_ then
+                                                    model.setting.height
+                                                else
+                                                    tempHeight_
+                                      , panelPosition = model.tempSetting.panelPosition
+                                      }
               }
             , Cmd.none
             )
 
         CreateCampusPicture ->
-            ( model, toH2c ())
+            ( model, toH2c () )
 
         DisplayDlButton ->
             ( { model | toolsSetting = { isDisplayDlButton = True
@@ -407,10 +427,15 @@ update msg model =
             let
                 getHistoryColor : Point -> String 
                 getHistoryColor (x_, y_) =
-                    Tuple.second <| Maybe.withDefault ((0, 0), "white") (Dict.get ((Dict.size model.history)-1) model.history)
+                    Tuple.second <| 
+                        Maybe.withDefault ( (0, 0), "white" ) <|
+                            Dict.get ((Dict.size model.history) - 1) model.history
             in
-            ( { model | campus = Dict.update (x, y) (Maybe.map (\n -> getHistoryColor (x, y))) model.campus
-                      , history = Dict.remove ((Dict.size model.history)-1) model.history
+            ( { model | campus = Dict.update 
+                                    (x, y) 
+                                        (Maybe.map (\n -> getHistoryColor (x, y) )) 
+                                            model.campus
+                      , history = Dict.remove ((Dict.size model.history) - 1) model.history
               }
             , toClickJudge ()
             ) 
