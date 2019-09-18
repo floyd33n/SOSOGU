@@ -15,13 +15,16 @@
       node: document.getElementById("elm")
       });
 
-    app.ports.toH2c.subscribe(function () {
+    app.ports.generateCampusImage.subscribe(function () {
       html2canvas(document.getElementById("campus")).then(canvas => {
           var campusImg = canvas.toDataURL();
           document.getElementById("dl").href = campusImg;
           document.getElementById("dl").download = 'campus.png';
+          app.ports.campusImageUrlToElm.send(campusImg)
         });
     });
+
+
   </script>
 </body>
 
