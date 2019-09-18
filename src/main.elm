@@ -80,6 +80,16 @@ type alias CampusSize =
     { width : Int
     , height : Int
     }
+type CampusPosition
+    = TopCenter
+    | TopRight
+    | TopLeft
+    | CenterCenter
+    | CenterRight
+    | CenterLeft
+    | BottomCenter
+    | BottomRight
+    | BottomLeft
 
 type Position
     = Right
@@ -113,11 +123,13 @@ type alias Setting =
 type alias PanelPosition =
     { settingPanel : Position
     , palettePanel : Position
+    , campus : CampusPosition
     }
 initPanelPosition : PanelPosition
 initPanelPosition =
     { settingPanel = Left
     , palettePanel = Right
+    , campus = CenterCenter
     }
 initSetting : Setting
 initSetting =
@@ -175,6 +187,7 @@ type Msg
     | ChangePixelSize String String
     | SetPixelWidth String
     | SetPixelHeight String
+    | SetCampusPosition CampusPosition
     | CreateCampusPicture
     | DisplayDlButton
     | ChangePanelPosition Panel Position
@@ -349,6 +362,20 @@ update msg model =
               }
             , Cmd.none
             )
+        
+        SetCampusPosition position_ ->
+            ( { model | tempSetting = { borderColor = model.tempSetting.borderColor
+                                      , borderStyle = model.tempSetting.borderStyle
+                                      , width = model.tempSetting.width
+                                      , height = model.tempSetting.height
+                                      , panelPosition = { settingPanel = model.tempSetting.panelPosition.settingPanel
+                                                        , palettePanel = model.tempSetting.panelPosition.palettePanel
+                                                        , campus = position_
+                                                        }
+                                      }
+              }
+            , Cmd.none
+            )
 
         CreateCampusPicture ->
             ( model, toH2c () )
@@ -371,6 +398,7 @@ update msg model =
                                                       , height = model.tempSetting.height
                                                       , panelPosition =  { settingPanel = Right
                                                                          , palettePanel = model.tempSetting.panelPosition.palettePanel
+                                                                         , campus = model.tempSetting.panelPosition.campus
                                                                          }
                                                       } 
                               } 
@@ -383,6 +411,7 @@ update msg model =
                                                       , height = model.tempSetting.height
                                                       , panelPosition =  { settingPanel = Left
                                                                          , palettePanel = model.tempSetting.panelPosition.palettePanel
+                                                                         , campus = model.tempSetting.panelPosition.campus
                                                                          }
                                                       } 
                               } 
@@ -397,9 +426,10 @@ update msg model =
                                                       , height = model.tempSetting.height
                                                       , panelPosition =  { settingPanel = model.tempSetting.panelPosition.settingPanel
                                                                          , palettePanel = Right
+                                                                         , campus = model.tempSetting.panelPosition.campus
                                                                          }
-                                                      } 
-                              } 
+                                                      }
+                              }
                             , Cmd.none
                             )
                         Left ->
@@ -409,6 +439,7 @@ update msg model =
                                                       , height = model.tempSetting.height
                                                       , panelPosition =  { settingPanel = model.tempSetting.panelPosition.settingPanel
                                                                          , palettePanel = Left
+                                                                         , campus = model.tempSetting.panelPosition.campus
                                                                          }
                                                       } 
                               } 
@@ -543,11 +574,50 @@ viewCampusPanel model =
            , Background.color <| shironezuIro
            ] 
            [ viewToolsPanel model
-           , el [centerX] <| 
+           , el ( (padding 1) :: (campusPosition model.setting) )<| 
                             html <|
                                    viewCampus model (model.campusSize.width, model.campusSize.height)
            ] 
-
+campusPosition : Setting -> List (E.Attribute Msg)
+campusPosition setting =
+    case setting.panelPosition.campus of
+        TopCenter ->
+            [ centerX 
+            , alignTop
+            ]
+        TopRight ->
+            [ alignRight 
+            , alignTop
+            ]
+        TopLeft ->
+            [ alignLeft 
+            , alignTop
+            ]
+        CenterCenter ->
+            [ centerX
+            , centerY
+            ]
+        CenterRight ->
+            [ alignRight
+            , centerY
+            ]
+        CenterLeft ->
+            [ alignLeft
+            , centerY
+            ]
+        BottomCenter ->
+            [ centerX
+            , alignBottom
+            ]
+        BottomRight ->
+            [ alignRight
+            , alignBottom
+            ]
+        BottomLeft ->
+            [ alignLeft
+            , alignBottom
+            ]
+        
 viewToolsPanel : Model -> Element Msg
 viewToolsPanel model =
     let
@@ -842,6 +912,13 @@ viewSettingPanel model =
                                                   ]
                                                   []
                                         ] 
+                                  , div [ HAttrs.style "color" "white"
+                                        , HAttrs.style "font-size" "14px"
+                                        ]
+                                        [ H.text "Campus"
+                                        , br [] []
+                                        , viewCampusPositionSetting model.tempSetting
+                                        ]
                                   ]
                        ]
               , E.el [centerX] <|
@@ -865,6 +942,42 @@ viewSettingPanel model =
                                                       E.text "disabled"
                                    }
               ]
+
+viewCampusPositionSetting : Setting -> Html Msg
+viewCampusPositionSetting tempSetting =
+    let
+        tempDiv : CampusPosition -> Html Msg
+        tempDiv position_ =
+            div [ onClick (SetCampusPosition position_)
+                , HAttrs.style "border" "1px solid black"
+                , HAttrs.style "width" "15px"
+                , HAttrs.style "height" "15px"
+                , if (tempSetting.panelPosition.campus == position_) then
+                      HAttrs.style "background-color" "#c3d825"
+                  else
+                      HAttrs.style "background-color" "white"
+                , HAttrs.style "float" "left"
+                , HAttrs.style "margin" "-1px"
+                ]
+                []
+    in
+        div [HAttrs.style "float" "left"]
+            [ div []
+                  [ tempDiv TopLeft 
+                  , tempDiv TopCenter
+                  , tempDiv TopRight
+                  ]
+            , div []
+                  [ tempDiv CenterLeft
+                  , tempDiv CenterCenter
+                  , tempDiv CenterRight
+                  ]
+            , div []
+                  [ tempDiv BottomLeft
+                  , tempDiv BottomCenter
+                  , tempDiv BottomRight
+                  ]
+            ]
 
 viewPalettePanel : Model -> Element Msg
 viewPalettePanel model =
