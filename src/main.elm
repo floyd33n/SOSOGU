@@ -657,7 +657,7 @@ viewToolsPanel model =
                             tempButton Nothing "0.6" "line-through" "" (HAttrs.style "" "") (hidden False)
                     "DL" ->
                         if model.toolsSetting.isDisplayDlButton then
-                            tempButton Nothing "1" "none" "dl" (href "") (target "_blank")
+                            tempButton Nothing "1" "none" "dl" (href model.campusImageUrl) (target "_blank")
                         else
                             tempButton Nothing "0.6" "line-through" "" (HAttrs.style "" "") (hidden False)
                     _ ->
