@@ -5208,6 +5208,7 @@ var author$project$Main$init = function (_n0) {
 		{
 			borderColorValue: author$project$Main$initBorderColorValue,
 			campus: author$project$Main$initCampus,
+			campusImageUrl: '',
 			campusSize: A2(author$project$Main$CampusSize, 0, 0),
 			colorValue: author$project$Main$initColorValue,
 			history: author$project$Main$initHistory,
@@ -5222,10 +5223,13 @@ var author$project$Main$init = function (_n0) {
 		},
 		elm$core$Platform$Cmd$none);
 };
-var elm$core$Platform$Sub$batch = _Platform_batch;
-var elm$core$Platform$Sub$none = elm$core$Platform$Sub$batch(_List_Nil);
+var author$project$Main$GetImageUrl = function (a) {
+	return {$: 'GetImageUrl', a: a};
+};
+var elm$json$Json$Decode$string = _Json_decodeString;
+var author$project$Main$campusImageUrlToElm = _Platform_incomingPort('campusImageUrlToElm', elm$json$Json$Decode$string);
 var author$project$Main$subscriptions = function (model) {
-	return elm$core$Platform$Sub$none;
+	return author$project$Main$campusImageUrlToElm(author$project$Main$GetImageUrl);
 };
 var elm$core$Dict$sizeHelp = F2(
 	function (n, dict) {
@@ -5254,6 +5258,12 @@ var author$project$Main$addColorToSubPalette = F2(
 			elm$core$Dict$size(model.subPalette),
 			color,
 			model.subPalette);
+	});
+var elm$json$Json$Encode$null = _Json_encodeNull;
+var author$project$Main$generateCampusImage = _Platform_outgoingPort(
+	'generateCampusImage',
+	function ($) {
+		return elm$json$Json$Encode$null;
 	});
 var elm$core$Dict$get = F2(
 	function (targetKey, dict) {
@@ -5411,17 +5421,6 @@ var author$project$Main$isCorrectWidthHeight = F2(
 var author$project$Main$isCorrectSetting = function (setting) {
 	return author$project$Main$isColor(setting.borderColor) && A2(author$project$Main$isCorrectWidthHeight, setting.width, setting.height);
 };
-var elm$json$Json$Encode$null = _Json_encodeNull;
-var author$project$Main$toClickJudge = _Platform_outgoingPort(
-	'toClickJudge',
-	function ($) {
-		return elm$json$Json$Encode$null;
-	});
-var author$project$Main$toH2c = _Platform_outgoingPort(
-	'toH2c',
-	function ($) {
-		return elm$json$Json$Encode$null;
-	});
 var elm$core$Dict$getMin = function (dict) {
 	getMin:
 	while (true) {
@@ -6040,7 +6039,7 @@ var author$project$Main$update = F2(
 			case 'CreateCampusPicture':
 				return _Utils_Tuple2(
 					model,
-					author$project$Main$toH2c(_Utils_Tuple0));
+					author$project$Main$generateCampusImage(_Utils_Tuple0));
 			case 'DisplayDlButton':
 				return _Utils_Tuple2(
 					_Utils_update(
@@ -6048,7 +6047,7 @@ var author$project$Main$update = F2(
 						{
 							toolsSetting: {isDisplayDlButton: true}
 						}),
-					author$project$Main$toH2c(_Utils_Tuple0));
+					author$project$Main$generateCampusImage(_Utils_Tuple0));
 			case 'ChangePanelPosition':
 				var panel_ = msg.a;
 				var position_ = msg.b;
@@ -6119,7 +6118,7 @@ var author$project$Main$update = F2(
 						model,
 						{setting: model.tempSetting}),
 					elm$core$Platform$Cmd$none) : _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
-			default:
+			case 'Undo':
 				var _n6 = msg.a;
 				var y = _n6.a;
 				var x = _n6.b;
@@ -6154,7 +6153,14 @@ var author$project$Main$update = F2(
 								elm$core$Dict$size(model.history) - 1,
 								model.history)
 						}),
-					author$project$Main$toClickJudge(_Utils_Tuple0));
+					elm$core$Platform$Cmd$none);
+			default:
+				var url = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{campusImageUrl: url}),
+					elm$core$Platform$Cmd$none);
 		}
 	});
 var EdutainmentLIVE$elm_bootstrap$Bootstrap$Internal$Button$Attrs = function (a) {
@@ -6566,7 +6572,6 @@ var elm$json$Json$Decode$at = F2(
 	function (fields, decoder) {
 		return A3(elm$core$List$foldr, elm$json$Json$Decode$field, decoder, fields);
 	});
-var elm$json$Json$Decode$string = _Json_decodeString;
 var elm$html$Html$Events$targetValue = A2(
 	elm$json$Json$Decode$at,
 	_List_fromArray(
@@ -8096,8 +8101,8 @@ var author$project$Main$debugLine = function (bool) {
 		_Debug_todo(
 			'Main',
 			{
-				start: {line: 1158, column: 17},
-				end: {line: 1158, column: 27}
+				start: {line: 1166, column: 17},
+				end: {line: 1166, column: 27}
 			})) : mdgriffith$elm_ui$Element$htmlAttribute(
 		A2(elm$html$Html$Attributes$style, '', ''));
 };
@@ -13950,7 +13955,7 @@ var author$project$Main$viewToolsPanel = function (model) {
 					'1',
 					'none',
 					'dl',
-					elm$html$Html$Attributes$href(''),
+					elm$html$Html$Attributes$href(model.campusImageUrl),
 					elm$html$Html$Attributes$target('_blank')) : A6(
 					tempButton,
 					elm$core$Maybe$Nothing,
@@ -14039,7 +14044,7 @@ var author$project$Main$viewCampusPanel = function (model) {
 				mdgriffith$elm_ui$Element$el,
 				A2(
 					elm$core$List$cons,
-					mdgriffith$elm_ui$Element$padding(1),
+					mdgriffith$elm_ui$Element$padding(0),
 					author$project$Main$campusPosition(model.setting)),
 				mdgriffith$elm_ui$Element$html(
 					A2(
