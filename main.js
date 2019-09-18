@@ -4850,9 +4850,10 @@ var author$project$Main$initHistory = elm$core$Dict$fromList(
 			_List_fromArray(
 				['white']))));
 var author$project$Main$initMainPalette = 'white';
+var author$project$Main$CenterCenter = {$: 'CenterCenter'};
 var author$project$Main$Left = {$: 'Left'};
 var author$project$Main$Right = {$: 'Right'};
-var author$project$Main$initPanelPosition = {palettePanel: author$project$Main$Right, settingPanel: author$project$Main$Left};
+var author$project$Main$initPanelPosition = {campus: author$project$Main$CenterCenter, palettePanel: author$project$Main$Right, settingPanel: author$project$Main$Left};
 var author$project$Main$initSetting = {borderColor: 'black', borderStyle: 'solid 1px', height: '20', panelPosition: author$project$Main$initPanelPosition, width: '20'};
 var author$project$Main$initSubPalette = elm$core$Dict$fromList(
 	_List_fromArray(
@@ -5294,8 +5295,10 @@ var elm$core$Maybe$withDefault = F2(
 			return _default;
 		}
 	});
-var author$project$Main$getCampusColor = F3(
-	function (model, x, y) {
+var author$project$Main$getCampusColor = F2(
+	function (model, _n0) {
+		var x = _n0.a;
+		var y = _n0.b;
 		return A2(
 			elm$core$Maybe$withDefault,
 			'white',
@@ -5814,9 +5817,10 @@ var author$project$Main$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
 			case 'ChangeColor':
-				var x = msg.a;
-				var y = msg.b;
-				var color = msg.c;
+				var _n1 = msg.a;
+				var x = _n1.a;
+				var y = _n1.b;
+				var color = msg.b;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
@@ -5834,7 +5838,10 @@ var author$project$Main$update = F2(
 								elm$core$Dict$size(model.history),
 								_Utils_Tuple2(
 									_Utils_Tuple2(x, y),
-									A3(author$project$Main$getCampusColor, model, x, y)),
+									A2(
+										author$project$Main$getCampusColor,
+										model,
+										_Utils_Tuple2(x, y))),
 								model.history)
 						}),
 					elm$core$Platform$Cmd$none);
@@ -5895,9 +5902,9 @@ var author$project$Main$update = F2(
 						}),
 					elm$core$Platform$Cmd$none);
 			case 'CreateCampus':
-				var createCampusList = function (_n1) {
-					var width_ = _n1.a;
-					var height_ = _n1.b;
+				var createCampusList = function (_n2) {
+					var width_ = _n2.a;
+					var height_ = _n2.b;
 					return A3(
 						elm_community$list_extra$List$Extra$lift2,
 						elm$core$Tuple$pair,
@@ -6015,6 +6022,21 @@ var author$project$Main$update = F2(
 							}
 						}),
 					elm$core$Platform$Cmd$none);
+			case 'SetCampusPosition':
+				var position_ = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							tempSetting: {
+								borderColor: model.tempSetting.borderColor,
+								borderStyle: model.tempSetting.borderStyle,
+								height: model.tempSetting.height,
+								panelPosition: {campus: position_, palettePanel: model.tempSetting.panelPosition.palettePanel, settingPanel: model.tempSetting.panelPosition.settingPanel},
+								width: model.tempSetting.width
+							}
+						}),
+					elm$core$Platform$Cmd$none);
 			case 'CreateCampusPicture':
 				return _Utils_Tuple2(
 					model,
@@ -6040,7 +6062,7 @@ var author$project$Main$update = F2(
 										borderColor: model.tempSetting.borderColor,
 										borderStyle: model.tempSetting.borderStyle,
 										height: model.tempSetting.height,
-										panelPosition: {palettePanel: model.tempSetting.panelPosition.palettePanel, settingPanel: author$project$Main$Right},
+										panelPosition: {campus: model.tempSetting.panelPosition.campus, palettePanel: model.tempSetting.panelPosition.palettePanel, settingPanel: author$project$Main$Right},
 										width: model.tempSetting.width
 									}
 								}),
@@ -6054,7 +6076,7 @@ var author$project$Main$update = F2(
 										borderColor: model.tempSetting.borderColor,
 										borderStyle: model.tempSetting.borderStyle,
 										height: model.tempSetting.height,
-										panelPosition: {palettePanel: model.tempSetting.panelPosition.palettePanel, settingPanel: author$project$Main$Left},
+										panelPosition: {campus: model.tempSetting.panelPosition.campus, palettePanel: model.tempSetting.panelPosition.palettePanel, settingPanel: author$project$Main$Left},
 										width: model.tempSetting.width
 									}
 								}),
@@ -6070,7 +6092,7 @@ var author$project$Main$update = F2(
 										borderColor: model.tempSetting.borderColor,
 										borderStyle: model.tempSetting.borderStyle,
 										height: model.tempSetting.height,
-										panelPosition: {palettePanel: author$project$Main$Right, settingPanel: model.tempSetting.panelPosition.settingPanel},
+										panelPosition: {campus: model.tempSetting.panelPosition.campus, palettePanel: author$project$Main$Right, settingPanel: model.tempSetting.panelPosition.settingPanel},
 										width: model.tempSetting.width
 									}
 								}),
@@ -6084,7 +6106,7 @@ var author$project$Main$update = F2(
 										borderColor: model.tempSetting.borderColor,
 										borderStyle: model.tempSetting.borderStyle,
 										height: model.tempSetting.height,
-										panelPosition: {palettePanel: author$project$Main$Left, settingPanel: model.tempSetting.panelPosition.settingPanel},
+										panelPosition: {campus: model.tempSetting.panelPosition.campus, palettePanel: author$project$Main$Left, settingPanel: model.tempSetting.panelPosition.settingPanel},
 										width: model.tempSetting.width
 									}
 								}),
@@ -6098,12 +6120,12 @@ var author$project$Main$update = F2(
 						{setting: model.tempSetting}),
 					elm$core$Platform$Cmd$none) : _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
 			default:
-				var _n5 = msg.a;
-				var y = _n5.a;
-				var x = _n5.b;
-				var getHistoryColor = function (_n6) {
-					var x_ = _n6.a;
-					var y_ = _n6.b;
+				var _n6 = msg.a;
+				var y = _n6.a;
+				var x = _n6.b;
+				var getHistoryColor = function (_n7) {
+					var x_ = _n7.a;
+					var y_ = _n7.b;
 					return A2(
 						elm$core$Maybe$withDefault,
 						_Utils_Tuple2(
@@ -8074,23 +8096,10 @@ var author$project$Main$debugLine = function (bool) {
 		_Debug_todo(
 			'Main',
 			{
-				start: {line: 1005, column: 17},
-				end: {line: 1005, column: 27}
+				start: {line: 1158, column: 17},
+				end: {line: 1158, column: 27}
 			})) : mdgriffith$elm_ui$Element$htmlAttribute(
 		A2(elm$html$Html$Attributes$style, '', ''));
-};
-var author$project$Main$AddColorToSubPalette = function (a) {
-	return {$: 'AddColorToSubPalette', a: a};
-};
-var author$project$Main$ColorValue = function (a) {
-	return {$: 'ColorValue', a: a};
-};
-var author$project$Main$DeleteSubPalette = function (a) {
-	return {$: 'DeleteSubPalette', a: a};
-};
-var author$project$Main$ForDisabled = {$: 'ForDisabled'};
-var author$project$Main$SetMainPalette = function (a) {
-	return {$: 'SetMainPalette', a: a};
 };
 var mdgriffith$elm_ui$Internal$Model$Rgba = F4(
 	function (a, b, c, d) {
@@ -8100,12 +8109,132 @@ var mdgriffith$elm_ui$Element$rgb255 = F3(
 	function (red, green, blue) {
 		return A4(mdgriffith$elm_ui$Internal$Model$Rgba, red / 255, green / 255, blue / 255, 1);
 	});
+var author$project$Main$rouIro = A3(mdgriffith$elm_ui$Element$rgb255, 43, 43, 43);
 var author$project$Main$shiroIro = A3(mdgriffith$elm_ui$Element$rgb255, 255, 255, 255);
+var mdgriffith$elm_ui$Internal$Model$AlignY = function (a) {
+	return {$: 'AlignY', a: a};
+};
+var mdgriffith$elm_ui$Internal$Model$Bottom = {$: 'Bottom'};
+var mdgriffith$elm_ui$Element$alignBottom = mdgriffith$elm_ui$Internal$Model$AlignY(mdgriffith$elm_ui$Internal$Model$Bottom);
 var mdgriffith$elm_ui$Internal$Model$AlignX = function (a) {
 	return {$: 'AlignX', a: a};
 };
+var mdgriffith$elm_ui$Internal$Model$Left = {$: 'Left'};
+var mdgriffith$elm_ui$Element$alignLeft = mdgriffith$elm_ui$Internal$Model$AlignX(mdgriffith$elm_ui$Internal$Model$Left);
+var mdgriffith$elm_ui$Internal$Model$Right = {$: 'Right'};
+var mdgriffith$elm_ui$Element$alignRight = mdgriffith$elm_ui$Internal$Model$AlignX(mdgriffith$elm_ui$Internal$Model$Right);
+var mdgriffith$elm_ui$Internal$Model$Top = {$: 'Top'};
+var mdgriffith$elm_ui$Element$alignTop = mdgriffith$elm_ui$Internal$Model$AlignY(mdgriffith$elm_ui$Internal$Model$Top);
 var mdgriffith$elm_ui$Internal$Model$CenterX = {$: 'CenterX'};
 var mdgriffith$elm_ui$Element$centerX = mdgriffith$elm_ui$Internal$Model$AlignX(mdgriffith$elm_ui$Internal$Model$CenterX);
+var mdgriffith$elm_ui$Internal$Model$CenterY = {$: 'CenterY'};
+var mdgriffith$elm_ui$Element$centerY = mdgriffith$elm_ui$Internal$Model$AlignY(mdgriffith$elm_ui$Internal$Model$CenterY);
+var author$project$Main$campusPosition = function (setting) {
+	var _n0 = setting.panelPosition.campus;
+	switch (_n0.$) {
+		case 'TopCenter':
+			return _List_fromArray(
+				[mdgriffith$elm_ui$Element$centerX, mdgriffith$elm_ui$Element$alignTop]);
+		case 'TopRight':
+			return _List_fromArray(
+				[mdgriffith$elm_ui$Element$alignRight, mdgriffith$elm_ui$Element$alignTop]);
+		case 'TopLeft':
+			return _List_fromArray(
+				[mdgriffith$elm_ui$Element$alignLeft, mdgriffith$elm_ui$Element$alignTop]);
+		case 'CenterCenter':
+			return _List_fromArray(
+				[mdgriffith$elm_ui$Element$centerX, mdgriffith$elm_ui$Element$centerY]);
+		case 'CenterRight':
+			return _List_fromArray(
+				[mdgriffith$elm_ui$Element$alignRight, mdgriffith$elm_ui$Element$centerY]);
+		case 'CenterLeft':
+			return _List_fromArray(
+				[mdgriffith$elm_ui$Element$alignLeft, mdgriffith$elm_ui$Element$centerY]);
+		case 'BottomCenter':
+			return _List_fromArray(
+				[mdgriffith$elm_ui$Element$centerX, mdgriffith$elm_ui$Element$alignBottom]);
+		case 'BottomRight':
+			return _List_fromArray(
+				[mdgriffith$elm_ui$Element$alignRight, mdgriffith$elm_ui$Element$alignBottom]);
+		default:
+			return _List_fromArray(
+				[mdgriffith$elm_ui$Element$alignLeft, mdgriffith$elm_ui$Element$alignBottom]);
+	}
+};
+var author$project$Main$shironezuIro = A3(mdgriffith$elm_ui$Element$rgb255, 220, 221, 221);
+var author$project$Main$ChangeColor = F2(
+	function (a, b) {
+		return {$: 'ChangeColor', a: a, b: b};
+	});
+var author$project$Main$viewCampus = F2(
+	function (model, _n0) {
+		var width = _n0.a;
+		var height = _n0.b;
+		return A2(
+			elm$html$Html$div,
+			_List_fromArray(
+				[
+					elm$html$Html$Attributes$id('campus')
+				]),
+			_List_fromArray(
+				[
+					A2(
+					elm$html$Html$div,
+					_List_Nil,
+					A2(
+						elm$core$List$map,
+						function (y) {
+							return A2(
+								elm$html$Html$div,
+								_List_Nil,
+								A2(
+									elm$core$List$map,
+									function (x) {
+										return A2(
+											elm$html$Html$div,
+											_List_fromArray(
+												[
+													A2(elm$html$Html$Attributes$style, 'float', 'left')
+												]),
+											_List_fromArray(
+												[
+													A2(
+													elm$html$Html$div,
+													_List_fromArray(
+														[
+															A2(elm$html$Html$Attributes$style, 'width', model.setting.width + 'px'),
+															A2(elm$html$Html$Attributes$style, 'height', model.setting.height + 'px'),
+															A2(elm$html$Html$Attributes$style, 'border', model.setting.borderColor + (' ' + model.setting.borderStyle)),
+															A2(
+															elm$html$Html$Attributes$style,
+															'background-color',
+															A2(
+																author$project$Main$getCampusColor,
+																model,
+																_Utils_Tuple2(y, x))),
+															A2(elm$html$Html$Attributes$style, 'padding', '0px'),
+															A2(elm$html$Html$Attributes$style, 'margin', '-1px'),
+															elm$html$Html$Events$onClick(
+															A2(
+																author$project$Main$ChangeColor,
+																_Utils_Tuple2(y, x),
+																model.mainPalette))
+														]),
+													_List_Nil)
+												]));
+									},
+									A2(elm$core$List$range, 0, width - 1)));
+						},
+						A2(elm$core$List$range, 0, height - 1)))
+				]));
+	});
+var author$project$Main$DisplayDlButton = {$: 'DisplayDlButton'};
+var author$project$Main$Undo = function (a) {
+	return {$: 'Undo', a: a};
+};
+var elm$html$Html$a = _VirtualDom_node('a');
+var elm$html$Html$Attributes$hidden = elm$html$Html$Attributes$boolProperty('hidden');
+var elm$html$Html$Attributes$target = elm$html$Html$Attributes$stringProperty('target');
 var mdgriffith$elm_ui$Internal$Model$Height = function (a) {
 	return {$: 'Height', a: a};
 };
@@ -13412,20 +13541,119 @@ var mdgriffith$elm_ui$Element$el = F2(
 				_List_fromArray(
 					[child])));
 	});
+var mdgriffith$elm_ui$Internal$Model$Fill = function (a) {
+	return {$: 'Fill', a: a};
+};
+var mdgriffith$elm_ui$Element$fill = mdgriffith$elm_ui$Internal$Model$Fill(1);
+var elm$core$Basics$always = F2(
+	function (a, _n0) {
+		return a;
+	});
+var elm$core$Basics$composeL = F3(
+	function (g, f, x) {
+		return g(
+			f(x));
+	});
+var mdgriffith$elm_ui$Internal$Model$unstyled = A2(elm$core$Basics$composeL, mdgriffith$elm_ui$Internal$Model$Unstyled, elm$core$Basics$always);
+var mdgriffith$elm_ui$Element$html = mdgriffith$elm_ui$Internal$Model$unstyled;
 var mdgriffith$elm_ui$Internal$Model$Empty = {$: 'Empty'};
 var mdgriffith$elm_ui$Element$none = mdgriffith$elm_ui$Internal$Model$Empty;
-var mdgriffith$elm_ui$Internal$Model$Px = function (a) {
-	return {$: 'Px', a: a};
-};
-var mdgriffith$elm_ui$Element$px = mdgriffith$elm_ui$Internal$Model$Px;
-var mdgriffith$elm_ui$Internal$Flag$borderColor = mdgriffith$elm_ui$Internal$Flag$flag(28);
-var mdgriffith$elm_ui$Internal$Model$Colored = F3(
-	function (a, b, c) {
-		return {$: 'Colored', a: a, b: b, c: c};
+var mdgriffith$elm_ui$Internal$Flag$padding = mdgriffith$elm_ui$Internal$Flag$flag(2);
+var mdgriffith$elm_ui$Internal$Model$PaddingStyle = F5(
+	function (a, b, c, d, e) {
+		return {$: 'PaddingStyle', a: a, b: b, c: c, d: d, e: e};
 	});
 var mdgriffith$elm_ui$Internal$Model$StyleClass = F2(
 	function (a, b) {
 		return {$: 'StyleClass', a: a, b: b};
+	});
+var mdgriffith$elm_ui$Element$padding = function (x) {
+	return A2(
+		mdgriffith$elm_ui$Internal$Model$StyleClass,
+		mdgriffith$elm_ui$Internal$Flag$padding,
+		A5(
+			mdgriffith$elm_ui$Internal$Model$PaddingStyle,
+			'p-' + elm$core$String$fromInt(x),
+			x,
+			x,
+			x,
+			x));
+};
+var mdgriffith$elm_ui$Element$paddingXY = F2(
+	function (x, y) {
+		return _Utils_eq(x, y) ? A2(
+			mdgriffith$elm_ui$Internal$Model$StyleClass,
+			mdgriffith$elm_ui$Internal$Flag$padding,
+			A5(
+				mdgriffith$elm_ui$Internal$Model$PaddingStyle,
+				'p-' + elm$core$String$fromInt(x),
+				x,
+				x,
+				x,
+				x)) : A2(
+			mdgriffith$elm_ui$Internal$Model$StyleClass,
+			mdgriffith$elm_ui$Internal$Flag$padding,
+			A5(
+				mdgriffith$elm_ui$Internal$Model$PaddingStyle,
+				'p-' + (elm$core$String$fromInt(x) + ('-' + elm$core$String$fromInt(y))),
+				y,
+				x,
+				y,
+				x));
+	});
+var mdgriffith$elm_ui$Internal$Model$Px = function (a) {
+	return {$: 'Px', a: a};
+};
+var mdgriffith$elm_ui$Element$px = mdgriffith$elm_ui$Internal$Model$Px;
+var mdgriffith$elm_ui$Internal$Model$AsRow = {$: 'AsRow'};
+var mdgriffith$elm_ui$Internal$Model$asRow = mdgriffith$elm_ui$Internal$Model$AsRow;
+var mdgriffith$elm_ui$Element$row = F2(
+	function (attrs, children) {
+		return A4(
+			mdgriffith$elm_ui$Internal$Model$element,
+			mdgriffith$elm_ui$Internal$Model$asRow,
+			mdgriffith$elm_ui$Internal$Model$div,
+			A2(
+				elm$core$List$cons,
+				mdgriffith$elm_ui$Internal$Model$htmlClass(mdgriffith$elm_ui$Internal$Style$classes.contentLeft + (' ' + mdgriffith$elm_ui$Internal$Style$classes.contentCenterY)),
+				A2(
+					elm$core$List$cons,
+					mdgriffith$elm_ui$Element$width(mdgriffith$elm_ui$Element$shrink),
+					A2(
+						elm$core$List$cons,
+						mdgriffith$elm_ui$Element$height(mdgriffith$elm_ui$Element$shrink),
+						attrs))),
+			mdgriffith$elm_ui$Internal$Model$Unkeyed(children));
+	});
+var mdgriffith$elm_ui$Internal$Flag$spacing = mdgriffith$elm_ui$Internal$Flag$flag(3);
+var mdgriffith$elm_ui$Internal$Model$SpacingStyle = F3(
+	function (a, b, c) {
+		return {$: 'SpacingStyle', a: a, b: b, c: c};
+	});
+var mdgriffith$elm_ui$Internal$Model$spacingName = F2(
+	function (x, y) {
+		return 'spacing-' + (elm$core$String$fromInt(x) + ('-' + elm$core$String$fromInt(y)));
+	});
+var mdgriffith$elm_ui$Element$spacing = function (x) {
+	return A2(
+		mdgriffith$elm_ui$Internal$Model$StyleClass,
+		mdgriffith$elm_ui$Internal$Flag$spacing,
+		A3(
+			mdgriffith$elm_ui$Internal$Model$SpacingStyle,
+			A2(mdgriffith$elm_ui$Internal$Model$spacingName, x, x),
+			x,
+			x));
+};
+var mdgriffith$elm_ui$Internal$Model$Text = function (a) {
+	return {$: 'Text', a: a};
+};
+var mdgriffith$elm_ui$Element$text = function (content) {
+	return mdgriffith$elm_ui$Internal$Model$Text(content);
+};
+var mdgriffith$elm_ui$Internal$Flag$bgColor = mdgriffith$elm_ui$Internal$Flag$flag(8);
+var mdgriffith$elm_ui$Internal$Model$Colored = F3(
+	function (a, b, c) {
+		return {$: 'Colored', a: a, b: b, c: c};
 	});
 var mdgriffith$elm_ui$Internal$Model$formatColorClass = function (_n0) {
 	var red = _n0.a;
@@ -13434,6 +13662,17 @@ var mdgriffith$elm_ui$Internal$Model$formatColorClass = function (_n0) {
 	var alpha = _n0.d;
 	return mdgriffith$elm_ui$Internal$Model$floatClass(red) + ('-' + (mdgriffith$elm_ui$Internal$Model$floatClass(green) + ('-' + (mdgriffith$elm_ui$Internal$Model$floatClass(blue) + ('-' + mdgriffith$elm_ui$Internal$Model$floatClass(alpha))))));
 };
+var mdgriffith$elm_ui$Element$Background$color = function (clr) {
+	return A2(
+		mdgriffith$elm_ui$Internal$Model$StyleClass,
+		mdgriffith$elm_ui$Internal$Flag$bgColor,
+		A3(
+			mdgriffith$elm_ui$Internal$Model$Colored,
+			'bg-' + mdgriffith$elm_ui$Internal$Model$formatColorClass(clr),
+			'background-color',
+			clr));
+};
+var mdgriffith$elm_ui$Internal$Flag$borderColor = mdgriffith$elm_ui$Internal$Flag$flag(28);
 var mdgriffith$elm_ui$Element$Border$color = function (clr) {
 	return A2(
 		mdgriffith$elm_ui$Internal$Model$StyleClass,
@@ -13489,24 +13728,280 @@ var mdgriffith$elm_ui$Element$Border$widthEach = function (_n0) {
 			bottom,
 			left));
 };
-var author$project$Main$panelHr = A2(
-	mdgriffith$elm_ui$Element$el,
-	_List_fromArray(
-		[
-			mdgriffith$elm_ui$Element$centerX,
-			mdgriffith$elm_ui$Element$width(
-			mdgriffith$elm_ui$Element$px(80)),
-			mdgriffith$elm_ui$Element$Border$widthEach(
-			{bottom: 1, left: 0, right: 0, top: 0}),
-			mdgriffith$elm_ui$Element$Border$color(author$project$Main$shiroIro)
-		]),
-	mdgriffith$elm_ui$Element$none);
-var author$project$Main$rouIro = A3(mdgriffith$elm_ui$Element$rgb255, 43, 43, 43);
-var elm$html$Html$Events$onDoubleClick = function (msg) {
+var mdgriffith$elm_ui$Internal$Flag$fontColor = mdgriffith$elm_ui$Internal$Flag$flag(14);
+var mdgriffith$elm_ui$Element$Font$color = function (fontColor) {
 	return A2(
-		elm$html$Html$Events$on,
-		'dblclick',
-		elm$json$Json$Decode$succeed(msg));
+		mdgriffith$elm_ui$Internal$Model$StyleClass,
+		mdgriffith$elm_ui$Internal$Flag$fontColor,
+		A3(
+			mdgriffith$elm_ui$Internal$Model$Colored,
+			'fc-' + mdgriffith$elm_ui$Internal$Model$formatColorClass(fontColor),
+			'color',
+			fontColor));
+};
+var mdgriffith$elm_ui$Internal$Flag$fontSize = mdgriffith$elm_ui$Internal$Flag$flag(4);
+var mdgriffith$elm_ui$Internal$Model$FontSize = function (a) {
+	return {$: 'FontSize', a: a};
+};
+var mdgriffith$elm_ui$Element$Font$size = function (i) {
+	return A2(
+		mdgriffith$elm_ui$Internal$Model$StyleClass,
+		mdgriffith$elm_ui$Internal$Flag$fontSize,
+		mdgriffith$elm_ui$Internal$Model$FontSize(i));
+};
+var mdgriffith$elm_ui$Internal$Flag$cursor = mdgriffith$elm_ui$Internal$Flag$flag(21);
+var mdgriffith$elm_ui$Internal$Model$Class = F2(
+	function (a, b) {
+		return {$: 'Class', a: a, b: b};
+	});
+var mdgriffith$elm_ui$Element$pointer = A2(mdgriffith$elm_ui$Internal$Model$Class, mdgriffith$elm_ui$Internal$Flag$cursor, mdgriffith$elm_ui$Internal$Style$classes.cursorPointer);
+var mdgriffith$elm_ui$Element$Events$onClick = A2(elm$core$Basics$composeL, mdgriffith$elm_ui$Internal$Model$Attr, elm$html$Html$Events$onClick);
+var mdgriffith$elm_ui$Element$Input$hasFocusStyle = function (attr) {
+	if (((attr.$ === 'StyleClass') && (attr.b.$ === 'PseudoSelector')) && (attr.b.a.$ === 'Focus')) {
+		var _n1 = attr.b;
+		var _n2 = _n1.a;
+		return true;
+	} else {
+		return false;
+	}
+};
+var mdgriffith$elm_ui$Internal$Model$NoAttribute = {$: 'NoAttribute'};
+var mdgriffith$elm_ui$Element$Input$focusDefault = function (attrs) {
+	return A2(elm$core$List$any, mdgriffith$elm_ui$Element$Input$hasFocusStyle, attrs) ? mdgriffith$elm_ui$Internal$Model$NoAttribute : mdgriffith$elm_ui$Internal$Model$htmlClass('focusable');
+};
+var mdgriffith$elm_ui$Element$Input$enter = 'Enter';
+var elm$virtual_dom$VirtualDom$MayPreventDefault = function (a) {
+	return {$: 'MayPreventDefault', a: a};
+};
+var elm$html$Html$Events$preventDefaultOn = F2(
+	function (event, decoder) {
+		return A2(
+			elm$virtual_dom$VirtualDom$on,
+			event,
+			elm$virtual_dom$VirtualDom$MayPreventDefault(decoder));
+	});
+var mdgriffith$elm_ui$Element$Input$onKey = F2(
+	function (desiredCode, msg) {
+		var decode = function (code) {
+			return _Utils_eq(code, desiredCode) ? elm$json$Json$Decode$succeed(msg) : elm$json$Json$Decode$fail('Not the enter key');
+		};
+		var isKey = A2(
+			elm$json$Json$Decode$andThen,
+			decode,
+			A2(elm$json$Json$Decode$field, 'key', elm$json$Json$Decode$string));
+		return mdgriffith$elm_ui$Internal$Model$Attr(
+			A2(
+				elm$html$Html$Events$preventDefaultOn,
+				'keyup',
+				A2(
+					elm$json$Json$Decode$map,
+					function (fired) {
+						return _Utils_Tuple2(fired, true);
+					},
+					isKey)));
+	});
+var mdgriffith$elm_ui$Element$Input$onEnter = function (msg) {
+	return A2(mdgriffith$elm_ui$Element$Input$onKey, mdgriffith$elm_ui$Element$Input$enter, msg);
+};
+var mdgriffith$elm_ui$Internal$Model$Button = {$: 'Button'};
+var mdgriffith$elm_ui$Internal$Model$Describe = function (a) {
+	return {$: 'Describe', a: a};
+};
+var mdgriffith$elm_ui$Element$Input$button = F2(
+	function (attrs, _n0) {
+		var onPress = _n0.onPress;
+		var label = _n0.label;
+		return A4(
+			mdgriffith$elm_ui$Internal$Model$element,
+			mdgriffith$elm_ui$Internal$Model$asEl,
+			mdgriffith$elm_ui$Internal$Model$div,
+			A2(
+				elm$core$List$cons,
+				mdgriffith$elm_ui$Element$width(mdgriffith$elm_ui$Element$shrink),
+				A2(
+					elm$core$List$cons,
+					mdgriffith$elm_ui$Element$height(mdgriffith$elm_ui$Element$shrink),
+					A2(
+						elm$core$List$cons,
+						mdgriffith$elm_ui$Internal$Model$htmlClass(mdgriffith$elm_ui$Internal$Style$classes.contentCenterX + (' ' + (mdgriffith$elm_ui$Internal$Style$classes.contentCenterY + (' ' + (mdgriffith$elm_ui$Internal$Style$classes.seButton + (' ' + mdgriffith$elm_ui$Internal$Style$classes.noTextSelection)))))),
+						A2(
+							elm$core$List$cons,
+							mdgriffith$elm_ui$Element$pointer,
+							A2(
+								elm$core$List$cons,
+								mdgriffith$elm_ui$Element$Input$focusDefault(attrs),
+								A2(
+									elm$core$List$cons,
+									mdgriffith$elm_ui$Internal$Model$Describe(mdgriffith$elm_ui$Internal$Model$Button),
+									A2(
+										elm$core$List$cons,
+										mdgriffith$elm_ui$Internal$Model$Attr(
+											elm$html$Html$Attributes$tabindex(0)),
+										function () {
+											if (onPress.$ === 'Nothing') {
+												return A2(
+													elm$core$List$cons,
+													mdgriffith$elm_ui$Internal$Model$Attr(
+														elm$html$Html$Attributes$disabled(true)),
+													attrs);
+											} else {
+												var msg = onPress.a;
+												return A2(
+													elm$core$List$cons,
+													mdgriffith$elm_ui$Element$Events$onClick(msg),
+													A2(
+														elm$core$List$cons,
+														mdgriffith$elm_ui$Element$Input$onEnter(msg),
+														attrs));
+											}
+										}()))))))),
+			mdgriffith$elm_ui$Internal$Model$Unkeyed(
+				_List_fromArray(
+					[label])));
+	});
+var author$project$Main$viewToolsPanel = function (model) {
+	var viewUndoButton = A2(
+		mdgriffith$elm_ui$Element$Input$button,
+		_List_Nil,
+		{
+			label: A2(
+				mdgriffith$elm_ui$Element$el,
+				_List_fromArray(
+					[
+						mdgriffith$elm_ui$Element$Font$color(author$project$Main$shiroIro),
+						mdgriffith$elm_ui$Element$Font$size(14)
+					]),
+				mdgriffith$elm_ui$Element$text('Undo')),
+			onPress: function () {
+				var y = A2(
+					elm$core$Maybe$withDefault,
+					_Utils_Tuple2(
+						_Utils_Tuple2(0, 0),
+						'white'),
+					A2(
+						elm$core$Dict$get,
+						elm$core$Dict$size(model.history) - 1,
+						model.history)).a.b;
+				var x = A2(
+					elm$core$Maybe$withDefault,
+					_Utils_Tuple2(
+						_Utils_Tuple2(0, 0),
+						'white'),
+					A2(
+						elm$core$Dict$get,
+						elm$core$Dict$size(model.history) - 1,
+						model.history)).a.a;
+				return elm$core$Maybe$Just(
+					author$project$Main$Undo(
+						_Utils_Tuple2(y, x)));
+			}()
+		});
+	var gendlButton = function (bText) {
+		var tempButton = F6(
+			function (msg, oValue, dValue, id_, attr1, attr2) {
+				return A2(
+					mdgriffith$elm_ui$Element$Input$button,
+					_List_Nil,
+					{
+						label: A2(
+							mdgriffith$elm_ui$Element$el,
+							_List_Nil,
+							mdgriffith$elm_ui$Element$html(
+								A2(
+									elm$html$Html$a,
+									_List_fromArray(
+										[
+											A2(elm$html$Html$Attributes$style, 'color', 'white'),
+											A2(elm$html$Html$Attributes$style, 'font-size', '14px'),
+											A2(elm$html$Html$Attributes$style, 'opacity', oValue),
+											A2(elm$html$Html$Attributes$style, 'text-decoration', dValue),
+											elm$html$Html$Attributes$id(id_),
+											attr1,
+											attr2
+										]),
+									_List_fromArray(
+										[
+											elm$html$Html$text(bText)
+										])))),
+						onPress: msg
+					});
+			});
+		switch (bText) {
+			case 'Gen':
+				return (elm$core$Dict$size(model.campus) > 1) ? A6(
+					tempButton,
+					elm$core$Maybe$Just(author$project$Main$DisplayDlButton),
+					'1',
+					'none',
+					'',
+					A2(elm$html$Html$Attributes$style, '', ''),
+					elm$html$Html$Attributes$hidden(false)) : A6(
+					tempButton,
+					elm$core$Maybe$Nothing,
+					'0.6',
+					'line-through',
+					'',
+					A2(elm$html$Html$Attributes$style, '', ''),
+					elm$html$Html$Attributes$hidden(false));
+			case 'DL':
+				return model.toolsSetting.isDisplayDlButton ? A6(
+					tempButton,
+					elm$core$Maybe$Nothing,
+					'1',
+					'none',
+					'dl',
+					elm$html$Html$Attributes$href(''),
+					elm$html$Html$Attributes$target('_blank')) : A6(
+					tempButton,
+					elm$core$Maybe$Nothing,
+					'0.6',
+					'line-through',
+					'',
+					A2(elm$html$Html$Attributes$style, '', ''),
+					elm$html$Html$Attributes$hidden(false));
+			default:
+				return mdgriffith$elm_ui$Element$none;
+		}
+	};
+	return A2(
+		mdgriffith$elm_ui$Element$row,
+		_List_fromArray(
+			[
+				mdgriffith$elm_ui$Element$width(mdgriffith$elm_ui$Element$fill),
+				mdgriffith$elm_ui$Element$height(
+				mdgriffith$elm_ui$Element$px(36)),
+				mdgriffith$elm_ui$Element$Border$widthEach(
+				{bottom: 1, left: 0, right: 0, top: 1}),
+				mdgriffith$elm_ui$Element$Border$color(author$project$Main$shiroIro),
+				mdgriffith$elm_ui$Element$Background$color(author$project$Main$rouIro)
+			]),
+		_List_fromArray(
+			[
+				A2(
+				mdgriffith$elm_ui$Element$el,
+				_List_fromArray(
+					[
+						mdgriffith$elm_ui$Element$Font$color(author$project$Main$shiroIro),
+						mdgriffith$elm_ui$Element$Font$size(17),
+						mdgriffith$elm_ui$Element$padding(2),
+						mdgriffith$elm_ui$Element$centerY
+					]),
+				mdgriffith$elm_ui$Element$text('Tools')),
+				A2(
+				mdgriffith$elm_ui$Element$row,
+				_List_fromArray(
+					[
+						mdgriffith$elm_ui$Element$alignRight,
+						A2(mdgriffith$elm_ui$Element$paddingXY, 20, 0),
+						mdgriffith$elm_ui$Element$spacing(5)
+					]),
+				_List_fromArray(
+					[
+						gendlButton('Gen'),
+						gendlButton('DL'),
+						viewUndoButton
+					]))
+			]));
 };
 var mdgriffith$elm_ui$Internal$Model$AsColumn = {$: 'AsColumn'};
 var mdgriffith$elm_ui$Internal$Model$asColumn = mdgriffith$elm_ui$Internal$Model$AsColumn;
@@ -13528,37 +14023,61 @@ var mdgriffith$elm_ui$Element$column = F2(
 						attrs))),
 			mdgriffith$elm_ui$Internal$Model$Unkeyed(children));
 	});
-var mdgriffith$elm_ui$Internal$Model$Fill = function (a) {
-	return {$: 'Fill', a: a};
-};
-var mdgriffith$elm_ui$Element$fill = mdgriffith$elm_ui$Internal$Model$Fill(1);
-var elm$core$Basics$always = F2(
-	function (a, _n0) {
-		return a;
-	});
-var elm$core$Basics$composeL = F3(
-	function (g, f, x) {
-		return g(
-			f(x));
-	});
-var mdgriffith$elm_ui$Internal$Model$unstyled = A2(elm$core$Basics$composeL, mdgriffith$elm_ui$Internal$Model$Unstyled, elm$core$Basics$always);
-var mdgriffith$elm_ui$Element$html = mdgriffith$elm_ui$Internal$Model$unstyled;
-var mdgriffith$elm_ui$Internal$Flag$padding = mdgriffith$elm_ui$Internal$Flag$flag(2);
-var mdgriffith$elm_ui$Internal$Model$PaddingStyle = F5(
-	function (a, b, c, d, e) {
-		return {$: 'PaddingStyle', a: a, b: b, c: c, d: d, e: e};
-	});
-var mdgriffith$elm_ui$Element$padding = function (x) {
+var author$project$Main$viewCampusPanel = function (model) {
 	return A2(
-		mdgriffith$elm_ui$Internal$Model$StyleClass,
-		mdgriffith$elm_ui$Internal$Flag$padding,
-		A5(
-			mdgriffith$elm_ui$Internal$Model$PaddingStyle,
-			'p-' + elm$core$String$fromInt(x),
-			x,
-			x,
-			x,
-			x));
+		mdgriffith$elm_ui$Element$column,
+		_List_fromArray(
+			[
+				mdgriffith$elm_ui$Element$width(mdgriffith$elm_ui$Element$fill),
+				mdgriffith$elm_ui$Element$height(mdgriffith$elm_ui$Element$fill),
+				mdgriffith$elm_ui$Element$Background$color(author$project$Main$shironezuIro)
+			]),
+		_List_fromArray(
+			[
+				author$project$Main$viewToolsPanel(model),
+				A2(
+				mdgriffith$elm_ui$Element$el,
+				A2(
+					elm$core$List$cons,
+					mdgriffith$elm_ui$Element$padding(1),
+					author$project$Main$campusPosition(model.setting)),
+				mdgriffith$elm_ui$Element$html(
+					A2(
+						author$project$Main$viewCampus,
+						model,
+						_Utils_Tuple2(model.campusSize.width, model.campusSize.height))))
+			]));
+};
+var author$project$Main$AddColorToSubPalette = function (a) {
+	return {$: 'AddColorToSubPalette', a: a};
+};
+var author$project$Main$ColorValue = function (a) {
+	return {$: 'ColorValue', a: a};
+};
+var author$project$Main$DeleteSubPalette = function (a) {
+	return {$: 'DeleteSubPalette', a: a};
+};
+var author$project$Main$ForDisabled = {$: 'ForDisabled'};
+var author$project$Main$SetMainPalette = function (a) {
+	return {$: 'SetMainPalette', a: a};
+};
+var author$project$Main$panelHr = A2(
+	mdgriffith$elm_ui$Element$el,
+	_List_fromArray(
+		[
+			mdgriffith$elm_ui$Element$centerX,
+			mdgriffith$elm_ui$Element$width(
+			mdgriffith$elm_ui$Element$px(80)),
+			mdgriffith$elm_ui$Element$Border$widthEach(
+			{bottom: 1, left: 0, right: 0, top: 0}),
+			mdgriffith$elm_ui$Element$Border$color(author$project$Main$shiroIro)
+		]),
+	mdgriffith$elm_ui$Element$none);
+var elm$html$Html$Events$onDoubleClick = function (msg) {
+	return A2(
+		elm$html$Html$Events$on,
+		'dblclick',
+		elm$json$Json$Decode$succeed(msg));
 };
 var mdgriffith$elm_ui$Internal$Model$paddingName = F4(
 	function (top, right, bottom, left) {
@@ -13588,51 +14107,6 @@ var mdgriffith$elm_ui$Element$paddingEach = function (_n0) {
 			right,
 			bottom,
 			left));
-};
-var mdgriffith$elm_ui$Internal$Model$AsRow = {$: 'AsRow'};
-var mdgriffith$elm_ui$Internal$Model$asRow = mdgriffith$elm_ui$Internal$Model$AsRow;
-var mdgriffith$elm_ui$Element$row = F2(
-	function (attrs, children) {
-		return A4(
-			mdgriffith$elm_ui$Internal$Model$element,
-			mdgriffith$elm_ui$Internal$Model$asRow,
-			mdgriffith$elm_ui$Internal$Model$div,
-			A2(
-				elm$core$List$cons,
-				mdgriffith$elm_ui$Internal$Model$htmlClass(mdgriffith$elm_ui$Internal$Style$classes.contentLeft + (' ' + mdgriffith$elm_ui$Internal$Style$classes.contentCenterY)),
-				A2(
-					elm$core$List$cons,
-					mdgriffith$elm_ui$Element$width(mdgriffith$elm_ui$Element$shrink),
-					A2(
-						elm$core$List$cons,
-						mdgriffith$elm_ui$Element$height(mdgriffith$elm_ui$Element$shrink),
-						attrs))),
-			mdgriffith$elm_ui$Internal$Model$Unkeyed(children));
-	});
-var mdgriffith$elm_ui$Internal$Flag$spacing = mdgriffith$elm_ui$Internal$Flag$flag(3);
-var mdgriffith$elm_ui$Internal$Model$SpacingStyle = F3(
-	function (a, b, c) {
-		return {$: 'SpacingStyle', a: a, b: b, c: c};
-	});
-var mdgriffith$elm_ui$Internal$Model$spacingName = F2(
-	function (x, y) {
-		return 'spacing-' + (elm$core$String$fromInt(x) + ('-' + elm$core$String$fromInt(y)));
-	});
-var mdgriffith$elm_ui$Element$spacing = function (x) {
-	return A2(
-		mdgriffith$elm_ui$Internal$Model$StyleClass,
-		mdgriffith$elm_ui$Internal$Flag$spacing,
-		A3(
-			mdgriffith$elm_ui$Internal$Model$SpacingStyle,
-			A2(mdgriffith$elm_ui$Internal$Model$spacingName, x, x),
-			x,
-			x));
-};
-var mdgriffith$elm_ui$Internal$Model$Text = function (a) {
-	return {$: 'Text', a: a};
-};
-var mdgriffith$elm_ui$Element$text = function (content) {
-	return mdgriffith$elm_ui$Internal$Model$Text(content);
 };
 var mdgriffith$elm_ui$Internal$Model$Padding = F5(
 	function (a, b, c, d, e) {
@@ -13802,406 +14276,262 @@ var mdgriffith$elm_ui$Element$wrappedRow = F2(
 			}
 		}
 	});
-var mdgriffith$elm_ui$Internal$Flag$bgColor = mdgriffith$elm_ui$Internal$Flag$flag(8);
-var mdgriffith$elm_ui$Element$Background$color = function (clr) {
-	return A2(
-		mdgriffith$elm_ui$Internal$Model$StyleClass,
-		mdgriffith$elm_ui$Internal$Flag$bgColor,
-		A3(
-			mdgriffith$elm_ui$Internal$Model$Colored,
-			'bg-' + mdgriffith$elm_ui$Internal$Model$formatColorClass(clr),
-			'background-color',
-			clr));
-};
-var mdgriffith$elm_ui$Internal$Flag$fontColor = mdgriffith$elm_ui$Internal$Flag$flag(14);
-var mdgriffith$elm_ui$Element$Font$color = function (fontColor) {
-	return A2(
-		mdgriffith$elm_ui$Internal$Model$StyleClass,
-		mdgriffith$elm_ui$Internal$Flag$fontColor,
-		A3(
-			mdgriffith$elm_ui$Internal$Model$Colored,
-			'fc-' + mdgriffith$elm_ui$Internal$Model$formatColorClass(fontColor),
-			'color',
-			fontColor));
-};
-var mdgriffith$elm_ui$Internal$Flag$fontSize = mdgriffith$elm_ui$Internal$Flag$flag(4);
-var mdgriffith$elm_ui$Internal$Model$FontSize = function (a) {
-	return {$: 'FontSize', a: a};
-};
-var mdgriffith$elm_ui$Element$Font$size = function (i) {
-	return A2(
-		mdgriffith$elm_ui$Internal$Model$StyleClass,
-		mdgriffith$elm_ui$Internal$Flag$fontSize,
-		mdgriffith$elm_ui$Internal$Model$FontSize(i));
-};
-var mdgriffith$elm_ui$Internal$Flag$cursor = mdgriffith$elm_ui$Internal$Flag$flag(21);
-var mdgriffith$elm_ui$Internal$Model$Class = F2(
-	function (a, b) {
-		return {$: 'Class', a: a, b: b};
-	});
-var mdgriffith$elm_ui$Element$pointer = A2(mdgriffith$elm_ui$Internal$Model$Class, mdgriffith$elm_ui$Internal$Flag$cursor, mdgriffith$elm_ui$Internal$Style$classes.cursorPointer);
-var mdgriffith$elm_ui$Element$Events$onClick = A2(elm$core$Basics$composeL, mdgriffith$elm_ui$Internal$Model$Attr, elm$html$Html$Events$onClick);
-var mdgriffith$elm_ui$Element$Input$hasFocusStyle = function (attr) {
-	if (((attr.$ === 'StyleClass') && (attr.b.$ === 'PseudoSelector')) && (attr.b.a.$ === 'Focus')) {
-		var _n1 = attr.b;
-		var _n2 = _n1.a;
-		return true;
-	} else {
-		return false;
-	}
-};
-var mdgriffith$elm_ui$Internal$Model$NoAttribute = {$: 'NoAttribute'};
-var mdgriffith$elm_ui$Element$Input$focusDefault = function (attrs) {
-	return A2(elm$core$List$any, mdgriffith$elm_ui$Element$Input$hasFocusStyle, attrs) ? mdgriffith$elm_ui$Internal$Model$NoAttribute : mdgriffith$elm_ui$Internal$Model$htmlClass('focusable');
-};
-var mdgriffith$elm_ui$Element$Input$enter = 'Enter';
-var elm$virtual_dom$VirtualDom$MayPreventDefault = function (a) {
-	return {$: 'MayPreventDefault', a: a};
-};
-var elm$html$Html$Events$preventDefaultOn = F2(
-	function (event, decoder) {
-		return A2(
-			elm$virtual_dom$VirtualDom$on,
-			event,
-			elm$virtual_dom$VirtualDom$MayPreventDefault(decoder));
-	});
-var mdgriffith$elm_ui$Element$Input$onKey = F2(
-	function (desiredCode, msg) {
-		var decode = function (code) {
-			return _Utils_eq(code, desiredCode) ? elm$json$Json$Decode$succeed(msg) : elm$json$Json$Decode$fail('Not the enter key');
-		};
-		var isKey = A2(
-			elm$json$Json$Decode$andThen,
-			decode,
-			A2(elm$json$Json$Decode$field, 'key', elm$json$Json$Decode$string));
-		return mdgriffith$elm_ui$Internal$Model$Attr(
-			A2(
-				elm$html$Html$Events$preventDefaultOn,
-				'keyup',
-				A2(
-					elm$json$Json$Decode$map,
-					function (fired) {
-						return _Utils_Tuple2(fired, true);
-					},
-					isKey)));
-	});
-var mdgriffith$elm_ui$Element$Input$onEnter = function (msg) {
-	return A2(mdgriffith$elm_ui$Element$Input$onKey, mdgriffith$elm_ui$Element$Input$enter, msg);
-};
-var mdgriffith$elm_ui$Internal$Model$Button = {$: 'Button'};
-var mdgriffith$elm_ui$Internal$Model$Describe = function (a) {
-	return {$: 'Describe', a: a};
-};
-var mdgriffith$elm_ui$Element$Input$button = F2(
-	function (attrs, _n0) {
-		var onPress = _n0.onPress;
-		var label = _n0.label;
-		return A4(
-			mdgriffith$elm_ui$Internal$Model$element,
-			mdgriffith$elm_ui$Internal$Model$asEl,
-			mdgriffith$elm_ui$Internal$Model$div,
-			A2(
-				elm$core$List$cons,
-				mdgriffith$elm_ui$Element$width(mdgriffith$elm_ui$Element$shrink),
-				A2(
-					elm$core$List$cons,
-					mdgriffith$elm_ui$Element$height(mdgriffith$elm_ui$Element$shrink),
-					A2(
-						elm$core$List$cons,
-						mdgriffith$elm_ui$Internal$Model$htmlClass(mdgriffith$elm_ui$Internal$Style$classes.contentCenterX + (' ' + (mdgriffith$elm_ui$Internal$Style$classes.contentCenterY + (' ' + (mdgriffith$elm_ui$Internal$Style$classes.seButton + (' ' + mdgriffith$elm_ui$Internal$Style$classes.noTextSelection)))))),
-						A2(
-							elm$core$List$cons,
-							mdgriffith$elm_ui$Element$pointer,
-							A2(
-								elm$core$List$cons,
-								mdgriffith$elm_ui$Element$Input$focusDefault(attrs),
-								A2(
-									elm$core$List$cons,
-									mdgriffith$elm_ui$Internal$Model$Describe(mdgriffith$elm_ui$Internal$Model$Button),
-									A2(
-										elm$core$List$cons,
-										mdgriffith$elm_ui$Internal$Model$Attr(
-											elm$html$Html$Attributes$tabindex(0)),
-										function () {
-											if (onPress.$ === 'Nothing') {
-												return A2(
-													elm$core$List$cons,
-													mdgriffith$elm_ui$Internal$Model$Attr(
-														elm$html$Html$Attributes$disabled(true)),
-													attrs);
-											} else {
-												var msg = onPress.a;
-												return A2(
-													elm$core$List$cons,
-													mdgriffith$elm_ui$Element$Events$onClick(msg),
-													A2(
-														elm$core$List$cons,
-														mdgriffith$elm_ui$Element$Input$onEnter(msg),
-														attrs));
-											}
-										}()))))))),
-			mdgriffith$elm_ui$Internal$Model$Unkeyed(
-				_List_fromArray(
-					[label])));
-	});
 var mdgriffith$elm_ui$Internal$Model$Label = function (a) {
 	return {$: 'Label', a: a};
 };
 var mdgriffith$elm_ui$Element$Region$description = A2(elm$core$Basics$composeL, mdgriffith$elm_ui$Internal$Model$Describe, mdgriffith$elm_ui$Internal$Model$Label);
-var author$project$Main$palettePosition = F2(
-	function (model, bool) {
-		return bool ? A2(
-			mdgriffith$elm_ui$Element$column,
-			_List_fromArray(
-				[
-					mdgriffith$elm_ui$Element$width(
-					mdgriffith$elm_ui$Element$px(100)),
-					mdgriffith$elm_ui$Element$height(mdgriffith$elm_ui$Element$fill),
-					mdgriffith$elm_ui$Element$Border$width(1),
-					mdgriffith$elm_ui$Element$Border$color(author$project$Main$shiroIro),
-					mdgriffith$elm_ui$Element$Background$color(author$project$Main$rouIro),
-					author$project$Main$debugLine(false)
-				]),
-			_List_fromArray(
-				[
-					A2(
-					mdgriffith$elm_ui$Element$el,
-					_List_fromArray(
-						[
-							mdgriffith$elm_ui$Element$Font$color(
-							A3(mdgriffith$elm_ui$Element$rgb255, 255, 255, 255)),
-							mdgriffith$elm_ui$Element$Font$size(17),
-							mdgriffith$elm_ui$Element$centerX,
-							mdgriffith$elm_ui$Element$padding(2)
-						]),
-					mdgriffith$elm_ui$Element$text('Palette')),
-					author$project$Main$panelHr,
-					A2(
-					mdgriffith$elm_ui$Element$column,
-					_List_fromArray(
-						[
-							mdgriffith$elm_ui$Element$centerX,
-							mdgriffith$elm_ui$Element$padding(3),
-							mdgriffith$elm_ui$Element$spacing(5)
-						]),
-					_List_fromArray(
-						[
+var author$project$Main$viewPalettePanel = function (model) {
+	return A2(
+		mdgriffith$elm_ui$Element$column,
+		_List_fromArray(
+			[
+				mdgriffith$elm_ui$Element$width(
+				mdgriffith$elm_ui$Element$px(100)),
+				mdgriffith$elm_ui$Element$height(mdgriffith$elm_ui$Element$fill),
+				mdgriffith$elm_ui$Element$Border$width(1),
+				mdgriffith$elm_ui$Element$Border$color(author$project$Main$shiroIro),
+				mdgriffith$elm_ui$Element$Background$color(author$project$Main$rouIro),
+				author$project$Main$debugLine(false)
+			]),
+		_List_fromArray(
+			[
+				A2(
+				mdgriffith$elm_ui$Element$el,
+				_List_fromArray(
+					[
+						mdgriffith$elm_ui$Element$Font$color(author$project$Main$shiroIro),
+						mdgriffith$elm_ui$Element$Font$size(17),
+						mdgriffith$elm_ui$Element$centerX,
+						mdgriffith$elm_ui$Element$padding(2)
+					]),
+				mdgriffith$elm_ui$Element$text('Palette')),
+				author$project$Main$panelHr,
+				A2(
+				mdgriffith$elm_ui$Element$column,
+				_List_fromArray(
+					[
+						mdgriffith$elm_ui$Element$centerX,
+						mdgriffith$elm_ui$Element$padding(3),
+						mdgriffith$elm_ui$Element$spacing(5)
+					]),
+				_List_fromArray(
+					[
+						A2(
+						mdgriffith$elm_ui$Element$el,
+						_List_fromArray(
+							[
+								mdgriffith$elm_ui$Element$Font$color(author$project$Main$shiroIro),
+								mdgriffith$elm_ui$Element$Font$size(14),
+								mdgriffith$elm_ui$Element$centerX
+							]),
+						mdgriffith$elm_ui$Element$text('Add Color')),
+						author$project$Main$panelHr,
+						A2(
+						mdgriffith$elm_ui$Element$el,
+						_List_fromArray(
+							[
+								mdgriffith$elm_ui$Element$width(
+								mdgriffith$elm_ui$Element$px(90))
+							]),
+						mdgriffith$elm_ui$Element$html(
 							A2(
-							mdgriffith$elm_ui$Element$el,
-							_List_fromArray(
-								[
-									mdgriffith$elm_ui$Element$Font$color(author$project$Main$shiroIro),
-									mdgriffith$elm_ui$Element$Font$size(14),
-									mdgriffith$elm_ui$Element$centerX
-								]),
-							mdgriffith$elm_ui$Element$text('Add Color')),
-							author$project$Main$panelHr,
-							A2(
-							mdgriffith$elm_ui$Element$el,
-							_List_fromArray(
-								[
-									mdgriffith$elm_ui$Element$width(
-									mdgriffith$elm_ui$Element$px(90))
-								]),
-							mdgriffith$elm_ui$Element$html(
-								A2(
-									elm$html$Html$input,
-									_List_fromArray(
-										[
-											elm$html$Html$Events$onInput(author$project$Main$ColorValue),
-											A2(elm$html$Html$Attributes$style, 'width', '80px'),
-											A2(elm$html$Html$Attributes$style, 'height', '14px'),
-											A2(elm$html$Html$Attributes$style, 'font-size', '0.7em'),
-											A2(elm$html$Html$Attributes$style, 'margin', '0 auto')
-										]),
-									_List_fromArray(
-										[
-											elm$html$Html$text(model.colorValue)
-										])))),
-							A2(
-							mdgriffith$elm_ui$Element$el,
-							_List_fromArray(
-								[mdgriffith$elm_ui$Element$centerX]),
-							mdgriffith$elm_ui$Element$html(
-								A2(
-									elm$html$Html$div,
-									_List_fromArray(
-										[
-											A2(elm$html$Html$Attributes$style, 'color', '#e2041b'),
-											A2(elm$html$Html$Attributes$style, 'font-size', '13px')
-										]),
-									_List_fromArray(
-										[
-											elm$html$Html$text(
-											author$project$Main$isColor(model.colorValue) ? '' : (elm$core$String$isEmpty(model.colorValue) ? 'Is Empty' : 'Isn\'t Color'))
-										])))),
-							A2(
-							mdgriffith$elm_ui$Element$el,
-							_List_fromArray(
-								[mdgriffith$elm_ui$Element$centerX]),
-							author$project$Main$isColor(model.colorValue) ? A2(
-								mdgriffith$elm_ui$Element$Input$button,
+								elm$html$Html$input,
 								_List_fromArray(
 									[
-										mdgriffith$elm_ui$Element$htmlAttribute(
-										A2(elm$html$Html$Attributes$style, 'color', 'white'))
+										elm$html$Html$Events$onInput(author$project$Main$ColorValue),
+										A2(elm$html$Html$Attributes$style, 'width', '80px'),
+										A2(elm$html$Html$Attributes$style, 'height', '14px'),
+										A2(elm$html$Html$Attributes$style, 'font-size', '0.7em'),
+										A2(elm$html$Html$Attributes$style, 'margin', '0 auto')
 									]),
-								{
-									label: A2(
-										mdgriffith$elm_ui$Element$row,
-										_List_Nil,
-										_List_fromArray(
-											[
-												A2(
-												mdgriffith$elm_ui$Element$el,
-												_List_fromArray(
-													[
-														mdgriffith$elm_ui$Element$Font$color(author$project$Main$shiroIro),
-														mdgriffith$elm_ui$Element$Font$size(14)
-													]),
-												mdgriffith$elm_ui$Element$text('Add ')),
-												mdgriffith$elm_ui$Element$html(
-												A2(
-													elm$html$Html$div,
-													_List_fromArray(
-														[
-															A2(elm$html$Html$Attributes$style, 'width', '14px'),
-															A2(elm$html$Html$Attributes$style, 'height', '14px'),
-															A2(elm$html$Html$Attributes$style, 'background-color', model.colorValue)
-														]),
-													_List_Nil))
-											])),
-									onPress: elm$core$Maybe$Just(
-										author$project$Main$AddColorToSubPalette(model.colorValue))
-								}) : A2(
-								mdgriffith$elm_ui$Element$el,
 								_List_fromArray(
 									[
-										mdgriffith$elm_ui$Element$htmlAttribute(
-										A2(elm$html$Html$Attributes$style, 'opacity', '0.6'))
+										elm$html$Html$text(model.colorValue)
+									])))),
+						A2(
+						mdgriffith$elm_ui$Element$el,
+						_List_fromArray(
+							[mdgriffith$elm_ui$Element$centerX]),
+						mdgriffith$elm_ui$Element$html(
+							A2(
+								elm$html$Html$div,
+								_List_fromArray(
+									[
+										A2(elm$html$Html$Attributes$style, 'color', '#e2041b'),
+										A2(elm$html$Html$Attributes$style, 'font-size', '13px')
 									]),
-								A2(
-									mdgriffith$elm_ui$Element$Input$button,
+								_List_fromArray(
+									[
+										elm$html$Html$text(
+										author$project$Main$isColor(model.colorValue) ? '' : (elm$core$String$isEmpty(model.colorValue) ? 'Is Empty' : 'Isn\'t Color'))
+									])))),
+						A2(
+						mdgriffith$elm_ui$Element$el,
+						_List_fromArray(
+							[mdgriffith$elm_ui$Element$centerX]),
+						author$project$Main$isColor(model.colorValue) ? A2(
+							mdgriffith$elm_ui$Element$Input$button,
+							_List_fromArray(
+								[
+									mdgriffith$elm_ui$Element$htmlAttribute(
+									A2(elm$html$Html$Attributes$style, 'color', 'white'))
+								]),
+							{
+								label: A2(
+									mdgriffith$elm_ui$Element$row,
+									_List_Nil,
 									_List_fromArray(
 										[
-											mdgriffith$elm_ui$Element$Region$description('disabled'),
-											mdgriffith$elm_ui$Element$htmlAttribute(
-											A2(elm$html$Html$Attributes$style, 'color', 'white'))
-										]),
-									{
-										label: A2(
+											A2(
 											mdgriffith$elm_ui$Element$el,
 											_List_fromArray(
 												[
 													mdgriffith$elm_ui$Element$Font$color(author$project$Main$shiroIro),
 													mdgriffith$elm_ui$Element$Font$size(14)
 												]),
-											mdgriffith$elm_ui$Element$text('disabled')),
-										onPress: elm$core$Maybe$Just(author$project$Main$ForDisabled)
-									})))
-						])),
-					A2(
-					mdgriffith$elm_ui$Element$column,
-					_List_fromArray(
-						[
-							mdgriffith$elm_ui$Element$centerX,
-							mdgriffith$elm_ui$Element$padding(3),
-							mdgriffith$elm_ui$Element$spacing(5)
-						]),
-					_List_fromArray(
-						[
-							A2(
+											mdgriffith$elm_ui$Element$text('Add ')),
+											mdgriffith$elm_ui$Element$html(
+											A2(
+												elm$html$Html$div,
+												_List_fromArray(
+													[
+														A2(elm$html$Html$Attributes$style, 'width', '14px'),
+														A2(elm$html$Html$Attributes$style, 'height', '14px'),
+														A2(elm$html$Html$Attributes$style, 'background-color', model.colorValue)
+													]),
+												_List_Nil))
+										])),
+								onPress: elm$core$Maybe$Just(
+									author$project$Main$AddColorToSubPalette(model.colorValue))
+							}) : A2(
 							mdgriffith$elm_ui$Element$el,
 							_List_fromArray(
 								[
-									mdgriffith$elm_ui$Element$Font$color(author$project$Main$shiroIro),
-									mdgriffith$elm_ui$Element$Font$size(14),
-									mdgriffith$elm_ui$Element$centerX
+									mdgriffith$elm_ui$Element$htmlAttribute(
+									A2(elm$html$Html$Attributes$style, 'opacity', '0.6'))
 								]),
-							mdgriffith$elm_ui$Element$text('Main Palette')),
-							author$project$Main$panelHr,
 							A2(
-							mdgriffith$elm_ui$Element$el,
-							_List_fromArray(
-								[mdgriffith$elm_ui$Element$centerX]),
-							mdgriffith$elm_ui$Element$html(
+								mdgriffith$elm_ui$Element$Input$button,
+								_List_fromArray(
+									[
+										mdgriffith$elm_ui$Element$Region$description('disabled'),
+										mdgriffith$elm_ui$Element$htmlAttribute(
+										A2(elm$html$Html$Attributes$style, 'color', 'white'))
+									]),
+								{
+									label: A2(
+										mdgriffith$elm_ui$Element$el,
+										_List_fromArray(
+											[
+												mdgriffith$elm_ui$Element$Font$color(author$project$Main$shiroIro),
+												mdgriffith$elm_ui$Element$Font$size(14)
+											]),
+										mdgriffith$elm_ui$Element$text('disabled')),
+									onPress: elm$core$Maybe$Just(author$project$Main$ForDisabled)
+								})))
+					])),
+				A2(
+				mdgriffith$elm_ui$Element$column,
+				_List_fromArray(
+					[
+						mdgriffith$elm_ui$Element$centerX,
+						mdgriffith$elm_ui$Element$padding(3),
+						mdgriffith$elm_ui$Element$spacing(5)
+					]),
+				_List_fromArray(
+					[
+						A2(
+						mdgriffith$elm_ui$Element$el,
+						_List_fromArray(
+							[
+								mdgriffith$elm_ui$Element$Font$color(author$project$Main$shiroIro),
+								mdgriffith$elm_ui$Element$Font$size(14),
+								mdgriffith$elm_ui$Element$centerX
+							]),
+						mdgriffith$elm_ui$Element$text('Main Palette')),
+						author$project$Main$panelHr,
+						A2(
+						mdgriffith$elm_ui$Element$el,
+						_List_fromArray(
+							[mdgriffith$elm_ui$Element$centerX]),
+						mdgriffith$elm_ui$Element$html(
+							A2(
+								elm$html$Html$div,
+								_List_fromArray(
+									[
+										A2(elm$html$Html$Attributes$style, 'width', '30px'),
+										A2(elm$html$Html$Attributes$style, 'height', '30px'),
+										A2(elm$html$Html$Attributes$style, 'border', 'solid 1px black'),
+										A2(elm$html$Html$Attributes$style, 'background-color', model.mainPalette)
+									]),
+								_List_Nil)))
+					])),
+				A2(
+				mdgriffith$elm_ui$Element$column,
+				_List_fromArray(
+					[
+						mdgriffith$elm_ui$Element$centerX,
+						mdgriffith$elm_ui$Element$paddingEach(
+						{bottom: 2, left: 0, right: 0, top: 2}),
+						mdgriffith$elm_ui$Element$spacing(5)
+					]),
+				_List_fromArray(
+					[
+						A2(
+						mdgriffith$elm_ui$Element$el,
+						_List_fromArray(
+							[
+								mdgriffith$elm_ui$Element$Font$color(author$project$Main$shiroIro),
+								mdgriffith$elm_ui$Element$Font$size(14),
+								mdgriffith$elm_ui$Element$centerX
+							]),
+						mdgriffith$elm_ui$Element$text('Sub Palette')),
+						author$project$Main$panelHr,
+						A2(
+						mdgriffith$elm_ui$Element$column,
+						_List_fromArray(
+							[mdgriffith$elm_ui$Element$centerX]),
+						_List_fromArray(
+							[
 								A2(
-									elm$html$Html$div,
-									_List_fromArray(
-										[
-											A2(elm$html$Html$Attributes$style, 'width', '30px'),
-											A2(elm$html$Html$Attributes$style, 'height', '30px'),
-											A2(elm$html$Html$Attributes$style, 'border', 'solid 1px black'),
-											A2(elm$html$Html$Attributes$style, 'background-color', model.mainPalette)
-										]),
-									_List_Nil)))
-						])),
-					A2(
-					mdgriffith$elm_ui$Element$column,
-					_List_fromArray(
-						[
-							mdgriffith$elm_ui$Element$centerX,
-							mdgriffith$elm_ui$Element$paddingEach(
-							{bottom: 2, left: 0, right: 0, top: 2}),
-							mdgriffith$elm_ui$Element$spacing(5)
-						]),
-					_List_fromArray(
-						[
-							A2(
-							mdgriffith$elm_ui$Element$el,
-							_List_fromArray(
-								[
-									mdgriffith$elm_ui$Element$Font$color(author$project$Main$shiroIro),
-									mdgriffith$elm_ui$Element$Font$size(14),
-									mdgriffith$elm_ui$Element$centerX
-								]),
-							mdgriffith$elm_ui$Element$text('Sub Palette')),
-							author$project$Main$panelHr,
-							A2(
-							mdgriffith$elm_ui$Element$column,
-							_List_fromArray(
-								[mdgriffith$elm_ui$Element$centerX]),
-							_List_fromArray(
-								[
+								mdgriffith$elm_ui$Element$wrappedRow,
+								_List_fromArray(
+									[
+										mdgriffith$elm_ui$Element$spacing(3)
+									]),
+								A2(
+									elm$core$List$map,
+									function (plt) {
+										return A2(
+											mdgriffith$elm_ui$Element$el,
+											_List_Nil,
+											mdgriffith$elm_ui$Element$html(
+												A2(
+													elm$html$Html$div,
+													_List_fromArray(
+														[
+															A2(elm$html$Html$Attributes$style, 'width', '25px'),
+															A2(elm$html$Html$Attributes$style, 'height', '25px'),
+															A2(
+															elm$html$Html$Attributes$style,
+															'background-color',
+															A2(author$project$Main$getPaletteColor, model, plt - 1)),
+															A2(elm$html$Html$Attributes$style, 'border', 'solid 1px black'),
+															elm$html$Html$Events$onDoubleClick(
+															author$project$Main$DeleteSubPalette(plt)),
+															elm$html$Html$Events$onClick(
+															author$project$Main$SetMainPalette(plt - 1))
+														]),
+													_List_Nil)));
+									},
 									A2(
-									mdgriffith$elm_ui$Element$wrappedRow,
-									_List_fromArray(
-										[
-											mdgriffith$elm_ui$Element$spacing(3)
-										]),
-									A2(
-										elm$core$List$map,
-										function (plt) {
-											return A2(
-												mdgriffith$elm_ui$Element$el,
-												_List_Nil,
-												mdgriffith$elm_ui$Element$html(
-													A2(
-														elm$html$Html$div,
-														_List_fromArray(
-															[
-																A2(elm$html$Html$Attributes$style, 'width', '25px'),
-																A2(elm$html$Html$Attributes$style, 'height', '25px'),
-																A2(
-																elm$html$Html$Attributes$style,
-																'background-color',
-																A2(author$project$Main$getPaletteColor, model, plt - 1)),
-																A2(elm$html$Html$Attributes$style, 'border', 'solid 1px black'),
-																elm$html$Html$Events$onDoubleClick(
-																author$project$Main$DeleteSubPalette(plt)),
-																elm$html$Html$Events$onClick(
-																author$project$Main$SetMainPalette(plt - 1))
-															]),
-														_List_Nil)));
-										},
-										A2(
-											elm$core$List$range,
-											1,
-											elm$core$Dict$size(model.subPalette))))
-								]))
-						]))
-				])) : mdgriffith$elm_ui$Element$none;
-	});
+										elm$core$List$range,
+										1,
+										elm$core$Dict$size(model.subPalette))))
+							]))
+					]))
+			]));
+};
 var author$project$Main$ApplySetting = {$: 'ApplySetting'};
 var author$project$Main$BorderColorValue = function (a) {
 	return {$: 'BorderColorValue', a: a};
@@ -14227,687 +14557,575 @@ var author$project$Main$onChangeH = function (handler) {
 		'change',
 		A2(elm$json$Json$Decode$map, handler, elm$html$Html$Events$targetValue));
 };
+var author$project$Main$BottomCenter = {$: 'BottomCenter'};
+var author$project$Main$BottomLeft = {$: 'BottomLeft'};
+var author$project$Main$BottomRight = {$: 'BottomRight'};
+var author$project$Main$CenterLeft = {$: 'CenterLeft'};
+var author$project$Main$CenterRight = {$: 'CenterRight'};
+var author$project$Main$SetCampusPosition = function (a) {
+	return {$: 'SetCampusPosition', a: a};
+};
+var author$project$Main$TopCenter = {$: 'TopCenter'};
+var author$project$Main$TopLeft = {$: 'TopLeft'};
+var author$project$Main$TopRight = {$: 'TopRight'};
+var author$project$Main$viewCampusPositionSetting = function (tempSetting) {
+	var tempDiv = function (position_) {
+		return A2(
+			elm$html$Html$div,
+			_List_fromArray(
+				[
+					elm$html$Html$Events$onClick(
+					author$project$Main$SetCampusPosition(position_)),
+					A2(elm$html$Html$Attributes$style, 'border', '1px solid black'),
+					A2(elm$html$Html$Attributes$style, 'width', '15px'),
+					A2(elm$html$Html$Attributes$style, 'height', '15px'),
+					_Utils_eq(tempSetting.panelPosition.campus, position_) ? A2(elm$html$Html$Attributes$style, 'background-color', '#c3d825') : A2(elm$html$Html$Attributes$style, 'background-color', 'white'),
+					A2(elm$html$Html$Attributes$style, 'float', 'left'),
+					A2(elm$html$Html$Attributes$style, 'margin', '-1px')
+				]),
+			_List_Nil);
+	};
+	return A2(
+		elm$html$Html$div,
+		_List_fromArray(
+			[
+				A2(elm$html$Html$Attributes$style, 'float', 'left')
+			]),
+		_List_fromArray(
+			[
+				A2(
+				elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						tempDiv(author$project$Main$TopLeft),
+						tempDiv(author$project$Main$TopCenter),
+						tempDiv(author$project$Main$TopRight)
+					])),
+				A2(
+				elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						tempDiv(author$project$Main$CenterLeft),
+						tempDiv(author$project$Main$CenterCenter),
+						tempDiv(author$project$Main$CenterRight)
+					])),
+				A2(
+				elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						tempDiv(author$project$Main$BottomLeft),
+						tempDiv(author$project$Main$BottomCenter),
+						tempDiv(author$project$Main$BottomRight)
+					]))
+			]));
+};
 var elm$html$Html$br = _VirtualDom_node('br');
 var elm$html$Html$option = _VirtualDom_node('option');
 var elm$html$Html$select = _VirtualDom_node('select');
 var elm$html$Html$Attributes$checked = elm$html$Html$Attributes$boolProperty('checked');
 var elm$html$Html$Attributes$name = elm$html$Html$Attributes$stringProperty('name');
-var author$project$Main$settingPosition = F2(
-	function (model, bool) {
-		return bool ? A2(
-			mdgriffith$elm_ui$Element$column,
-			_List_fromArray(
-				[
-					mdgriffith$elm_ui$Element$width(
-					mdgriffith$elm_ui$Element$px(100)),
-					mdgriffith$elm_ui$Element$height(mdgriffith$elm_ui$Element$fill),
-					mdgriffith$elm_ui$Element$Border$width(1),
-					mdgriffith$elm_ui$Element$Border$color(author$project$Main$shiroIro),
-					mdgriffith$elm_ui$Element$Background$color(author$project$Main$rouIro)
-				]),
-			_List_fromArray(
-				[
-					A2(
-					mdgriffith$elm_ui$Element$el,
-					_List_fromArray(
-						[
-							mdgriffith$elm_ui$Element$Font$color(
-							A3(mdgriffith$elm_ui$Element$rgb255, 255, 255, 255)),
-							mdgriffith$elm_ui$Element$Font$size(17),
-							mdgriffith$elm_ui$Element$centerX,
-							mdgriffith$elm_ui$Element$padding(2)
-						]),
-					mdgriffith$elm_ui$Element$text('Setting')),
-					author$project$Main$panelHr,
-					A2(
-					mdgriffith$elm_ui$Element$column,
-					_List_fromArray(
-						[
-							mdgriffith$elm_ui$Element$centerX,
-							mdgriffith$elm_ui$Element$spacing(5),
-							mdgriffith$elm_ui$Element$padding(3)
-						]),
-					_List_fromArray(
-						[
+var author$project$Main$viewSettingPanel = function (model) {
+	return A2(
+		mdgriffith$elm_ui$Element$column,
+		_List_fromArray(
+			[
+				mdgriffith$elm_ui$Element$width(
+				mdgriffith$elm_ui$Element$px(100)),
+				mdgriffith$elm_ui$Element$height(mdgriffith$elm_ui$Element$fill),
+				mdgriffith$elm_ui$Element$Border$width(1),
+				mdgriffith$elm_ui$Element$Border$color(author$project$Main$shiroIro),
+				mdgriffith$elm_ui$Element$Background$color(author$project$Main$rouIro)
+			]),
+		_List_fromArray(
+			[
+				A2(
+				mdgriffith$elm_ui$Element$el,
+				_List_fromArray(
+					[
+						mdgriffith$elm_ui$Element$Font$color(author$project$Main$shiroIro),
+						mdgriffith$elm_ui$Element$Font$size(17),
+						mdgriffith$elm_ui$Element$centerX,
+						mdgriffith$elm_ui$Element$padding(2)
+					]),
+				mdgriffith$elm_ui$Element$text('Setting')),
+				author$project$Main$panelHr,
+				A2(
+				mdgriffith$elm_ui$Element$column,
+				_List_fromArray(
+					[
+						mdgriffith$elm_ui$Element$centerX,
+						mdgriffith$elm_ui$Element$spacing(5),
+						mdgriffith$elm_ui$Element$padding(3)
+					]),
+				_List_fromArray(
+					[
+						A2(
+						mdgriffith$elm_ui$Element$el,
+						_List_fromArray(
+							[
+								mdgriffith$elm_ui$Element$Font$size(14),
+								mdgriffith$elm_ui$Element$Font$color(author$project$Main$shiroIro),
+								mdgriffith$elm_ui$Element$centerX
+							]),
+						mdgriffith$elm_ui$Element$text('Border Color')),
+						author$project$Main$panelHr,
+						A2(
+						mdgriffith$elm_ui$Element$el,
+						_List_fromArray(
+							[
+								mdgriffith$elm_ui$Element$width(
+								mdgriffith$elm_ui$Element$px(90))
+							]),
+						mdgriffith$elm_ui$Element$html(
 							A2(
-							mdgriffith$elm_ui$Element$el,
-							_List_fromArray(
-								[
-									mdgriffith$elm_ui$Element$Font$size(14),
-									mdgriffith$elm_ui$Element$Font$color(author$project$Main$shiroIro),
-									mdgriffith$elm_ui$Element$centerX
-								]),
-							mdgriffith$elm_ui$Element$text('Border Color')),
-							author$project$Main$panelHr,
+								elm$html$Html$input,
+								_List_fromArray(
+									[
+										elm$html$Html$Events$onInput(author$project$Main$BorderColorValue),
+										A2(elm$html$Html$Attributes$style, 'width', '80px'),
+										A2(elm$html$Html$Attributes$style, 'height', '14px'),
+										A2(elm$html$Html$Attributes$style, 'font-size', '0.7em'),
+										elm$html$Html$Attributes$placeholder('black'),
+										A2(elm$html$Html$Attributes$style, 'margin', '0 auto')
+									]),
+								_List_fromArray(
+									[
+										elm$html$Html$text(model.tempSetting.borderColor)
+									])))),
+						A2(
+						mdgriffith$elm_ui$Element$el,
+						_List_fromArray(
+							[mdgriffith$elm_ui$Element$centerX]),
+						mdgriffith$elm_ui$Element$html(
 							A2(
-							mdgriffith$elm_ui$Element$el,
-							_List_fromArray(
-								[
-									mdgriffith$elm_ui$Element$width(
-									mdgriffith$elm_ui$Element$px(90))
-								]),
-							mdgriffith$elm_ui$Element$html(
-								A2(
-									elm$html$Html$input,
-									_List_fromArray(
-										[
-											elm$html$Html$Events$onInput(author$project$Main$BorderColorValue),
-											A2(elm$html$Html$Attributes$style, 'width', '80px'),
-											A2(elm$html$Html$Attributes$style, 'height', '14px'),
-											A2(elm$html$Html$Attributes$style, 'font-size', '0.7em'),
-											elm$html$Html$Attributes$placeholder('black'),
-											A2(elm$html$Html$Attributes$style, 'margin', '0 auto')
-										]),
-									_List_fromArray(
-										[
-											elm$html$Html$text(model.tempSetting.borderColor)
-										])))),
-							A2(
-							mdgriffith$elm_ui$Element$el,
-							_List_fromArray(
-								[mdgriffith$elm_ui$Element$centerX]),
-							mdgriffith$elm_ui$Element$html(
-								A2(
-									elm$html$Html$div,
-									_List_fromArray(
-										[
-											A2(elm$html$Html$Attributes$style, 'color', '#e2041b'),
-											A2(elm$html$Html$Attributes$style, 'font-size', '13px')
-										]),
-									_List_fromArray(
-										[
-											elm$html$Html$text(
-											author$project$Main$isColor(model.tempSetting.borderColor) ? '' : (elm$core$String$isEmpty(model.tempSetting.borderColor) ? 'Is Empty' : 'Isn\'t Color'))
-										]))))
-						])),
-					A2(
-					mdgriffith$elm_ui$Element$column,
-					_List_fromArray(
-						[
-							mdgriffith$elm_ui$Element$centerX,
-							mdgriffith$elm_ui$Element$padding(3),
-							mdgriffith$elm_ui$Element$spacing(5)
-						]),
-					_List_fromArray(
-						[
-							A2(
-							mdgriffith$elm_ui$Element$el,
-							_List_fromArray(
-								[
-									mdgriffith$elm_ui$Element$Font$size(14),
-									mdgriffith$elm_ui$Element$Font$color(author$project$Main$shiroIro)
-								]),
-							mdgriffith$elm_ui$Element$text('Border Style')),
-							author$project$Main$panelHr,
-							A2(
-							mdgriffith$elm_ui$Element$el,
-							_List_fromArray(
-								[
-									mdgriffith$elm_ui$Element$centerX,
-									mdgriffith$elm_ui$Element$height(
-									mdgriffith$elm_ui$Element$px(14)),
-									mdgriffith$elm_ui$Element$Font$size(14)
-								]),
-							mdgriffith$elm_ui$Element$html(
-								function () {
-									var option_ = F2(
-										function (value_, text_) {
-											return A2(
-												elm$html$Html$option,
-												_List_fromArray(
-													[
-														elm$html$Html$Attributes$value(value_)
-													]),
-												_List_fromArray(
-													[
-														elm$html$Html$text(text_)
-													]));
-										});
-									var handler = function (selectedValue) {
-										return author$project$Main$Change(selectedValue);
-									};
-									return A2(
-										elm$html$Html$div,
-										_List_fromArray(
-											[
-												A2(elm$html$Html$Attributes$style, 'height', '14px'),
-												A2(elm$html$Html$Attributes$style, 'font-size', '14px')
-											]),
-										_List_fromArray(
-											[
-												A2(
-												elm$html$Html$select,
-												_List_fromArray(
-													[
-														author$project$Main$onChangeH(handler)
-													]),
-												_List_fromArray(
-													[
-														A2(option_, 'solid 1px', 'solid'),
-														A2(option_, 'none', 'none'),
-														A2(option_, 'double', 'double'),
-														A2(option_, 'groove', 'groove'),
-														A2(option_, 'ridge', 'ridge'),
-														A2(option_, 'dashed 1px', 'dashed'),
-														A2(option_, 'dotted 1px', 'dotted')
-													]))
-											]));
-								}()))
-						])),
-					A2(
-					mdgriffith$elm_ui$Element$column,
-					_List_fromArray(
-						[
-							mdgriffith$elm_ui$Element$centerX,
-							mdgriffith$elm_ui$Element$padding(3),
-							mdgriffith$elm_ui$Element$spacing(5)
-						]),
-					_List_fromArray(
-						[
-							A2(
-							mdgriffith$elm_ui$Element$el,
-							_List_fromArray(
-								[
-									mdgriffith$elm_ui$Element$Font$size(14),
-									mdgriffith$elm_ui$Element$Font$color(author$project$Main$shiroIro),
-									mdgriffith$elm_ui$Element$centerX
-								]),
-							mdgriffith$elm_ui$Element$text('Pixel Size')),
-							author$project$Main$panelHr,
-							A2(
-							mdgriffith$elm_ui$Element$column,
-							_List_fromArray(
-								[
-									mdgriffith$elm_ui$Element$spacing(3)
-								]),
+								elm$html$Html$div,
+								_List_fromArray(
+									[
+										A2(elm$html$Html$Attributes$style, 'color', '#e2041b'),
+										A2(elm$html$Html$Attributes$style, 'font-size', '13px')
+									]),
+								_List_fromArray(
+									[
+										elm$html$Html$text(
+										author$project$Main$isColor(model.tempSetting.borderColor) ? '' : (elm$core$String$isEmpty(model.tempSetting.borderColor) ? 'Is Empty' : 'Isn\'t Color'))
+									]))))
+					])),
+				A2(
+				mdgriffith$elm_ui$Element$column,
+				_List_fromArray(
+					[
+						mdgriffith$elm_ui$Element$centerX,
+						mdgriffith$elm_ui$Element$padding(3),
+						mdgriffith$elm_ui$Element$spacing(5)
+					]),
+				_List_fromArray(
+					[
+						A2(
+						mdgriffith$elm_ui$Element$el,
+						_List_fromArray(
+							[
+								mdgriffith$elm_ui$Element$Font$size(14),
+								mdgriffith$elm_ui$Element$Font$color(author$project$Main$shiroIro)
+							]),
+						mdgriffith$elm_ui$Element$text('Border Style')),
+						author$project$Main$panelHr,
+						A2(
+						mdgriffith$elm_ui$Element$el,
+						_List_fromArray(
+							[
+								mdgriffith$elm_ui$Element$centerX,
+								mdgriffith$elm_ui$Element$height(
+								mdgriffith$elm_ui$Element$px(14)),
+								mdgriffith$elm_ui$Element$Font$size(14)
+							]),
+						mdgriffith$elm_ui$Element$html(
 							function () {
-								var pixelSizeErr = function (value_) {
-									var _n0 = elm$core$String$toInt(value_);
-									if (_n0.$ === 'Nothing') {
-										return elm$core$String$isEmpty(value_) ? 'Is empty' : 'Isn\'t Integer';
-									} else {
-										var n = _n0.a;
-										return (n <= 0) ? 'Is 0 or less' : '';
-									}
+								var option_ = F2(
+									function (value_, text_) {
+										return A2(
+											elm$html$Html$option,
+											_List_fromArray(
+												[
+													elm$html$Html$Attributes$value(value_)
+												]),
+											_List_fromArray(
+												[
+													elm$html$Html$text(text_)
+												]));
+									});
+								var handler = function (selectedValue) {
+									return author$project$Main$Change(selectedValue);
 								};
-								return _List_fromArray(
-									[
-										mdgriffith$elm_ui$Element$html(
-										A2(
-											elm$html$Html$div,
-											_List_fromArray(
-												[
-													A2(elm$html$Html$Attributes$style, 'color', 'white'),
-													A2(elm$html$Html$Attributes$style, 'font-size', '14px'),
-													A2(elm$html$Html$Attributes$style, 'padding', '3px')
-												]),
-											_List_fromArray(
-												[
-													elm$html$Html$text('width : '),
-													A2(
-													elm$html$Html$input,
-													_List_fromArray(
-														[
-															A2(elm$html$Html$Attributes$style, '', ''),
-															A2(elm$html$Html$Attributes$style, 'width', '30px'),
-															A2(elm$html$Html$Attributes$style, 'height', '14px'),
-															A2(elm$html$Html$Attributes$style, 'font-size', '95%'),
-															elm$html$Html$Attributes$placeholder(model.setting.width),
-															elm$html$Html$Events$onInput(author$project$Main$SetPixelWidth)
-														]),
-													_List_fromArray(
-														[
-															elm$html$Html$text(model.tempSetting.width)
-														])),
-													A2(
-													elm$html$Html$div,
-													_List_fromArray(
-														[
-															A2(elm$html$Html$Attributes$style, 'color', '#e2041b'),
-															A2(elm$html$Html$Attributes$style, 'font-size', '13px')
-														]),
-													_List_fromArray(
-														[
-															elm$html$Html$text(
-															pixelSizeErr(model.tempSetting.width))
-														]))
-												]))),
-										mdgriffith$elm_ui$Element$html(
-										A2(
-											elm$html$Html$div,
-											_List_fromArray(
-												[
-													A2(elm$html$Html$Attributes$style, 'color', 'white'),
-													A2(elm$html$Html$Attributes$style, 'font-size', '14px'),
-													A2(elm$html$Html$Attributes$style, 'padding', '3px')
-												]),
-											_List_fromArray(
-												[
-													elm$html$Html$text('height : '),
-													A2(
-													elm$html$Html$input,
-													_List_fromArray(
-														[
-															A2(elm$html$Html$Attributes$style, 'width', '30px'),
-															A2(elm$html$Html$Attributes$style, 'height', '14px'),
-															A2(elm$html$Html$Attributes$style, 'font-size', '95%'),
-															elm$html$Html$Attributes$placeholder(model.setting.height),
-															elm$html$Html$Events$onInput(author$project$Main$SetPixelHeight)
-														]),
-													_List_Nil),
-													A2(
-													elm$html$Html$div,
-													_List_fromArray(
-														[
-															A2(elm$html$Html$Attributes$style, 'color', '#e2041b'),
-															A2(elm$html$Html$Attributes$style, 'font-size', '13px')
-														]),
-													_List_fromArray(
-														[
-															elm$html$Html$text(
-															pixelSizeErr(model.tempSetting.height))
-														]))
-												])))
-									]);
-							}())
-						])),
-					A2(
-					mdgriffith$elm_ui$Element$column,
-					_List_fromArray(
-						[
-							mdgriffith$elm_ui$Element$centerX,
-							mdgriffith$elm_ui$Element$padding(3),
-							mdgriffith$elm_ui$Element$spacing(5)
-						]),
-					_List_fromArray(
-						[
-							A2(
-							mdgriffith$elm_ui$Element$el,
-							_List_fromArray(
-								[
-									mdgriffith$elm_ui$Element$Font$size(14),
-									mdgriffith$elm_ui$Element$Font$color(author$project$Main$shiroIro),
-									mdgriffith$elm_ui$Element$centerX
-								]),
-							mdgriffith$elm_ui$Element$text('Position')),
-							author$project$Main$panelHr,
-							A2(
-							mdgriffith$elm_ui$Element$el,
-							_List_fromArray(
-								[mdgriffith$elm_ui$Element$centerX]),
-							mdgriffith$elm_ui$Element$html(
-								A2(
+								return A2(
 									elm$html$Html$div,
-									_List_Nil,
+									_List_fromArray(
+										[
+											A2(elm$html$Html$Attributes$style, 'height', '14px'),
+											A2(elm$html$Html$Attributes$style, 'font-size', '14px')
+										]),
 									_List_fromArray(
 										[
 											A2(
-											elm$html$Html$div,
+											elm$html$Html$select,
 											_List_fromArray(
 												[
-													A2(elm$html$Html$Attributes$style, 'color', 'white'),
-													A2(elm$html$Html$Attributes$style, 'font-size', '14px')
+													author$project$Main$onChangeH(handler)
 												]),
 											_List_fromArray(
 												[
-													elm$html$Html$text('Setting'),
-													A2(elm$html$Html$br, _List_Nil, _List_Nil),
-													elm$html$Html$text('R'),
-													A2(
-													elm$html$Html$input,
-													_List_fromArray(
-														[
-															elm$html$Html$Attributes$type_('radio'),
-															elm$html$Html$Attributes$value('right'),
-															elm$html$Html$Attributes$name('settingpanel'),
-															elm$html$Html$Events$onClick(
-															A2(author$project$Main$ChangePanelPosition, author$project$Main$SettingPanel, author$project$Main$Right)),
-															elm$html$Html$Attributes$checked(
-															_Utils_eq(model.tempSetting.panelPosition.settingPanel, author$project$Main$Right))
-														]),
-													_List_Nil),
-													elm$html$Html$text('L'),
-													A2(
-													elm$html$Html$input,
-													_List_fromArray(
-														[
-															elm$html$Html$Attributes$type_('radio'),
-															elm$html$Html$Attributes$value(''),
-															elm$html$Html$Attributes$name('settingpanel'),
-															elm$html$Html$Events$onClick(
-															A2(author$project$Main$ChangePanelPosition, author$project$Main$SettingPanel, author$project$Main$Left)),
-															elm$html$Html$Attributes$checked(
-															_Utils_eq(model.tempSetting.panelPosition.settingPanel, author$project$Main$Left))
-														]),
-													_List_Nil)
-												])),
-											A2(
-											elm$html$Html$div,
-											_List_fromArray(
-												[
-													A2(elm$html$Html$Attributes$style, 'color', 'white'),
-													A2(elm$html$Html$Attributes$style, 'font-size', '14px')
-												]),
-											_List_fromArray(
-												[
-													elm$html$Html$text('Palette'),
-													A2(elm$html$Html$br, _List_Nil, _List_Nil),
-													elm$html$Html$text('R'),
-													A2(
-													elm$html$Html$input,
-													_List_fromArray(
-														[
-															elm$html$Html$Attributes$type_('radio'),
-															elm$html$Html$Attributes$value(''),
-															elm$html$Html$Attributes$name('paletteposition'),
-															elm$html$Html$Events$onClick(
-															A2(author$project$Main$ChangePanelPosition, author$project$Main$PalettePanel, author$project$Main$Right)),
-															elm$html$Html$Attributes$checked(
-															_Utils_eq(model.tempSetting.panelPosition.palettePanel, author$project$Main$Right))
-														]),
-													_List_Nil),
-													elm$html$Html$text('L'),
-													A2(
-													elm$html$Html$input,
-													_List_fromArray(
-														[
-															elm$html$Html$Attributes$type_('radio'),
-															elm$html$Html$Attributes$value(''),
-															elm$html$Html$Attributes$name('paletteposition'),
-															elm$html$Html$Events$onClick(
-															A2(author$project$Main$ChangePanelPosition, author$project$Main$PalettePanel, author$project$Main$Left)),
-															elm$html$Html$Attributes$checked(
-															_Utils_eq(model.tempSetting.panelPosition.palettePanel, author$project$Main$Left))
-														]),
-													_List_Nil)
+													A2(option_, 'solid 1px', 'solid'),
+													A2(option_, 'none', 'none'),
+													A2(option_, 'double', 'double'),
+													A2(option_, 'groove', 'groove'),
+													A2(option_, 'ridge', 'ridge'),
+													A2(option_, 'dashed 1px', 'dashed'),
+													A2(option_, 'dotted 1px', 'dotted')
 												]))
-										]))))
-						])),
-					A2(
-					mdgriffith$elm_ui$Element$el,
-					_List_fromArray(
-						[mdgriffith$elm_ui$Element$centerX]),
-					author$project$Main$isCorrectSetting(model.tempSetting) ? A2(
-						mdgriffith$elm_ui$Element$Input$button,
+										]));
+							}()))
+					])),
+				A2(
+				mdgriffith$elm_ui$Element$column,
+				_List_fromArray(
+					[
+						mdgriffith$elm_ui$Element$centerX,
+						mdgriffith$elm_ui$Element$padding(3),
+						mdgriffith$elm_ui$Element$spacing(5)
+					]),
+				_List_fromArray(
+					[
+						A2(
+						mdgriffith$elm_ui$Element$el,
 						_List_fromArray(
 							[
-								mdgriffith$elm_ui$Element$htmlAttribute(
-								A2(elm$html$Html$Attributes$style, 'color', 'white'))
+								mdgriffith$elm_ui$Element$Font$size(14),
+								mdgriffith$elm_ui$Element$Font$color(author$project$Main$shiroIro),
+								mdgriffith$elm_ui$Element$centerX
 							]),
-						{
-							label: A2(
-								mdgriffith$elm_ui$Element$el,
-								_List_fromArray(
-									[
-										mdgriffith$elm_ui$Element$Font$color(author$project$Main$shiroIro),
-										mdgriffith$elm_ui$Element$Font$size(14)
-									]),
-								mdgriffith$elm_ui$Element$text('Apply')),
-							onPress: elm$core$Maybe$Just(author$project$Main$ApplySetting)
-						}) : A2(
-						mdgriffith$elm_ui$Element$Input$button,
+						mdgriffith$elm_ui$Element$text('Pixel Size')),
+						author$project$Main$panelHr,
+						A2(
+						mdgriffith$elm_ui$Element$column,
 						_List_fromArray(
 							[
-								mdgriffith$elm_ui$Element$htmlAttribute(
-								A2(elm$html$Html$Attributes$style, 'opacity', '0.6')),
-								mdgriffith$elm_ui$Element$htmlAttribute(
-								A2(elm$html$Html$Attributes$style, 'color', 'white'))
+								mdgriffith$elm_ui$Element$spacing(3)
 							]),
-						{
-							label: A2(
-								mdgriffith$elm_ui$Element$el,
-								_List_fromArray(
-									[
-										mdgriffith$elm_ui$Element$Font$color(author$project$Main$shiroIro),
-										mdgriffith$elm_ui$Element$Font$size(14)
-									]),
-								mdgriffith$elm_ui$Element$text('disabled')),
-							onPress: elm$core$Maybe$Nothing
-						}))
-				])) : mdgriffith$elm_ui$Element$none;
-	});
-var author$project$Main$shironezuIro = A3(mdgriffith$elm_ui$Element$rgb255, 220, 221, 221);
-var author$project$Main$DisplayDlButton = {$: 'DisplayDlButton'};
-var author$project$Main$Undo = function (a) {
-	return {$: 'Undo', a: a};
-};
-var elm$html$Html$a = _VirtualDom_node('a');
-var elm$html$Html$Attributes$hidden = elm$html$Html$Attributes$boolProperty('hidden');
-var elm$html$Html$Attributes$target = elm$html$Html$Attributes$stringProperty('target');
-var mdgriffith$elm_ui$Internal$Model$Right = {$: 'Right'};
-var mdgriffith$elm_ui$Element$alignRight = mdgriffith$elm_ui$Internal$Model$AlignX(mdgriffith$elm_ui$Internal$Model$Right);
-var mdgriffith$elm_ui$Internal$Model$AlignY = function (a) {
-	return {$: 'AlignY', a: a};
-};
-var mdgriffith$elm_ui$Internal$Model$CenterY = {$: 'CenterY'};
-var mdgriffith$elm_ui$Element$centerY = mdgriffith$elm_ui$Internal$Model$AlignY(mdgriffith$elm_ui$Internal$Model$CenterY);
-var mdgriffith$elm_ui$Element$paddingXY = F2(
-	function (x, y) {
-		return _Utils_eq(x, y) ? A2(
-			mdgriffith$elm_ui$Internal$Model$StyleClass,
-			mdgriffith$elm_ui$Internal$Flag$padding,
-			A5(
-				mdgriffith$elm_ui$Internal$Model$PaddingStyle,
-				'p-' + elm$core$String$fromInt(x),
-				x,
-				x,
-				x,
-				x)) : A2(
-			mdgriffith$elm_ui$Internal$Model$StyleClass,
-			mdgriffith$elm_ui$Internal$Flag$padding,
-			A5(
-				mdgriffith$elm_ui$Internal$Model$PaddingStyle,
-				'p-' + (elm$core$String$fromInt(x) + ('-' + elm$core$String$fromInt(y))),
-				y,
-				x,
-				y,
-				x));
-	});
-var author$project$Main$toolsPanel = F2(
-	function (model, bool) {
-		var viewUndoButton = A2(
-			mdgriffith$elm_ui$Element$Input$button,
-			_List_Nil,
-			{
-				label: A2(
-					mdgriffith$elm_ui$Element$el,
-					_List_fromArray(
-						[
-							mdgriffith$elm_ui$Element$Font$color(author$project$Main$shiroIro),
-							mdgriffith$elm_ui$Element$Font$size(14)
-						]),
-					mdgriffith$elm_ui$Element$text('Undo')),
-				onPress: function () {
-					var y = A2(
-						elm$core$Maybe$withDefault,
-						_Utils_Tuple2(
-							_Utils_Tuple2(0, 0),
-							'white'),
-						A2(
-							elm$core$Dict$get,
-							elm$core$Dict$size(model.history) - 1,
-							model.history)).a.b;
-					var x = A2(
-						elm$core$Maybe$withDefault,
-						_Utils_Tuple2(
-							_Utils_Tuple2(0, 0),
-							'white'),
-						A2(
-							elm$core$Dict$get,
-							elm$core$Dict$size(model.history) - 1,
-							model.history)).a.a;
-					return elm$core$Maybe$Just(
-						author$project$Main$Undo(
-							_Utils_Tuple2(y, x)));
-				}()
-			});
-		var gendlButton = function (bText) {
-			var tempButton = F6(
-				function (msg, oValue, dValue, id_, attr1, attr2) {
-					return A2(
-						mdgriffith$elm_ui$Element$Input$button,
-						_List_Nil,
-						{
-							label: A2(
-								mdgriffith$elm_ui$Element$el,
-								_List_Nil,
-								mdgriffith$elm_ui$Element$html(
+						function () {
+							var pixelSizeErr = function (value_) {
+								var _n0 = elm$core$String$toInt(value_);
+								if (_n0.$ === 'Nothing') {
+									return elm$core$String$isEmpty(value_) ? 'Is empty' : 'Isn\'t Integer';
+								} else {
+									var n = _n0.a;
+									return (n <= 0) ? 'Is 0 or less' : '';
+								}
+							};
+							return _List_fromArray(
+								[
+									mdgriffith$elm_ui$Element$html(
 									A2(
-										elm$html$Html$a,
+										elm$html$Html$div,
 										_List_fromArray(
 											[
 												A2(elm$html$Html$Attributes$style, 'color', 'white'),
 												A2(elm$html$Html$Attributes$style, 'font-size', '14px'),
-												A2(elm$html$Html$Attributes$style, 'opacity', oValue),
-												A2(elm$html$Html$Attributes$style, 'text-decoration', dValue),
-												elm$html$Html$Attributes$id(id_),
-												attr1,
-												attr2
+												A2(elm$html$Html$Attributes$style, 'padding', '3px')
 											]),
 										_List_fromArray(
 											[
-												elm$html$Html$text(bText)
-											])))),
-							onPress: msg
-						});
-				});
-			switch (bText) {
-				case 'Gen':
-					return (elm$core$Dict$size(model.campus) > 1) ? A6(
-						tempButton,
-						elm$core$Maybe$Just(author$project$Main$DisplayDlButton),
-						'1',
-						'none',
-						'',
-						A2(elm$html$Html$Attributes$style, '', ''),
-						elm$html$Html$Attributes$hidden(false)) : A6(
-						tempButton,
-						elm$core$Maybe$Nothing,
-						'0.6',
-						'line-through',
-						'',
-						A2(elm$html$Html$Attributes$style, '', ''),
-						elm$html$Html$Attributes$hidden(false));
-				case 'DL':
-					return model.toolsSetting.isDisplayDlButton ? A6(
-						tempButton,
-						elm$core$Maybe$Nothing,
-						'1',
-						'none',
-						'dl',
-						elm$html$Html$Attributes$href(''),
-						elm$html$Html$Attributes$target('_blank')) : A6(
-						tempButton,
-						elm$core$Maybe$Nothing,
-						'0.6',
-						'line-through',
-						'',
-						A2(elm$html$Html$Attributes$style, '', ''),
-						elm$html$Html$Attributes$hidden(false));
-				default:
-					return mdgriffith$elm_ui$Element$none;
-			}
-		};
-		return bool ? A2(
-			mdgriffith$elm_ui$Element$row,
-			_List_fromArray(
-				[
-					mdgriffith$elm_ui$Element$width(mdgriffith$elm_ui$Element$fill),
-					mdgriffith$elm_ui$Element$height(
-					mdgriffith$elm_ui$Element$px(36)),
-					mdgriffith$elm_ui$Element$Border$widthEach(
-					{bottom: 1, left: 0, right: 0, top: 1}),
-					mdgriffith$elm_ui$Element$Border$color(author$project$Main$shiroIro),
-					mdgriffith$elm_ui$Element$Background$color(author$project$Main$rouIro)
-				]),
-			_List_fromArray(
-				[
-					A2(
-					mdgriffith$elm_ui$Element$el,
-					_List_fromArray(
-						[
-							mdgriffith$elm_ui$Element$Font$color(author$project$Main$shiroIro),
-							mdgriffith$elm_ui$Element$Font$size(17),
-							mdgriffith$elm_ui$Element$padding(2),
-							mdgriffith$elm_ui$Element$centerY
-						]),
-					mdgriffith$elm_ui$Element$text('Tools')),
-					A2(
-					mdgriffith$elm_ui$Element$row,
-					_List_fromArray(
-						[
-							mdgriffith$elm_ui$Element$alignRight,
-							A2(mdgriffith$elm_ui$Element$paddingXY, 20, 0),
-							mdgriffith$elm_ui$Element$spacing(5)
-						]),
-					_List_fromArray(
-						[
-							gendlButton('Gen'),
-							gendlButton('DL'),
-							viewUndoButton
-						]))
-				])) : mdgriffith$elm_ui$Element$none;
-	});
-var author$project$Main$ChangeColor = F3(
-	function (a, b, c) {
-		return {$: 'ChangeColor', a: a, b: b, c: c};
-	});
-var author$project$Main$viewCampus = F3(
-	function (model, width, height) {
-		return A2(
-			elm$html$Html$div,
-			_List_fromArray(
-				[
-					elm$html$Html$Attributes$id('campus')
-				]),
-			_List_fromArray(
-				[
-					A2(
-					elm$html$Html$div,
-					_List_Nil,
-					A2(
-						elm$core$List$map,
-						function (y) {
-							return A2(
+												elm$html$Html$text('width : '),
+												A2(
+												elm$html$Html$input,
+												_List_fromArray(
+													[
+														A2(elm$html$Html$Attributes$style, '', ''),
+														A2(elm$html$Html$Attributes$style, 'width', '30px'),
+														A2(elm$html$Html$Attributes$style, 'height', '14px'),
+														A2(elm$html$Html$Attributes$style, 'font-size', '95%'),
+														elm$html$Html$Attributes$placeholder(model.setting.width),
+														elm$html$Html$Events$onInput(author$project$Main$SetPixelWidth)
+													]),
+												_List_fromArray(
+													[
+														elm$html$Html$text(model.tempSetting.width)
+													])),
+												A2(
+												elm$html$Html$div,
+												_List_fromArray(
+													[
+														A2(elm$html$Html$Attributes$style, 'color', '#e2041b'),
+														A2(elm$html$Html$Attributes$style, 'font-size', '13px')
+													]),
+												_List_fromArray(
+													[
+														elm$html$Html$text(
+														pixelSizeErr(model.tempSetting.width))
+													]))
+											]))),
+									mdgriffith$elm_ui$Element$html(
+									A2(
+										elm$html$Html$div,
+										_List_fromArray(
+											[
+												A2(elm$html$Html$Attributes$style, 'color', 'white'),
+												A2(elm$html$Html$Attributes$style, 'font-size', '14px'),
+												A2(elm$html$Html$Attributes$style, 'padding', '3px')
+											]),
+										_List_fromArray(
+											[
+												elm$html$Html$text('height : '),
+												A2(
+												elm$html$Html$input,
+												_List_fromArray(
+													[
+														A2(elm$html$Html$Attributes$style, 'width', '30px'),
+														A2(elm$html$Html$Attributes$style, 'height', '14px'),
+														A2(elm$html$Html$Attributes$style, 'font-size', '95%'),
+														elm$html$Html$Attributes$placeholder(model.setting.height),
+														elm$html$Html$Events$onInput(author$project$Main$SetPixelHeight)
+													]),
+												_List_Nil),
+												A2(
+												elm$html$Html$div,
+												_List_fromArray(
+													[
+														A2(elm$html$Html$Attributes$style, 'color', '#e2041b'),
+														A2(elm$html$Html$Attributes$style, 'font-size', '13px')
+													]),
+												_List_fromArray(
+													[
+														elm$html$Html$text(
+														pixelSizeErr(model.tempSetting.height))
+													]))
+											])))
+								]);
+						}())
+					])),
+				A2(
+				mdgriffith$elm_ui$Element$column,
+				_List_fromArray(
+					[
+						mdgriffith$elm_ui$Element$centerX,
+						mdgriffith$elm_ui$Element$padding(3),
+						mdgriffith$elm_ui$Element$spacing(5)
+					]),
+				_List_fromArray(
+					[
+						A2(
+						mdgriffith$elm_ui$Element$el,
+						_List_fromArray(
+							[
+								mdgriffith$elm_ui$Element$Font$size(14),
+								mdgriffith$elm_ui$Element$Font$color(author$project$Main$shiroIro),
+								mdgriffith$elm_ui$Element$centerX
+							]),
+						mdgriffith$elm_ui$Element$text('Position')),
+						author$project$Main$panelHr,
+						A2(
+						mdgriffith$elm_ui$Element$el,
+						_List_fromArray(
+							[mdgriffith$elm_ui$Element$centerX]),
+						mdgriffith$elm_ui$Element$html(
+							A2(
 								elm$html$Html$div,
 								_List_Nil,
-								A2(
-									elm$core$List$map,
-									function (x) {
-										return A2(
-											elm$html$Html$div,
-											_List_fromArray(
-												[
-													A2(elm$html$Html$Attributes$style, 'float', 'left')
-												]),
-											_List_fromArray(
-												[
-													A2(
-													elm$html$Html$div,
-													_List_fromArray(
-														[
-															A2(elm$html$Html$Attributes$style, 'width', model.setting.width + 'px'),
-															A2(elm$html$Html$Attributes$style, 'height', model.setting.height + 'px'),
-															A2(elm$html$Html$Attributes$style, 'border', model.setting.borderColor + (' ' + model.setting.borderStyle)),
-															A2(
-															elm$html$Html$Attributes$style,
-															'background-color',
-															A3(author$project$Main$getCampusColor, model, y, x)),
-															A2(elm$html$Html$Attributes$style, 'padding', '0px'),
-															A2(elm$html$Html$Attributes$style, 'margin', '-1px'),
-															elm$html$Html$Events$onClick(
-															A3(author$project$Main$ChangeColor, y, x, model.mainPalette))
-														]),
-													_List_Nil)
-												]));
-									},
-									A2(elm$core$List$range, 0, width - 1)));
-						},
-						A2(elm$core$List$range, 0, height - 1)))
-				]));
-	});
-var mdgriffith$elm_ui$Internal$Model$Left = {$: 'Left'};
-var mdgriffith$elm_ui$Element$alignLeft = mdgriffith$elm_ui$Internal$Model$AlignX(mdgriffith$elm_ui$Internal$Model$Left);
+								_List_fromArray(
+									[
+										A2(
+										elm$html$Html$div,
+										_List_fromArray(
+											[
+												A2(elm$html$Html$Attributes$style, 'color', 'white'),
+												A2(elm$html$Html$Attributes$style, 'font-size', '14px')
+											]),
+										_List_fromArray(
+											[
+												elm$html$Html$text('Setting'),
+												A2(elm$html$Html$br, _List_Nil, _List_Nil),
+												elm$html$Html$text('R'),
+												A2(
+												elm$html$Html$input,
+												_List_fromArray(
+													[
+														elm$html$Html$Attributes$type_('radio'),
+														elm$html$Html$Attributes$value('right'),
+														elm$html$Html$Attributes$name('settingpanel'),
+														elm$html$Html$Events$onClick(
+														A2(author$project$Main$ChangePanelPosition, author$project$Main$SettingPanel, author$project$Main$Right)),
+														elm$html$Html$Attributes$checked(
+														_Utils_eq(model.tempSetting.panelPosition.settingPanel, author$project$Main$Right))
+													]),
+												_List_Nil),
+												elm$html$Html$text('L'),
+												A2(
+												elm$html$Html$input,
+												_List_fromArray(
+													[
+														elm$html$Html$Attributes$type_('radio'),
+														elm$html$Html$Attributes$value(''),
+														elm$html$Html$Attributes$name('settingpanel'),
+														elm$html$Html$Events$onClick(
+														A2(author$project$Main$ChangePanelPosition, author$project$Main$SettingPanel, author$project$Main$Left)),
+														elm$html$Html$Attributes$checked(
+														_Utils_eq(model.tempSetting.panelPosition.settingPanel, author$project$Main$Left))
+													]),
+												_List_Nil)
+											])),
+										A2(
+										elm$html$Html$div,
+										_List_fromArray(
+											[
+												A2(elm$html$Html$Attributes$style, 'color', 'white'),
+												A2(elm$html$Html$Attributes$style, 'font-size', '14px')
+											]),
+										_List_fromArray(
+											[
+												elm$html$Html$text('Palette'),
+												A2(elm$html$Html$br, _List_Nil, _List_Nil),
+												elm$html$Html$text('R'),
+												A2(
+												elm$html$Html$input,
+												_List_fromArray(
+													[
+														elm$html$Html$Attributes$type_('radio'),
+														elm$html$Html$Attributes$value(''),
+														elm$html$Html$Attributes$name('paletteposition'),
+														elm$html$Html$Events$onClick(
+														A2(author$project$Main$ChangePanelPosition, author$project$Main$PalettePanel, author$project$Main$Right)),
+														elm$html$Html$Attributes$checked(
+														_Utils_eq(model.tempSetting.panelPosition.palettePanel, author$project$Main$Right))
+													]),
+												_List_Nil),
+												elm$html$Html$text('L'),
+												A2(
+												elm$html$Html$input,
+												_List_fromArray(
+													[
+														elm$html$Html$Attributes$type_('radio'),
+														elm$html$Html$Attributes$value(''),
+														elm$html$Html$Attributes$name('paletteposition'),
+														elm$html$Html$Events$onClick(
+														A2(author$project$Main$ChangePanelPosition, author$project$Main$PalettePanel, author$project$Main$Left)),
+														elm$html$Html$Attributes$checked(
+														_Utils_eq(model.tempSetting.panelPosition.palettePanel, author$project$Main$Left))
+													]),
+												_List_Nil)
+											])),
+										A2(
+										elm$html$Html$div,
+										_List_fromArray(
+											[
+												A2(elm$html$Html$Attributes$style, 'color', 'white'),
+												A2(elm$html$Html$Attributes$style, 'font-size', '14px')
+											]),
+										_List_fromArray(
+											[
+												elm$html$Html$text('Campus'),
+												A2(elm$html$Html$br, _List_Nil, _List_Nil),
+												author$project$Main$viewCampusPositionSetting(model.tempSetting)
+											]))
+									]))))
+					])),
+				A2(
+				mdgriffith$elm_ui$Element$el,
+				_List_fromArray(
+					[mdgriffith$elm_ui$Element$centerX]),
+				author$project$Main$isCorrectSetting(model.tempSetting) ? A2(
+					mdgriffith$elm_ui$Element$Input$button,
+					_List_fromArray(
+						[
+							mdgriffith$elm_ui$Element$htmlAttribute(
+							A2(elm$html$Html$Attributes$style, 'color', 'white'))
+						]),
+					{
+						label: A2(
+							mdgriffith$elm_ui$Element$el,
+							_List_fromArray(
+								[
+									mdgriffith$elm_ui$Element$Font$color(author$project$Main$shiroIro),
+									mdgriffith$elm_ui$Element$Font$size(14)
+								]),
+							mdgriffith$elm_ui$Element$text('Apply')),
+						onPress: elm$core$Maybe$Just(author$project$Main$ApplySetting)
+					}) : A2(
+					mdgriffith$elm_ui$Element$Input$button,
+					_List_fromArray(
+						[
+							mdgriffith$elm_ui$Element$htmlAttribute(
+							A2(elm$html$Html$Attributes$style, 'opacity', '0.6')),
+							mdgriffith$elm_ui$Element$htmlAttribute(
+							A2(elm$html$Html$Attributes$style, 'color', 'white'))
+						]),
+					{
+						label: A2(
+							mdgriffith$elm_ui$Element$el,
+							_List_fromArray(
+								[
+									mdgriffith$elm_ui$Element$Font$color(author$project$Main$shiroIro),
+									mdgriffith$elm_ui$Element$Font$size(14)
+								]),
+							mdgriffith$elm_ui$Element$text('disabled')),
+						onPress: elm$core$Maybe$Nothing
+					}))
+			]));
+};
+var author$project$Main$viewPanels = function (model) {
+	var view_ = function () {
+		var _n0 = _Utils_Tuple2(model.setting.panelPosition.settingPanel, model.setting.panelPosition.palettePanel);
+		if (_n0.a.$ === 'Right') {
+			if (_n0.b.$ === 'Left') {
+				var _n3 = _n0.a;
+				var _n4 = _n0.b;
+				return _List_fromArray(
+					[
+						author$project$Main$viewPalettePanel(model),
+						author$project$Main$viewCampusPanel(model),
+						author$project$Main$viewSettingPanel(model)
+					]);
+			} else {
+				var _n5 = _n0.a;
+				var _n6 = _n0.b;
+				return _List_fromArray(
+					[
+						author$project$Main$viewCampusPanel(model),
+						author$project$Main$viewPalettePanel(model),
+						author$project$Main$viewSettingPanel(model)
+					]);
+			}
+		} else {
+			if (_n0.b.$ === 'Right') {
+				var _n1 = _n0.a;
+				var _n2 = _n0.b;
+				return _List_fromArray(
+					[
+						author$project$Main$viewSettingPanel(model),
+						author$project$Main$viewCampusPanel(model),
+						author$project$Main$viewPalettePanel(model)
+					]);
+			} else {
+				var _n7 = _n0.a;
+				var _n8 = _n0.b;
+				return _List_fromArray(
+					[
+						author$project$Main$viewSettingPanel(model),
+						author$project$Main$viewPalettePanel(model),
+						author$project$Main$viewCampusPanel(model)
+					]);
+			}
+		}
+	}();
+	return A2(
+		mdgriffith$elm_ui$Element$row,
+		_List_fromArray(
+			[
+				mdgriffith$elm_ui$Element$width(mdgriffith$elm_ui$Element$fill),
+				mdgriffith$elm_ui$Element$height(mdgriffith$elm_ui$Element$fill)
+			]),
+		view_);
+};
 var elm$html$Html$Attributes$alt = elm$html$Html$Attributes$stringProperty('alt');
 var elm$html$Html$Attributes$src = function (url) {
 	return A2(
@@ -15283,8 +15501,7 @@ var author$project$Main$view = function (model) {
 									A2(mdgriffith$elm_ui$Element$paddingXY, 15, 0),
 									mdgriffith$elm_ui$Element$Border$widthEach(
 									{bottom: 0, left: 1, right: 1, top: 1}),
-									mdgriffith$elm_ui$Element$Border$color(
-									A3(mdgriffith$elm_ui$Element$rgb255, 255, 255, 255))
+									mdgriffith$elm_ui$Element$Border$color(author$project$Main$shiroIro)
 								]),
 							_List_fromArray(
 								[
@@ -15293,8 +15510,7 @@ var author$project$Main$view = function (model) {
 									_List_fromArray(
 										[
 											mdgriffith$elm_ui$Element$alignLeft,
-											mdgriffith$elm_ui$Element$Font$color(
-											A3(mdgriffith$elm_ui$Element$rgb255, 255, 255, 255))
+											mdgriffith$elm_ui$Element$Font$color(author$project$Main$shiroIro)
 										]),
 									mdgriffith$elm_ui$Element$text('SOSOGU')),
 									A2(
@@ -15370,51 +15586,7 @@ var author$project$Main$view = function (model) {
 											})
 										]))
 								])),
-							A2(
-							mdgriffith$elm_ui$Element$row,
-							_List_fromArray(
-								[
-									mdgriffith$elm_ui$Element$width(mdgriffith$elm_ui$Element$fill),
-									mdgriffith$elm_ui$Element$height(mdgriffith$elm_ui$Element$fill),
-									author$project$Main$debugLine(false)
-								]),
-							_List_fromArray(
-								[
-									A2(
-									author$project$Main$settingPosition,
-									model,
-									_Utils_eq(model.setting.panelPosition.settingPanel, author$project$Main$Left)),
-									A2(
-									author$project$Main$palettePosition,
-									model,
-									_Utils_eq(model.setting.panelPosition.palettePanel, author$project$Main$Left)),
-									A2(
-									mdgriffith$elm_ui$Element$column,
-									_List_fromArray(
-										[
-											mdgriffith$elm_ui$Element$width(mdgriffith$elm_ui$Element$fill),
-											mdgriffith$elm_ui$Element$height(mdgriffith$elm_ui$Element$fill),
-											mdgriffith$elm_ui$Element$Background$color(author$project$Main$shironezuIro)
-										]),
-									_List_fromArray(
-										[
-											A2(author$project$Main$toolsPanel, model, true),
-											A2(
-											mdgriffith$elm_ui$Element$el,
-											_List_fromArray(
-												[mdgriffith$elm_ui$Element$centerX]),
-											mdgriffith$elm_ui$Element$html(
-												A3(author$project$Main$viewCampus, model, model.campusSize.width, model.campusSize.height)))
-										])),
-									A2(
-									author$project$Main$palettePosition,
-									model,
-									_Utils_eq(model.setting.panelPosition.palettePanel, author$project$Main$Right)),
-									A2(
-									author$project$Main$settingPosition,
-									model,
-									_Utils_eq(model.setting.panelPosition.settingPanel, author$project$Main$Right))
-								]))
+							author$project$Main$viewPanels(model)
 						])))
 			]));
 };
