@@ -49,6 +49,7 @@ type alias Model =
     , borderColorValue : CssColor
     , toolsSetting : ToolsSetting
     , history : History
+    , campusImageUrl : String
     }
 
 type alias Campus =
@@ -165,6 +166,7 @@ init _ =
       , borderColorValue = initBorderColorValue
       , toolsSetting = initToolsSetting
       , history = initHistory
+      , campusImageUrl = ""
       } 
     , Cmd.none
     )
@@ -193,7 +195,8 @@ type Msg
     | ChangePanelPosition Panel Position
     | ApplySetting
     | Undo Point
-
+    | GetImageUrl String
+ 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
     case msg of
@@ -378,13 +381,13 @@ update msg model =
             )
 
         CreateCampusPicture ->
-            ( model, toH2c () )
+            ( model, generateCampusImage () )
 
         DisplayDlButton ->
             ( { model | toolsSetting = { isDisplayDlButton = True
                                        } 
               }
-            , toH2c ()
+            , generateCampusImage ()
             )
         
         ChangePanelPosition panel_ position_ ->
@@ -468,8 +471,13 @@ update msg model =
                                             model.campus
                       , history = Dict.remove ((Dict.size model.history) - 1) model.history
               }
-            , toClickJudge ()
+            , Cmd.none
             ) 
+
+        GetImageUrl url ->
+            ( { model | campusImageUrl = url } 
+            , Cmd.none
+            )
 
 --VIEW--
 view : Model -> Html Msg
@@ -574,7 +582,7 @@ viewCampusPanel model =
            , Background.color <| shironezuIro
            ] 
            [ viewToolsPanel model
-           , el ( (padding 1) :: (campusPosition model.setting) )<| 
+           , el ( (padding 0) :: (campusPosition model.setting) )<| 
                             html <|
                                    viewCampus model (model.campusSize.width, model.campusSize.height)
            ] 
@@ -1275,11 +1283,10 @@ main =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Sub.none
+    campusImageUrlToElm GetImageUrl
 
-port toH2c : () -> Cmd msg
-port toClickJudge : () -> Cmd msg
---port fromH2c -> 
+port generateCampusImage : () -> Cmd msg
+port campusImageUrlToElm : (String -> msg) -> Sub msg
 --ColorSet--
 rouIro = rgb255 43 43 43
 sumiIro = rgb255 89 88 87
