@@ -130,7 +130,7 @@ initPanelPosition : PanelPosition
 initPanelPosition =
     { settingPanel = Left
     , palettePanel = Right
-    , campus = CenterCenter
+    , campus = TopCenter
     }
 initSetting : Setting
 initSetting =
