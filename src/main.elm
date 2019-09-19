@@ -43,6 +43,7 @@ type alias Model =
     , mainPalette : CssColor
     , campusSize : CampusSize
     , tempCampusSize : TempCampusSize
+    , didCreateCampus : Bool
     , modalVisibility : BModal.Visibility
     , openingModalWindow : BModal.Visibility
     , setting : Setting
@@ -160,6 +161,7 @@ init _ =
       , mainPalette = initMainPalette
       , campusSize = (CampusSize 0 0)
       , tempCampusSize = (TempCampusSize "" "")
+      , didCreateCampus = False
       , modalVisibility = BModal.hidden
       , openingModalWindow = BModal.shown
       , setting = initSetting
@@ -299,6 +301,7 @@ update msg model =
                                          , height = (convertTemp model.tempCampusSize.height) - 1
                                          }
                           , openingModalWindow = BModal.hidden
+                          , didCreateCampus = True
                   }
                 , Cmd.none
                 )
@@ -1193,27 +1196,30 @@ getCampusColor model (x, y) =
 
 viewCampus : Model -> Points -> Html Msg
 viewCampus model (width, height) =
-    div [ id "campus" ]
-        [ div [] <|
-            List.map (\y -> div [] <|
-                List.map ( \x -> div [ HAttrs.style "float" "left"
-                                     ] <|
-                    [ div [ HAttrs.style "width" (model.setting.width ++ "px")
-                          , HAttrs.style "height" (model.setting.height ++ "px")
-                          , HAttrs.style "border" (model.setting.borderColor ++ " " ++ model.setting.borderStyle)
-                          , HAttrs.style "background-color" (getCampusColor model (y, x) )
-                          , HAttrs.style "padding" "0px"
-                          , HAttrs.style "margin" "-1px"
-                          , HEvents.onClick (ChangeColor (y, x) model.mainPalette)
-                          --, HEvents.onDoubleClick (ChangeColor y x "white")
-                          ]
-                          []
-                    ]
-                         ) <|
-                            List.range 0 (width)
-                      ) <|
-                          List.range 0 (height)
-        ]
+    if model.didCreateCampus then
+        div [ id "campus" ]
+            [ div [] <|
+                List.map (\y -> div [] <|
+                    List.map ( \x -> div [ HAttrs.style "float" "left"
+                                         ] <|
+                        [ div [ HAttrs.style "width" (model.setting.width ++ "px")
+                              , HAttrs.style "height" (model.setting.height ++ "px")
+                              , HAttrs.style "border" (model.setting.borderColor ++ " " ++ model.setting.borderStyle)
+                              , HAttrs.style "background-color" (getCampusColor model (y, x) )
+                              , HAttrs.style "padding" "0px"
+                              , HAttrs.style "margin" "-1px"
+                              , HEvents.onClick (ChangeColor (y, x) model.mainPalette)
+                              --, HEvents.onDoubleClick (ChangeColor y x "white")
+                              ]
+                              []
+                        ]
+                             ) <|
+                                List.range 0 (width)
+                          ) <|
+                              List.range 0 (height)
+            ]
+    else 
+        div [] []
 
 addColorToSubPalette : Model -> CssColor -> SubPalette
 addColorToSubPalette model color =
