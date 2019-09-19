@@ -292,11 +292,11 @@ update msg model =
                     Maybe.withDefault 0 (String.toInt str)
             in
                 ( { model | campus = Dict.fromList <| 
-                                        createCampusList ( convertTemp model.tempCampusSize.width
-                                                         , convertTemp model.tempCampusSize.height
+                                        createCampusList ( (convertTemp model.tempCampusSize.width) - 1
+                                                         , (convertTemp model.tempCampusSize.height) - 1
                                                          )
-                          , campusSize = { width = convertTemp model.tempCampusSize.width
-                                         , height = convertTemp model.tempCampusSize.height
+                          , campusSize = { width = (convertTemp model.tempCampusSize.width) - 1
+                                         , height = (convertTemp model.tempCampusSize.height) - 1
                                          }
                           , openingModalWindow = BModal.hidden
                   }
@@ -1210,9 +1210,9 @@ viewCampus model (width, height) =
                           []
                     ]
                          ) <|
-                            List.range 0 (width-1)
+                            List.range 0 (width)
                       ) <|
-                          List.range 0 (height-1)
+                          List.range 0 (height)
         ]
 
 addColorToSubPalette : Model -> CssColor -> SubPalette
