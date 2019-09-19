@@ -73,7 +73,8 @@ initBorderColorValue =
     "black"
 initCampus : Campus
 initCampus =
-    Dict.fromList [((0, 0), "white")]
+    Dict.empty
+    --Dict.fromList [((0, 0), "white")]
 type alias TempCampusSize =
     { width : String
     , height : String
@@ -670,7 +671,7 @@ viewToolsPanel model =
              in
                 case bText of
                     "Gen" ->
-                        if (Dict.size model.campus > 1) then
+                        if (Dict.size model.campus >= 1) then
                             tempButton (Just DisplayDlButton) "1" "none" "" (HAttrs.style "" "") (hidden False)
                         else
                             tempButton Nothing "0.6" "line-through" "" (HAttrs.style "" "") (hidden False)
