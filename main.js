@@ -4850,10 +4850,10 @@ var author$project$Main$initHistory = elm$core$Dict$fromList(
 			_List_fromArray(
 				['white']))));
 var author$project$Main$initMainPalette = 'white';
-var author$project$Main$CenterCenter = {$: 'CenterCenter'};
 var author$project$Main$Left = {$: 'Left'};
 var author$project$Main$Right = {$: 'Right'};
-var author$project$Main$initPanelPosition = {campus: author$project$Main$CenterCenter, palettePanel: author$project$Main$Right, settingPanel: author$project$Main$Left};
+var author$project$Main$TopCenter = {$: 'TopCenter'};
+var author$project$Main$initPanelPosition = {campus: author$project$Main$TopCenter, palettePanel: author$project$Main$Right, settingPanel: author$project$Main$Left};
 var author$project$Main$initSetting = {borderColor: 'black', borderStyle: 'solid 1px', height: '20', panelPosition: author$project$Main$initPanelPosition, width: '20'};
 var author$project$Main$initSubPalette = elm$core$Dict$fromList(
 	_List_fromArray(
@@ -5794,6 +5794,27 @@ var elm$core$Dict$update = F3(
 			return A2(elm$core$Dict$remove, targetKey, dictionary);
 		}
 	});
+var elm$core$List$drop = F2(
+	function (n, list) {
+		drop:
+		while (true) {
+			if (n <= 0) {
+				return list;
+			} else {
+				if (!list.b) {
+					return list;
+				} else {
+					var x = list.a;
+					var xs = list.b;
+					var $temp$n = n - 1,
+						$temp$list = xs;
+					n = $temp$n;
+					list = $temp$list;
+					continue drop;
+				}
+			}
+		}
+	});
 var elm$core$Maybe$map = F2(
 	function (f, maybe) {
 		if (maybe.$ === 'Just') {
@@ -5812,6 +5833,46 @@ var elm$core$Tuple$second = function (_n0) {
 	var y = _n0.b;
 	return y;
 };
+var elm$core$Dict$foldl = F3(
+	function (func, acc, dict) {
+		foldl:
+		while (true) {
+			if (dict.$ === 'RBEmpty_elm_builtin') {
+				return acc;
+			} else {
+				var key = dict.b;
+				var value = dict.c;
+				var left = dict.d;
+				var right = dict.e;
+				var $temp$func = func,
+					$temp$acc = A3(
+					func,
+					key,
+					value,
+					A3(elm$core$Dict$foldl, func, acc, left)),
+					$temp$dict = right;
+				func = $temp$func;
+				acc = $temp$acc;
+				dict = $temp$dict;
+				continue foldl;
+			}
+		}
+	});
+var elm_community$dict_extra$Dict$Extra$mapKeys = F2(
+	function (keyMapper, dict) {
+		return A3(
+			elm$core$Dict$foldl,
+			F3(
+				function (k, v, acc) {
+					return A3(
+						elm$core$Dict$insert,
+						keyMapper(k),
+						v,
+						acc);
+				}),
+			elm$core$Dict$empty,
+			dict);
+	});
 var author$project$Main$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
@@ -5832,16 +5893,41 @@ var author$project$Main$update = F2(
 										return color;
 									}),
 								model.campus),
-							history: A3(
-								elm$core$Dict$insert,
-								elm$core$Dict$size(model.history),
-								_Utils_Tuple2(
-									_Utils_Tuple2(x, y),
-									A2(
-										author$project$Main$getCampusColor,
-										model,
-										_Utils_Tuple2(x, y))),
-								model.history)
+							history: function () {
+								if (elm$core$Dict$size(model.history) <= 100) {
+									return A3(
+										elm$core$Dict$insert,
+										elm$core$Dict$size(model.history),
+										_Utils_Tuple2(
+											_Utils_Tuple2(x, y),
+											A2(
+												author$project$Main$getCampusColor,
+												model,
+												_Utils_Tuple2(x, y))),
+										model.history);
+								} else {
+									var tempHistory = A2(
+										elm_community$dict_extra$Dict$Extra$mapKeys,
+										function (n) {
+											return n - 1;
+										},
+										elm$core$Dict$fromList(
+											A2(
+												elm$core$List$drop,
+												1,
+												elm$core$Dict$toList(model.history))));
+									return A3(
+										elm$core$Dict$insert,
+										elm$core$Dict$size(tempHistory),
+										_Utils_Tuple2(
+											_Utils_Tuple2(x, y),
+											A2(
+												author$project$Main$getCampusColor,
+												model,
+												_Utils_Tuple2(x, y))),
+										tempHistory);
+								}
+							}()
 						}),
 					elm$core$Platform$Cmd$none);
 			case 'ColorValue':
@@ -5928,11 +6014,11 @@ var author$project$Main$update = F2(
 							campus: elm$core$Dict$fromList(
 								createCampusList(
 									_Utils_Tuple2(
-										convertTemp(model.tempCampusSize.width),
-										convertTemp(model.tempCampusSize.height)))),
+										convertTemp(model.tempCampusSize.width) - 1,
+										convertTemp(model.tempCampusSize.height) - 1))),
 							campusSize: {
-								height: convertTemp(model.tempCampusSize.height),
-								width: convertTemp(model.tempCampusSize.width)
+								height: convertTemp(model.tempCampusSize.height) - 1,
+								width: convertTemp(model.tempCampusSize.width) - 1
 							},
 							openingModalWindow: EdutainmentLIVE$elm_bootstrap$Bootstrap$Modal$hidden
 						}),
@@ -8101,8 +8187,8 @@ var author$project$Main$debugLine = function (bool) {
 		_Debug_todo(
 			'Main',
 			{
-				start: {line: 1166, column: 17},
-				end: {line: 1166, column: 27}
+				start: {line: 1182, column: 17},
+				end: {line: 1182, column: 27}
 			})) : mdgriffith$elm_ui$Element$htmlAttribute(
 		A2(elm$html$Html$Attributes$style, '', ''));
 };
@@ -8228,9 +8314,9 @@ var author$project$Main$viewCampus = F2(
 													_List_Nil)
 												]));
 									},
-									A2(elm$core$List$range, 0, width - 1)));
+									A2(elm$core$List$range, 0, width)));
 						},
-						A2(elm$core$List$range, 0, height - 1)))
+						A2(elm$core$List$range, 0, height)))
 				]));
 	});
 var author$project$Main$DisplayDlButton = {$: 'DisplayDlButton'};
@@ -14565,12 +14651,12 @@ var author$project$Main$onChangeH = function (handler) {
 var author$project$Main$BottomCenter = {$: 'BottomCenter'};
 var author$project$Main$BottomLeft = {$: 'BottomLeft'};
 var author$project$Main$BottomRight = {$: 'BottomRight'};
+var author$project$Main$CenterCenter = {$: 'CenterCenter'};
 var author$project$Main$CenterLeft = {$: 'CenterLeft'};
 var author$project$Main$CenterRight = {$: 'CenterRight'};
 var author$project$Main$SetCampusPosition = function (a) {
 	return {$: 'SetCampusPosition', a: a};
 };
-var author$project$Main$TopCenter = {$: 'TopCenter'};
 var author$project$Main$TopLeft = {$: 'TopLeft'};
 var author$project$Main$TopRight = {$: 'TopRight'};
 var author$project$Main$viewCampusPositionSetting = function (tempSetting) {
