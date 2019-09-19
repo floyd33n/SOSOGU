@@ -5211,6 +5211,7 @@ var author$project$Main$init = function (_n0) {
 			campusImageUrl: '',
 			campusSize: A2(author$project$Main$CampusSize, 0, 0),
 			colorValue: author$project$Main$initColorValue,
+			didCreateCampus: false,
 			history: author$project$Main$initHistory,
 			mainPalette: author$project$Main$initMainPalette,
 			modalVisibility: EdutainmentLIVE$elm_bootstrap$Bootstrap$Modal$hidden,
@@ -6020,6 +6021,7 @@ var author$project$Main$update = F2(
 								height: convertTemp(model.tempCampusSize.height) - 1,
 								width: convertTemp(model.tempCampusSize.width) - 1
 							},
+							didCreateCampus: true,
 							openingModalWindow: EdutainmentLIVE$elm_bootstrap$Bootstrap$Modal$hidden
 						}),
 					elm$core$Platform$Cmd$none);
@@ -8187,8 +8189,8 @@ var author$project$Main$debugLine = function (bool) {
 		_Debug_todo(
 			'Main',
 			{
-				start: {line: 1182, column: 17},
-				end: {line: 1182, column: 27}
+				start: {line: 1185, column: 17},
+				end: {line: 1185, column: 27}
 			})) : mdgriffith$elm_ui$Element$htmlAttribute(
 		A2(elm$html$Html$Attributes$style, '', ''));
 };
@@ -8261,7 +8263,7 @@ var author$project$Main$viewCampus = F2(
 	function (model, _n0) {
 		var width = _n0.a;
 		var height = _n0.b;
-		return A2(
+		return model.didCreateCampus ? A2(
 			elm$html$Html$div,
 			_List_fromArray(
 				[
@@ -8317,7 +8319,7 @@ var author$project$Main$viewCampus = F2(
 									A2(elm$core$List$range, 0, width)));
 						},
 						A2(elm$core$List$range, 0, height)))
-				]));
+				])) : A2(elm$html$Html$div, _List_Nil, _List_Nil);
 	});
 var author$project$Main$DisplayDlButton = {$: 'DisplayDlButton'};
 var author$project$Main$Undo = function (a) {
