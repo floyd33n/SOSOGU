@@ -4463,6 +4463,12 @@ var author$project$Main$TempCampusSize = F2(
 var author$project$Main$initBorderColorValue = 'black';
 var elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
 var elm$core$Dict$empty = elm$core$Dict$RBEmpty_elm_builtin;
+var author$project$Main$initCampus = elm$core$Dict$empty;
+var author$project$Main$initColorValue = 'white';
+var elm$core$Basics$apL = F2(
+	function (f, x) {
+		return f(x);
+	});
 var elm$core$Dict$Black = {$: 'Black'};
 var elm$core$Dict$RBNode_elm_builtin = F5(
 	function (a, b, c, d, e) {
@@ -4683,18 +4689,6 @@ var elm$core$Dict$fromList = function (assocs) {
 		elm$core$Dict$empty,
 		assocs);
 };
-var author$project$Main$initCampus = elm$core$Dict$fromList(
-	_List_fromArray(
-		[
-			_Utils_Tuple2(
-			_Utils_Tuple2(0, 0),
-			'white')
-		]));
-var author$project$Main$initColorValue = 'white';
-var elm$core$Basics$apL = F2(
-	function (f, x) {
-		return f(x);
-	});
 var elm$core$Basics$le = _Utils_le;
 var elm$core$Basics$sub = _Basics_sub;
 var elm$core$List$rangeHelp = F3(
@@ -8189,8 +8183,8 @@ var author$project$Main$debugLine = function (bool) {
 		_Debug_todo(
 			'Main',
 			{
-				start: {line: 1185, column: 17},
-				end: {line: 1185, column: 27}
+				start: {line: 1186, column: 17},
+				end: {line: 1186, column: 27}
 			})) : mdgriffith$elm_ui$Element$htmlAttribute(
 		A2(elm$html$Html$Attributes$style, '', ''));
 };
@@ -8325,6 +8319,7 @@ var author$project$Main$DisplayDlButton = {$: 'DisplayDlButton'};
 var author$project$Main$Undo = function (a) {
 	return {$: 'Undo', a: a};
 };
+var elm$core$Basics$ge = _Utils_ge;
 var elm$html$Html$a = _VirtualDom_node('a');
 var elm$html$Html$Attributes$hidden = elm$html$Html$Attributes$boolProperty('hidden');
 var elm$html$Html$Attributes$target = elm$html$Html$Attributes$stringProperty('target');
@@ -12685,7 +12680,6 @@ var mdgriffith$elm_ui$Internal$Model$renderWidth = function (w) {
 				A2(elm$core$List$cons, style, newStyle));
 	}
 };
-var elm$core$Basics$ge = _Utils_ge;
 var mdgriffith$elm_ui$Internal$Flag$borderWidth = mdgriffith$elm_ui$Internal$Flag$flag(27);
 var mdgriffith$elm_ui$Internal$Model$skippable = F2(
 	function (flag, style) {
@@ -14021,7 +14015,7 @@ var author$project$Main$viewToolsPanel = function (model) {
 			});
 		switch (bText) {
 			case 'Gen':
-				return (elm$core$Dict$size(model.campus) > 1) ? A6(
+				return (elm$core$Dict$size(model.campus) >= 1) ? A6(
 					tempButton,
 					elm$core$Maybe$Just(author$project$Main$DisplayDlButton),
 					'1',
