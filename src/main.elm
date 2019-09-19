@@ -6,13 +6,14 @@ import Html.Events as HEvents exposing (..)
 import Html.Lazy as HLazy exposing (..)
 import Array exposing (..)
 import Dict exposing (..)
+import Dict.Extra as DictEx
 --import Debug exposing (..)
 import Svg exposing (..)
 import Process exposing (..)
 import Task exposing (..)
 import Regex exposing (..)
-import List.Extra as ExList exposing (..)
-import Result.Extra as ExResult exposing  (..)
+import List.Extra as ListEx exposing (..)
+import Result.Extra as ResultEX exposing  (..)
 import Element as E exposing (..)
 import Element.Background as Background
 import Element.Border as Border
@@ -111,7 +112,7 @@ type alias History =
     Dict Serial ((Point), CssColor)
 initHistory : History
 initHistory =
-    Dict.fromList <| ExList.lift2 Tuple.pair (List.range 0 0) (ExList.lift2 Tuple.pair (ExList.lift2 Tuple.pair (List.range 0 0) (List.range 0 0)) ["white"])
+    Dict.fromList <| ListEx.lift2 Tuple.pair (List.range 0 0) (ListEx.lift2 Tuple.pair (ListEx.lift2 Tuple.pair (List.range 0 0) (List.range 0 0)) ["white"])
     
 type alias Setting =
     { borderColor : String
@@ -205,12 +206,27 @@ update msg model =
                                     (x, y) 
                                         (Maybe.map (\n -> color))
                                             model.campus
-                      , history = Dict.insert 
-                                      (Dict.size model.history)
-                                          ( (x, y)
-                                          , getCampusColor model (x, y)
-                                          )  
-                                                                        model.history
+                      , history = if (Dict.size model.history) <= 100 then
+                                      Dict.insert 
+                                          (Dict.size model.history)
+                                              ( (x, y)
+                                              , getCampusColor model (x, y)
+                                              )  
+                                              model.history
+                                  else
+                                      let
+                                          tempHistory = model.history
+                                                            |> Dict.toList
+                                                            |> List.drop 1
+                                                            |> Dict.fromList
+                                                            |> DictEx.mapKeys (\n -> n - 1)
+                                      in
+                                          Dict.insert
+                                              (Dict.size tempHistory)
+                                                  ( (x, y)
+                                                  , getCampusColor model (x, y)
+                                                  )
+                                                  tempHistory
               }
             , Cmd.none
             )
@@ -264,8 +280,8 @@ update msg model =
             let
                 createCampusList : Points-> List ( ( Int, Int ), String )
                 createCampusList (width_, height_) =
-                    ExList.lift2 
-                        Tuple.pair ( ExList.lift2 
+                    ListEx.lift2 
+                        Tuple.pair ( ListEx.lift2 
                                        Tuple.pair (List.range 0 width_) 
                                                   (List.range 0 height_)
                                    ) 
