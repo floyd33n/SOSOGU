@@ -842,35 +842,6 @@ viewSettingPanel model =
                                     , item_ "groove" "groove"
                                     , item_ "ridge" "ridge"
                                     ]
-
-                       {-
-                       , E.el [centerX, E.height <| px 14
-                              , Font.size <| 14
-                              ] <|
-                                  html <|
-                                      let
-                                          handler selectedValue =
-                                              Change selectedValue
-
-                                          option_ : String -> String -> Html Msg
-                                          option_ value_ text_ =
-                                              option [ value value_ ] 
-                                                     [ H.text text_ ]
-                                      in
-                                          div [ HAttrs.style "height" "14px"
-                                              , HAttrs.style "font-size" "14px" 
-                                              ]
-                                              [ H.select [ onChangeH handler ]
-                                                         [ option_ "solid 1px" "solid"
-                                                         , option_ "none" "none"
-                                                         , option_ "double" "double"
-                                                         , option_ "groove" "groove"
-                                                         , option_ "ridge" "ridge"
-                                                         , option_ "dashed 1px" "dashed"
-                                                         , option_ "dotted 1px" "dotted"
-                                                         ]
-                                              ]
-                       -}
                        ]
               -- Pixel Size --
               , column [ centerX
@@ -973,72 +944,6 @@ viewSettingPanel model =
                                         viewCampusPositionSetting model.tempSetting
                                 ]
                        ]
-                       {-
-                       , E.el [ Font.size 14
-                              , Font.color <| shiroIro
-                              , centerX
-                              , htmlAttribute <| HAttrs.style "letter-spacing" "0.03em"
-                              ] <|
-                                  E.text "Setting"
-                       , E.el [centerX] <|
-                          html <|
-                              div []
-                                  []
-                                  [ div [ HAttrs.style "color" "white"
-                                        , HAttrs.style "font-size" "14px"
-                                        ]
-                                        [ H.text "Setting"
-                                        , br [] []
-                                        , viewSettingPalettePositionSetting model.tempSetting
-                                        , H.text "Right"
-                                        , H.input [ type_ "radio"
-                                                  , value "right"
-                                                  , name "settingpanel"
-                                                  , onClick <| ChangePanelPosition SettingPanel Right
-                                                  , checked <| model.tempSetting.panelPosition.settingPanel == Right
-                                                  ]
-                                                  []
-                                        , H.br [] []
-                                        , H.text "Left"
-                                        , H.input [ type_ "radio"
-                                                  , value ""
-                                                  , name "settingpanel"
-                                                  , onClick <| ChangePanelPosition SettingPanel Left
-                                                  , checked <| model.tempSetting.panelPosition.settingPanel == Left
-                                                  ]
-                                                  []
-                                        ]
-                                  , div [ HAttrs.style "color" "white"
-                                        , HAttrs.style "font-size" "14px"
-                                        ] 
-                                        [ H.text "Palette"
-                                        , br [] []
-                                        , H.text "R"
-                                        , H.input [ type_ "radio"
-                                                  , value ""
-                                                  , name "paletteposition"
-                                                  , onClick <| ChangePanelPosition PalettePanel Right
-                                                  , checked <| model.tempSetting.panelPosition.palettePanel == Right
-                                                  ]
-                                                  []
-                                        , H.text "L"
-                                        , H.input [ type_ "radio"
-                                                  , value ""
-                                                  , name "paletteposition"
-                                                  , onClick <| ChangePanelPosition PalettePanel Left
-                                                  , checked <| model.tempSetting.panelPosition.palettePanel == Left
-                                                  ]
-                                                  []
-                                        ] 
-                                  , div [ HAttrs.style "color" "white"
-                                        , HAttrs.style "font-size" "14px"
-                                        ]
-                                        [ H.text "Campus"
-                                        , br [] []
-                                        , viewCampusPositionSetting model.tempSetting
-                                        ]
-                                  ]
-                       -}
               , E.el [centerX
                      ] <|
                   if isCorrectSetting model.tempSetting then
@@ -1197,18 +1102,6 @@ viewPalettePanel model =
                                                                  , HAttrs.style "font-size" "0.7em"
                                                                  ]
                                                   ]
-                        {-
-                        , E.el [ E.width <| px 90
-                               ] <| 
-                                   html <|
-                                       H.input [ onInput ColorValue 
-                                               , HAttrs.style "width" "80px"
-                                               , HAttrs.style "height" "14px"
-                                               , HAttrs.style "font-size" "0.7em"
-                                               , HAttrs.style "margin" "0 auto"
-                                               ] 
-                                               [H.text model.colorValue]
-                        -}
                         , el [centerX] <|
                             html <|
                                 div [ HAttrs.style "color" "#e2041b" 
