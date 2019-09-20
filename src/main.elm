@@ -9,6 +9,7 @@ import Dict exposing (..)
 import Dict.Extra as DictEx
 --import Debug exposing (..)
 import Svg exposing (..)
+--import Svg.Attributes as SAttrs exposing (..)
 import Process exposing (..)
 import Task exposing (..)
 import Regex exposing (..)
@@ -27,6 +28,8 @@ import Bootstrap.Grid as BGrid
 import Bootstrap.Grid.Col as BCol
 import Bootstrap.Grid.Row as BRow
 import Bootstrap.Form.Input as BInput
+import Bootstrap.Form.Select as BSelect
+import Bootstrap.Form.Radio as BRadio
 import Json.Decode as JD
 css path =
   H.node "link" [rel "stylesheet", href path] []
@@ -519,6 +522,7 @@ view model =
                       ]
                       [ E.el [alignLeft
                              , Font.color <| shiroIro
+                             , htmlAttribute <| HAttrs.style "letter-spacing" "0.08em"
                              ] <| 
                                 E.text "SOSOGU"
                       , row [ alignRight 
@@ -533,6 +537,7 @@ view model =
                                                                    }
                                                          , E.el [ Font.color <| shiroIro 
                                                                 , Font.size <| 16
+                                                                , htmlAttribute <| HAttrs.style "letter-spacing" "0.05em"
                                                                 ] <|
                                                             E.text "Home"
                                                          ]
@@ -546,6 +551,7 @@ view model =
                                                                    }
                                                          , E.el [ Font.color <| shiroIro
                                                                 , Font.size <| 16
+                                                                , htmlAttribute <| HAttrs.style "letter-spacing" "0.05em"
                                                                 ] <|
                                                             E.text "Repository"
                                                          ]
@@ -707,8 +713,15 @@ viewToolsPanel model =
                    , Font.size <| 17
                    , padding 2
                    , centerY
+                   , htmlAttribute <| HAttrs.style "letter-spacing" "0.05em"
                    ] <|
-                      E.text "Tools"
+                      row [ spacing 2 ]
+                          [ E.image [ htmlAttribute <| HAttrs.style "filter" "invert(100%)" ]
+                                    { src = "file/tools.svg"
+                                    , description = ""
+                                    }
+                          , E.text "Tools"
+                          ]
             , E.row [ alignRight
                     , paddingXY 20 0
                     , spacing 5
@@ -730,7 +743,7 @@ panelHr =
 
 viewSettingPanel : Model -> Element Msg
 viewSettingPanel model =
-        column [ E.width <| px 100
+        column [ E.width <| px 110
                , E.height fill
                , Border.width 1
                , Border.color <| shiroIro
@@ -740,31 +753,38 @@ viewSettingPanel model =
                     , Font.size <| 17
                     , centerX
                     , padding 2
+                    , htmlAttribute <| HAttrs.style "letter-spacing" "0.05em"
                     ] <| 
-                        E.text "Setting"
+                        row [ spacing 2 ]
+                            [ E.image [ htmlAttribute <| HAttrs.style "filter" "invert(100%)" 
+                                      ]
+                                      { src = "file/settings.svg"
+                                      , description = ""
+                                      }
+                            , E.text "Setting"
+                            ]
               , panelHr
               -- Border Color --
               , column [ centerX
-                       , spacing 5
+                       , spacing 4
                        , padding 3
                        ] 
                        [ E.el [ Font.size 14
                               , Font.color <| shiroIro
                               , centerX
+                              , htmlAttribute <| HAttrs.style "letter-spacing" "0.03em"
                               ] <|
                                   E.text "Border Color"
                        , panelHr
-                       , E.el [ E.width <| px 90 
+                       , E.el [ centerX
                               ] <|
                                   html <|
-                                      H.input [ onInput BorderColorValue
-                                              , HAttrs.style "width" "80px"
-                                              , HAttrs.style "height" "14px"
-                                              , HAttrs.style "font-size" "0.7em"
-                                              , HAttrs.placeholder "black"
-                                              , HAttrs.style "margin" "0 auto"
-                                              ]  
-                                              [ H.text model.tempSetting.borderColor ]
+                                      BInput.text [ BInput.onInput BorderColorValue
+                                                  , BInput.attrs [ HAttrs.style "height" "14px" 
+                                                                 , HAttrs.style "width" "80px"
+                                                                 , HAttrs.style "font-size" "0.7em"
+                                                                 ]
+                                                  ]
                        , el [centerX] <|
                            html <|
                                div [ HAttrs.style "color" "#e2041b" 
@@ -786,9 +806,44 @@ viewSettingPanel model =
                        ]
                        [ E.el [ Font.size 14 
                               , Font.color <| shiroIro
+                              , htmlAttribute <| HAttrs.style "letter-spacing" "0.03em"
                               ] <| 
                           E.text "Border Style"
                        , panelHr
+                       , E.el [] <|
+                          html <|
+                              let
+                                  item_ : String -> String -> BSelect.Item msg
+                                  item_ value_ text_ =
+                                      BSelect.item [ value value_ 
+                                                   , HAttrs.style "height" "13px"
+                                                   , HAttrs.style "position" "relative"
+                                                   , HAttrs.style "text-align" "center"
+                                                   , HAttrs.style "font-size" "13px"
+                                                   , HAttrs.style "padding" "0px"
+                                                   ]
+                                                  [ H.text text_ ]
+                             in
+                                BSelect.select
+                                    [ BSelect.onChange Change
+                                    , BSelect.small
+                                    , BSelect.attrs [ HAttrs.style "" ""
+                                                    , HAttrs.style "height" "18px"
+                                                    , HAttrs.style "width" "80px"
+                                                    , HAttrs.style "font-size" "13px"
+                                                    , HAttrs.style "padding" "0px"
+                                                    ]
+                                    ]
+                                    [ item_ "solid 1px" "solid"
+                                    , item_ "none" "none"
+                                    , item_ "dotted 1px" "dotted"
+                                    , item_ "dashed 1px" "dashed"
+                                    , item_ "double" "double"
+                                    , item_ "groove" "groove"
+                                    , item_ "ridge" "ridge"
+                                    ]
+
+                       {-
                        , E.el [centerX, E.height <| px 14
                               , Font.size <| 14
                               ] <|
@@ -815,6 +870,7 @@ viewSettingPanel model =
                                                          , option_ "dotted 1px" "dotted"
                                                          ]
                                               ]
+                       -}
                        ]
               -- Pixel Size --
               , column [ centerX
@@ -824,6 +880,7 @@ viewSettingPanel model =
                        [ E.el [ Font.size 14
                               , Font.color <| shiroIro
                               , centerX
+                              , htmlAttribute <| HAttrs.style "letter-spacing" "0.03em"
                               ] <|
                                   E.text "Pixel Size"
                        , panelHr
@@ -843,65 +900,97 @@ viewSettingPanel model =
                                            else
                                                ""
                             in
-                                [ html <|
-                                    div [ HAttrs.style "color" "white" 
-                                        , HAttrs.style "font-size" "14px"
-                                        , HAttrs.style "padding" "3px"
-                                        ]
-                                        [ H.text "width : "
-                                        , H.input [ HAttrs.style "" ""
-                                                  , HAttrs.style "width" "30px"
-                                                  , HAttrs.style "height" "14px"
-                                                  , HAttrs.style "font-size" "95%"
-                                                  , placeholder model.setting.width
-                                                  , onInput SetPixelWidth
-                                                  ]  
-                                                  [ H.text model.tempSetting.width ]
-                                        , div [ HAttrs.style "color" "#e2041b"
-                                              , HAttrs.style "font-size" "13px"
-                                              ] 
-                                              [ H.text <| pixelSizeErr model.tempSetting.width ]
-                                        ]
+                                [ row [ Font.color <| shiroIro
+                                      , Font.size <| 14
+                                      , centerX
+                                      ]
+                                      [ E.el [] <|
+                                          E.text "width : "
+                                      , html <|
+                                          BInput.text [ BInput.onInput SetPixelWidth
+                                                      , BInput.small
+                                                      , BInput.attrs [ HAttrs.style "height" "14px"
+                                                                     , HAttrs.style "width" "40px"
+                                                                     , HAttrs.style "font-size" "95%"
+                                                                     ]
+                                                      ]
+                                      ]
                                 , html <|
-                                    div [ HAttrs.style "color" "white" 
-                                        , HAttrs.style "font-size" "14px"
-                                        , HAttrs.style "padding" "3px"
-                                        ]
-                                        [ H.text "height : "
-                                        , H.input [ HAttrs.style "width" "30px" 
-                                                  , HAttrs.style "height" "14px"
-                                                  , HAttrs.style "font-size" "95%"
-                                                  , placeholder model.setting.height
-                                                  , onInput SetPixelHeight
-                                                  ]
-                                                  []
-                                        , div [ HAttrs.style "color" "#e2041b"
-                                              , HAttrs.style "font-size" "13px"
-                                              ] 
-                                              [ H.text <| pixelSizeErr model.tempSetting.height ]
-                                        ]
+                                    div [ HAttrs.style "color" "#e2041b"
+                                        , HAttrs.style "font-size" "13px"
+                                        ] 
+                                        [ H.text <| pixelSizeErr model.tempSetting.width ]
+                                , row [ Font.color <| shiroIro
+                                      , Font.size <| 14
+                                      , centerX
+                                      ]
+                                      [ E.el [] <|
+                                          E.text "height : "
+                                      , html <|
+                                          BInput.text [ BInput.onInput SetPixelHeight
+                                                      , BInput.small
+                                                      , BInput.attrs [ HAttrs.style "height" "14px"
+                                                                     , HAttrs.style "width" "40px"
+                                                                     , HAttrs.style "font-size" "95%"
+                                                                     ]
+                                                      ]
+                                      ]
+                                  , html <|
+                                      div [ HAttrs.style "color" "#e2041b"
+                                          , HAttrs.style "font-size" "13px"
+                                          ]                                            
+                                          [ H.text <| pixelSizeErr model.tempSetting.height ]
                                 ]
                        ]
               --panel position--
-              , column [ centerX
-                       , padding 3
-                       , spacing 5
-                       ]
+              , column [ centerX ]
                        [ E.el [ Font.size 14
                               , Font.color <| shiroIro
                               , centerX
+                              , htmlAttribute <| HAttrs.style "letter-spacing" "0.03em"
                               ] <|
                                   E.text "Position"
                        , panelHr
+                       , column [ Font.size 14
+                                , Font.color <| shiroIro
+                                , centerX
+                                , htmlAttribute <| HAttrs.style "letter-spacing" "0.03.em"
+                                ]
+                                [ E.el [centerX] <|
+                                    E.text "Setting"
+                                , E.el [centerX] <|
+                                    html <|
+                                        viewSettingPalettePositionSelect SettingPanel model.tempSetting
+                                , E.el [centerX] <|
+                                    E.text "Palette"
+                                , E.el [centerX] <|
+                                    html <|
+                                        viewSettingPalettePositionSelect PalettePanel model.tempSetting
+                                , E.el [centerX] <|
+                                    E.text "Campus"
+                                , E.el [centerX] <|
+                                    html <|
+                                        viewCampusPositionSetting model.tempSetting
+                                ]
+                       ]
+                       {-
+                       , E.el [ Font.size 14
+                              , Font.color <| shiroIro
+                              , centerX
+                              , htmlAttribute <| HAttrs.style "letter-spacing" "0.03em"
+                              ] <|
+                                  E.text "Setting"
                        , E.el [centerX] <|
                           html <|
                               div []
+                                  []
                                   [ div [ HAttrs.style "color" "white"
                                         , HAttrs.style "font-size" "14px"
                                         ]
                                         [ H.text "Setting"
                                         , br [] []
-                                        , H.text "R"
+                                        , viewSettingPalettePositionSetting model.tempSetting
+                                        , H.text "Right"
                                         , H.input [ type_ "radio"
                                                   , value "right"
                                                   , name "settingpanel"
@@ -909,7 +998,8 @@ viewSettingPanel model =
                                                   , checked <| model.tempSetting.panelPosition.settingPanel == Right
                                                   ]
                                                   []
-                                        , H.text "L"
+                                        , H.br [] []
+                                        , H.text "Left"
                                         , H.input [ type_ "radio"
                                                   , value ""
                                                   , name "settingpanel"
@@ -948,14 +1038,19 @@ viewSettingPanel model =
                                         , viewCampusPositionSetting model.tempSetting
                                         ]
                                   ]
-                       ]
-              , E.el [centerX] <|
+                       -}
+              , E.el [centerX
+                     ] <|
                   if isCorrectSetting model.tempSetting then
                       Input.button [ htmlAttribute <| HAttrs.style "color" "white"
                                    ]
                                    { onPress = Just ApplySetting
                                    , label = E.el [ Font.color <| shiroIro
                                                   , Font.size <| 14
+                                                  , Border.color <| shiroIro
+                                                  , Border.width <| 1
+                                                  , Border.rounded 5
+                                                  , padding 2
                                                   ] <|
                                                       E.text "Apply"
                                    }
@@ -986,6 +1081,16 @@ viewCampusPositionSetting tempSetting =
                       HAttrs.style "background-color" "white"
                 , HAttrs.style "float" "left"
                 , HAttrs.style "margin" "-1px"
+                , if position_ == TopLeft then
+                    HAttrs.style "border-radius" "5px 0 0 0"
+                  else if position_ == TopRight then
+                    HAttrs.style "border-radius" "0 5px 0 0"
+                  else if position_ == BottomLeft then
+                    HAttrs.style "border-radius" "0 0 0 5px"
+                  else if position_ == BottomRight then
+                    HAttrs.style "border-radius" "0 0 5px 0"
+                  else
+                    HAttrs.style "" ""
                 ]
                 []
     in
@@ -1007,21 +1112,70 @@ viewCampusPositionSetting tempSetting =
                   ]
             ]
 
+
+viewSettingPalettePositionSelect : Panel ->  Setting -> Html Msg
+viewSettingPalettePositionSelect panel_ tempSetting =
+    let
+        temp_ : Position -> Html Msg
+        temp_ position_ =
+            div [ onClick (ChangePanelPosition panel_ position_)
+                , HAttrs.style "border" "1px solid black"
+                , HAttrs.style "width" "15px"
+                , HAttrs.style "height" "15px"
+                , case panel_ of
+                    SettingPanel ->
+                        if (tempSetting.panelPosition.settingPanel == position_) then
+                            HAttrs.style "background-color" "#c3d825"
+                        else
+                          HAttrs.style "background-color" "white"
+                    PalettePanel ->
+                        if (tempSetting.panelPosition.palettePanel == position_) then
+                            HAttrs.style "background-color" "#c3d825"
+                        else
+                          HAttrs.style "background-color" "white"
+                , HAttrs.style "float" "left"
+                , HAttrs.style "margin" "-1px"
+                , if position_ == Left then
+                    HAttrs.style "border-radius" "5px 0 0 5px"
+                  else if position_ == Right then
+                    HAttrs.style "border-radius" "0 5px 5px 0"
+                  else
+                    HAttrs.style "" ""
+                ]
+                []
+    in
+        div [HAttrs.style "float" "left"]
+            [ div []
+                  [ temp_ Left
+                  , temp_ Right
+                  ]
+            ]
+
 viewPalettePanel : Model -> Element Msg
 viewPalettePanel model =
-        column [ E.width <| px 100
+        column [ E.width <| px 110
                , E.height fill
                , Border.width 1
                , Border.color<| shiroIro
                , Background.color <| rouIro
                , debugLine False
                ]
-               [ el [ Font.color <| shiroIro
-                    , Font.size <| 17
-                    , centerX
-                    , padding 2
-                    ] <| 
-                        E.text "Palette"
+               [ row [ Font.color <| shiroIro
+                     , Font.size <| 17
+                     , centerX
+                     , padding 2
+                     , htmlAttribute <| HAttrs.style "letter-spacing" "0.05em"
+                     , spacing 2
+                     ] 
+                     [ E.image [ htmlAttribute <| HAttrs.style "filter" "invert(100%)" 
+                               , htmlAttribute <| HAttrs.style "width" "16px"
+                               , htmlAttribute <| HAttrs.style "height" "16px"
+                               ]
+                               { src = "file/paint-palette-svgrepo-com.svg"
+                               , description = ""
+                               }
+                     , E.text "Palette"
+                     ]
                , panelHr
                , column [ centerX
                         , padding 3
@@ -1030,9 +1184,20 @@ viewPalettePanel model =
                         [ E.el [ Font.color <| shiroIro
                                , Font.size <| 14
                                , centerX
+                               , htmlAttribute <| HAttrs.style "letter-spacing" "0.03em"
                                ]  <|
                                    E.text "Add Color"
                         , panelHr
+                       , E.el [ centerX
+                              ] <|
+                                  html <|
+                                      BInput.text [ BInput.onInput ColorValue
+                                                  , BInput.attrs [ HAttrs.style "height" "14px" 
+                                                                 , HAttrs.style "width" "80px"
+                                                                 , HAttrs.style "font-size" "0.7em"
+                                                                 ]
+                                                  ]
+                        {-
                         , E.el [ E.width <| px 90
                                ] <| 
                                    html <|
@@ -1043,6 +1208,7 @@ viewPalettePanel model =
                                                , HAttrs.style "margin" "0 auto"
                                                ] 
                                                [H.text model.colorValue]
+                        -}
                         , el [centerX] <|
                             html <|
                                 div [ HAttrs.style "color" "#e2041b" 
@@ -1061,7 +1227,11 @@ viewPalettePanel model =
                                   Input.button [ htmlAttribute <| HAttrs.style "color" "white"
                                                ] 
                                                { onPress = Just (AddColorToSubPalette model.colorValue)
-                                               , label = row []
+                                               , label = row [ Border.color <| shiroIro
+                                                             , Border.width <| 1
+                                                             , Border.rounded 5
+                                                             , padding 2
+                                                             ]
                                                              [ E.el [ Font.color <| shiroIro
                                                                     , Font.size <| 14
                                                                     ] <|
@@ -1094,6 +1264,7 @@ viewPalettePanel model =
                         [ E.el [ Font.color <| shiroIro
                                , Font.size <| 14
                                , centerX
+                               , htmlAttribute <| HAttrs.style "letter-spacing" "0.03em"
                                ]  <|
                                    E.text "Main Palette"
                         , panelHr
@@ -1114,6 +1285,7 @@ viewPalettePanel model =
                         [ E.el [ Font.color <| shiroIro
                                , Font.size <| 14
                                , centerX
+                               , htmlAttribute <| HAttrs.style "letter-spacing" "0.03em"
                                ] <|
                                   E.text "Sub Palette"
                         , panelHr
