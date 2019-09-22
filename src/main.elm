@@ -91,12 +91,6 @@ type CampusPosition
     = TopCenter
     | TopRight
     | TopLeft
-    | CenterCenter
-    | CenterRight
-    | CenterLeft
-    | BottomCenter
-    | BottomRight
-    | BottomLeft
 
 type Position
     = Right
@@ -612,6 +606,7 @@ viewCampusPanel model =
                             html <|
                                    viewCampus model (model.campusSize.width, model.campusSize.height)
            ] 
+
 campusPosition : Setting -> List (E.Attribute Msg)
 campusPosition setting =
     case setting.panelPosition.campus of
@@ -626,30 +621,6 @@ campusPosition setting =
         TopLeft ->
             [ alignLeft 
             , alignTop
-            ]
-        CenterCenter ->
-            [ centerX
-            , centerY
-            ]
-        CenterRight ->
-            [ alignRight
-            , centerY
-            ]
-        CenterLeft ->
-            [ alignLeft
-            , centerY
-            ]
-        BottomCenter ->
-            [ centerX
-            , alignBottom
-            ]
-        BottomRight ->
-            [ alignRight
-            , alignBottom
-            ]
-        BottomLeft ->
-            [ alignLeft
-            , alignBottom
             ]
         
 viewToolsPanel : Model -> Element Msg
@@ -986,35 +957,20 @@ viewCampusPositionSetting tempSetting =
                       HAttrs.style "background-color" "white"
                 , HAttrs.style "float" "left"
                 , HAttrs.style "margin" "-1px"
-                , if position_ == TopLeft then
-                    HAttrs.style "border-radius" "5px 0 0 0"
-                  else if position_ == TopRight then
-                    HAttrs.style "border-radius" "0 5px 0 0"
-                  else if position_ == BottomLeft then
-                    HAttrs.style "border-radius" "0 0 0 5px"
-                  else if position_ == BottomRight then
-                    HAttrs.style "border-radius" "0 0 5px 0"
-                  else
-                    HAttrs.style "" ""
+                , case position_ of
+                    TopLeft ->
+                        HAttrs.style "border-radius" "5px 0 0 5px"
+                    TopRight ->
+                        HAttrs.style "border-radius" "0 5px 5px 0"
+                    TopCenter ->
+                        HAttrs.style "" ""
                 ]
                 []
     in
         div [HAttrs.style "float" "left"]
-            [ div []
-                  [ tempDiv TopLeft 
-                  , tempDiv TopCenter
-                  , tempDiv TopRight
-                  ]
-            , div []
-                  [ tempDiv CenterLeft
-                  , tempDiv CenterCenter
-                  , tempDiv CenterRight
-                  ]
-            , div []
-                  [ tempDiv BottomLeft
-                  , tempDiv BottomCenter
-                  , tempDiv BottomRight
-                  ]
+            [ tempDiv TopLeft 
+            , tempDiv TopCenter
+            , tempDiv TopRight
             ]
 
 
@@ -1073,8 +1029,8 @@ viewPalettePanel model =
                      , spacing 2
                      ] 
                      [ E.image [ htmlAttribute <| HAttrs.style "filter" "invert(100%)" 
-                               , htmlAttribute <| HAttrs.style "width" "16px"
-                               , htmlAttribute <| HAttrs.style "height" "16px"
+                               --, htmlAttribute <| HAttrs.style "width" "16px"
+                               --, htmlAttribute <| HAttrs.style "height" "16px"
                                ]
                                { src = "file/paint-palette-svgrepo-com.svg"
                                , description = ""
