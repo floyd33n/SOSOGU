@@ -885,7 +885,9 @@ viewSettingPanel model =
                                 ]
                        ]
               --panel position--
-              , column [ centerX ]
+              , column [ centerX 
+                       , spacing 10
+                       ]
                        [ E.el [ Font.size 14
                               , Font.color <| shiroIro
                               , centerX
@@ -897,25 +899,39 @@ viewSettingPanel model =
                                 , Font.color <| shiroIro
                                 , centerX
                                 , htmlAttribute <| HAttrs.style "letter-spacing" "0.03.em"
+                                , spacing 7
                                 ]
-                                [ E.el [centerX] <|
-                                    E.text "Setting"
-                                , E.el [centerX] <|
-                                    html <|
-                                        viewSettingPalettePositionSelect SettingPanel model.tempSetting
-                                , E.el [centerX] <|
-                                    E.text "Palette"
-                                , E.el [centerX] <|
-                                    html <|
-                                        viewSettingPalettePositionSelect PalettePanel model.tempSetting
-                                , E.el [centerX] <|
-                                    E.text "Campus"
-                                , E.el [centerX] <|
-                                    html <|
-                                        viewCampusPositionSetting model.tempSetting
+                                [ column [ centerX
+                                         , spacing 4
+                                         ]
+                                         [ E.el [centerX] <|
+                                            E.text "Setting"
+                                         , E.el [centerX] <|
+                                            html <|
+                                                viewSettingPalettePositionSelect SettingPanel model.tempSetting
+                                         ]
+                                , column [ centerX
+                                         , spacing 4
+                                         ]
+                                         [ E.el [centerX] <|
+                                             E.text "Palette"
+                                         , E.el [centerX] <|
+                                            html <|
+                                                viewSettingPalettePositionSelect PalettePanel model.tempSetting
+                                         ]
+                                , column [ centerX
+                                         , spacing 4
+                                         ]
+                                         [ E.el [ centerX ] <|
+                                            E.text "Campus"
+                                         , E.el [ centerX ] <|
+                                            html <|
+                                                viewCampusPositionSetting model.tempSetting
+                                         ]
                                 ]
                        ]
-              , E.el [centerX
+              , E.el [ centerX
+                     , paddingEach { top = 20, right = 0, left = 0, bottom = 0 }
                      ] <|
                   if isCorrectSetting model.tempSetting then
                       Input.button [ htmlAttribute <| HAttrs.style "color" "white"
