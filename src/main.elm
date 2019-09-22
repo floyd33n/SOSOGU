@@ -602,7 +602,7 @@ viewCampusPanel model =
            , Background.color <| shironezuIro
            ] 
            [ viewToolsPanel model
-           , el ( (padding 0) :: (campusPosition model.setting) )<| 
+           , el ( (padding 3) :: (campusPosition model.setting) )<| 
                             html <|
                                    viewCampus model (model.campusSize.width, model.campusSize.height)
            ] 
