@@ -676,7 +676,15 @@ viewToolsPanel model =
     in
         row [ E.width fill
             , E.height <| px 36
-            , Border.widthEach { top = 1, right = 0, left = 0, bottom = 1 }
+            , case (model.setting.panelPosition.settingPanel, model.setting.panelPosition.palettePanel) of
+                (Right, Right) ->
+                    Border.widthEach { top = 1, right = 0, left = 1, bottom = 1 }
+                (Left, Left) ->
+                    Border.widthEach { top = 1, right = 1, left = 0, bottom = 1 }
+                (Right, Left) ->
+                    Border.widthEach { top = 1, right = 0, left = 0, bottom = 1 }
+                (Left, Right) ->
+                    Border.widthEach { top = 1, right = 0, left = 0, bottom = 1 }
             , Border.color <| shiroIro
             , Background.color <| rouIro
             ]
@@ -953,6 +961,10 @@ viewSettingPanel model =
                                    { onPress = Nothing
                                    , label = E.el [ Font.color <| shiroIro
                                                   , Font.size <| 14
+                                                  , Border.color <| shiroIro
+                                                  , Border.width <| 1
+                                                  , Border.rounded 5
+                                                  , padding 2
                                                   ] <| 
                                                       E.text "disabled"
                                    }
@@ -1032,7 +1044,19 @@ viewPalettePanel : Model -> Element Msg
 viewPalettePanel model =
         column [ E.width <| px 110
                , E.height fill
-               , Border.width 1
+               , case model.setting.panelPosition.palettePanel of
+                  Right ->
+                      case model.setting.panelPosition.settingPanel of
+                          Right -> 
+                              Border.widthEach { top = 1, right = 0, left = 1, bottom = 1 }
+                          Left ->
+                              Border.width 1
+                  Left ->
+                      case model.setting.panelPosition.settingPanel of
+                          Right ->
+                              Border.width 1
+                          Left ->
+                              Border.widthEach { top = 1, right = 1, left = 0, bottom = 1 }
                , Border.color<| shiroIro
                , Background.color <| rouIro
                , debugLine False
@@ -1118,6 +1142,10 @@ viewPalettePanel model =
                                                    { onPress = Just ForDisabled
                                                    , label = E.el [ Font.color <| shiroIro
                                                                   , Font.size <| 14
+                                                                  , Border.color <| shiroIro
+                                                                  , Border.width <| 1
+                                                                  , Border.rounded 5
+                                                                  , padding 2
                                                                   ] <| 
                                                                       E.text "disabled"
                                                     }
@@ -1143,9 +1171,9 @@ viewPalettePanel model =
                                            ] 
                                            [] 
                         ]
-               , column [ centerX
-                        , paddingEach { top = 2, right = 0, left = 0, bottom = 2 }
+               , column [ paddingEach { top = 2, right = 0, left = 0, bottom = 2 }
                         , spacing 5
+                        , centerX
                         ]
                         [ E.el [ Font.color <| shiroIro
                                , Font.size <| 14
@@ -1154,22 +1182,24 @@ viewPalettePanel model =
                                ] <|
                                   E.text "Sub Palette"
                         , panelHr
-                        , column [ centerX
-                                ]
-                                [ wrappedRow [ spacing 3 ] <|
-                                    List.map (\plt -> E.el [] <|
-                                                          html <|
-                                                              div [ HAttrs.style "width" "25px"
-                                                                  , HAttrs.style "height" "25px"
-                                                                  , HAttrs.style "background-color" <| getPaletteColor model (plt-1)
-                                                                  , HAttrs.style "border" "solid 1px black"
-                                                                  , onDoubleClick (DeleteSubPalette plt)
-                                                                  , onClick (SetMainPalette (plt-1))
-                                                                  ]  
-                                                                  []
-                                             ) <|
-                                                List.range 1 (Dict.size model.subPalette)
-                                ]
+                        , column [ E.width <| px 95
+                                 ]
+                                 [ wrappedRow [ spacing 3 
+                                              , centerX
+                                              ] <|
+                                     List.map (\plt -> E.el [] <|
+                                                           html <|
+                                                               div [ HAttrs.style "width" "25px"
+                                                                   , HAttrs.style "height" "25px"
+                                                                   , HAttrs.style "background-color" <| getPaletteColor model (plt-1)
+                                                                   , HAttrs.style "border" "solid 1px black"
+                                                                   , onDoubleClick (DeleteSubPalette plt)
+                                                                   , onClick (SetMainPalette (plt-1))
+                                                                   ]  
+                                                                   []
+                                              ) <|
+                                                 List.range 1 (Dict.size model.subPalette)
+                                 ]
                         ]
                ]
 
