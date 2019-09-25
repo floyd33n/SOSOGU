@@ -9,7 +9,7 @@ import Dict exposing (..)
 import Dict.Extra as DictEx
 --import Debug exposing (..)
 import Svg exposing (..)
---import Svg.Attributes as SAttrs exposing (..)
+import Svg.Attributes as SAttrs exposing (..)
 import Process exposing (..)
 import Task exposing (..)
 import Regex exposing (..)
@@ -55,6 +55,7 @@ type alias Model =
     , toolsSetting : ToolsSetting
     , history : History
     , campusImageUrl : String
+    , settingPanelStatus : PanelStatus
     }
 
 type alias Campus =
@@ -149,7 +150,9 @@ initToolsSetting : ToolsSetting
 initToolsSetting =
     { isDisplayDlButton = False
     }
-
+type PanelStatus
+    = Open
+    | Close
 --INIT--
 init : () -> (Model, Cmd Msg)
 init _ =
@@ -168,6 +171,7 @@ init _ =
       , toolsSetting = initToolsSetting
       , history = initHistory
       , campusImageUrl = ""
+      , settingPanelStatus = Close
       } 
     , Cmd.none
     )
@@ -197,6 +201,8 @@ type Msg
     | ApplySetting
     | Undo Point
     | GetImageUrl String
+    | OpenSettingPanel
+    | CloseSettingPanel
  
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -496,6 +502,18 @@ update msg model =
             , Cmd.none
             )
 
+        OpenSettingPanel ->
+            ( { model | settingPanelStatus = Open
+              }
+            , Cmd.none
+            )
+
+        CloseSettingPanel ->
+            ( { model | settingPanelStatus = Close
+              }
+            , Cmd.none
+            )
+
 --VIEW--
 view : Model -> Html Msg
 view model =
@@ -505,32 +523,40 @@ view model =
         , createCampusWindow model
         , layout [debugLine False
                  ] <|
-            column [ E.width fill, E.height fill, debugLine False]
+            column [ E.width E.fill, E.height E.fill, debugLine False]
                 [ row [ debugLine False
-                      , E.width fill
+                      , E.width E.fill
                       , E.height <| px 50
                       , Background.color <| rouIro
-                      , paddingXY 15 0
+                      , paddingXY 16 0
                       , Border.widthEach { top = 1, right = 1, left = 1, bottom = 0 }
                       , Border.color <| shiroIro
                       ]
-                      [ E.el [alignLeft
-                             , Font.color <| shiroIro
-                             , htmlAttribute <| HAttrs.style "letter-spacing" "0.08em"
-                             ] <| 
-                                E.text "SOSOGU"
+                      [ E.row [ alignLeft
+                              , Font.color <| shiroIro
+                              , htmlAttribute <| HAttrs.style "letter-spacing" "0.06em" 
+                              , E.spacing 5
+                              ]
+                              [ E.image [ E.width <| px 25
+                                        , E.height <| px 25
+                                        ]  
+                                        { src = "file/icon.png"
+                                        , description = ""
+                                        }
+                              , E.text "SOSOGU"
+                              ]
                       , row [ alignRight 
-                            , spacing 6
+                            , E.spacing 6
                             ]
                             [ newTabLink []
                                          { url = ""
-                                         , label = E.row [ spacing 3 ]
+                                         , label = E.row [ E.spacing 3 ]
                                                          [ E.image [ htmlAttribute <| HAttrs.style "filter" "invert(100%)" ]
                                                                    { src = "file/home.svg"
                                                                    , description = ""
                                                                    }
                                                          , E.el [ Font.color <| shiroIro 
-                                                                , Font.size <| 16
+                                                                , Font.size <| 15
                                                                 , htmlAttribute <| HAttrs.style "letter-spacing" "0.05em"
                                                                 ] <|
                                                             E.text "Home"
@@ -538,13 +564,13 @@ view model =
                                          }
                             , newTabLink []
                                          { url = "https://github.com/floyd33n/SOSOGU"
-                                         , label = E.row [ spacing 3 ]
+                                         , label = E.row [ E.spacing 3 ]
                                                          [ E.image [ htmlAttribute <| HAttrs.style "filter" "invert(100%)" ]
                                                                    { src = "file/mark-github.svg"
                                                                    , description = ""
                                                                    }
                                                          , E.el [ Font.color <| shiroIro
-                                                                , Font.size <| 16
+                                                                , Font.size <| 15
                                                                 , htmlAttribute <| HAttrs.style "letter-spacing" "0.05em"
                                                                 ] <|
                                                             E.text "Repository"
@@ -590,15 +616,15 @@ viewPanels model =
                     ]
 
     in
-        row [ E.width fill
-            , E.height fill
+        row [ E.width E.fill
+            , E.height E.fill
             ]
             view_
 
 viewCampusPanel : Model -> Element Msg
 viewCampusPanel model =
-    column [ E.width fill
-           , E.height fill
+    column [ E.width E.fill
+           , E.height E.fill
            , Background.color <| shironezuIro
            ] 
            [ viewToolsPanel model
@@ -639,7 +665,7 @@ viewToolsPanel model =
                                              , HAttrs.style "font-size" "14px"
                                              , HAttrs.style "opacity" oValue
                                              , HAttrs.style "text-decoration" dValue
-                                             , id id_
+                                             , HAttrs.id id_
                                              , attr1
                                              , attr2
                                              ]
@@ -654,7 +680,7 @@ viewToolsPanel model =
                             tempButton Nothing "0.6" "line-through" "" (HAttrs.style "" "") (hidden False)
                     "DL" ->
                         if model.toolsSetting.isDisplayDlButton then
-                            tempButton Nothing "1" "none" "dl" (href model.campusImageUrl) (target "_blank")
+                            tempButton Nothing "1" "none" "dl" (href model.campusImageUrl) (HAttrs.target "_blank")
                         else
                             tempButton Nothing "0.6" "line-through" "" (HAttrs.style "" "") (hidden False)
                     _ ->
@@ -674,7 +700,7 @@ viewToolsPanel model =
                                             E.text <| "Undo"
                          }
     in
-        row [ E.width fill
+        row [ E.width E.fill
             , E.height <| px 36
             , case (model.setting.panelPosition.settingPanel, model.setting.panelPosition.palettePanel) of
                 (Right, Right) ->
@@ -689,12 +715,13 @@ viewToolsPanel model =
             , Background.color <| rouIro
             ]
             [ E.el [ Font.color <| shiroIro
-                   , Font.size <| 17
+                   , Font.size <| 16
                    , padding 2
                    , centerY
                    , htmlAttribute <| HAttrs.style "letter-spacing" "0.05em"
                    ] <|
-                      row [ spacing 2 ]
+                      row [ E.spacing 2 
+                          ]
                           [ E.image [ htmlAttribute <| HAttrs.style "filter" "invert(100%)" ]
                                     { src = "file/tools.svg"
                                     , description = ""
@@ -703,7 +730,7 @@ viewToolsPanel model =
                           ]
             , E.row [ alignRight
                     , paddingXY 20 0
-                    , spacing 5
+                    , E.spacing 5
                     ]
                     [ gendlButton "Gen"
                     , gendlButton "DL"
@@ -719,33 +746,82 @@ panelHr =
          , Border.color <| shiroIro
          ] <|
          none
-
 viewSettingPanel : Model -> Element Msg
 viewSettingPanel model =
+    case model.settingPanelStatus of
+        Open ->
+            openSettingPanel model
+        Close ->
+            closedSettingPanel model
+
+closedSettingPanel : Model -> Element Msg
+closedSettingPanel model =
+    column [ E.width <| px 50
+           , E.height E.fill
+           , Border.width 1
+           , Border.color <| shiroIro
+           , Background.color <| rouIro
+           , E.spacing 2
+           , padding 1
+           ]
+           [ el [centerX
+                , padding 1
+                ] <|
+                    Input.button [ Border.color <| shiroIro
+                                 , Border.width <| 1
+                                 , Border.rounded 1
+                                 , htmlAttribute <| HAttrs.style "padding" "2px"
+                                 ]
+                                 { onPress = Just OpenSettingPanel
+                                 , label = el [ centerX ] <|
+                                    E.image [ htmlAttribute <| HAttrs.style "filter" "invert(100%)"
+                                            , E.width <| px 15
+                                            , E.height <| px 15
+                                            ]
+                                            { src = "file/settings.svg"
+                                            , description = ""
+                                            }
+                                 }
+           ]
+openSettingPanel : Model -> Element Msg
+openSettingPanel model =
         column [ E.width <| px 110
-               , E.height fill
+               , E.height E.fill
                , Border.width 1
                , Border.color <| shiroIro
                , Background.color <| rouIro
                ]
                [ el [ Font.color <| shiroIro
-                    , Font.size <| 17
+                    , Font.size <| 16
                     , centerX
                     , padding 2
                     , htmlAttribute <| HAttrs.style "letter-spacing" "0.05em"
                     ] <| 
-                        row [ spacing 2 ]
-                            [ E.image [ htmlAttribute <| HAttrs.style "filter" "invert(100%)" 
-                                      ]
-                                      { src = "file/settings.svg"
-                                      , description = ""
-                                      }
-                            , E.text "Setting"
-                            ]
+                        E.el [] <|
+                            Input.button  [
+                                          ]
+                                          { onPress = Just CloseSettingPanel
+                                          , label = E.el [ centerX ] <|
+                                              row[ E.spacing 2 ]
+                                                 [ E.el [ Border.color <| shiroIro
+                                                        , Border.width <| 1
+                                                        , Border.rounded 1
+                                                        , htmlAttribute <| HAttrs.style "padding" "0px"
+                                                        ] <|
+                                                    E.image [ htmlAttribute <| HAttrs.style "filter" "invert(100%)"
+                                                            , E.width <| px 17
+                                                            , E.height <| px 17
+                                                            ]
+                                                            { src = "file/x.svg"
+                                                            , description = ""
+                                                            }
+                                                 , E.text "Setting"
+                                                 ]
+                                          }
               , panelHr
               -- Border Color --
               , column [ centerX
-                       , spacing 4
+                       , E.spacing 4
                        , padding 3
                        ] 
                        [ E.el [ Font.size 14
@@ -759,6 +835,10 @@ viewSettingPanel model =
                               ] <|
                                   html <|
                                       BInput.text [ BInput.onInput BorderColorValue
+                                                  , if isColor model.tempSetting.borderColor then
+                                                        BInput.attrs []
+                                                    else
+                                                        BInput.danger
                                                   , BInput.attrs [ HAttrs.style "height" "14px" 
                                                                  , HAttrs.style "width" "80px"
                                                                  , HAttrs.style "font-size" "0.7em"
@@ -781,7 +861,7 @@ viewSettingPanel model =
               -- Border Style --
               , column [ centerX
                        , padding 3
-                       , spacing 5
+                       , E.spacing 5
                        ]
                        [ E.el [ Font.size 14 
                               , Font.color <| shiroIro
@@ -825,7 +905,7 @@ viewSettingPanel model =
               -- Pixel Size --
               , column [ centerX
                        , padding 3
-                       , spacing 5
+                       , E.spacing 5
                        ] 
                        [ E.el [ Font.size 14
                               , Font.color <| shiroIro
@@ -834,7 +914,7 @@ viewSettingPanel model =
                               ] <|
                                   E.text "Pixel Size"
                        , panelHr
-                       , column [ spacing 3 ] <|
+                       , column [ E.spacing 3 ] <|
                             let
                                 pixelSizeErr : String -> String
                                 pixelSizeErr value_ =
@@ -859,6 +939,10 @@ viewSettingPanel model =
                                       , html <|
                                           BInput.text [ BInput.onInput SetPixelWidth
                                                       , BInput.small
+                                                      , if (Maybe.withDefault 0 (String.toInt model.tempSetting.width)) > 0 then
+                                                            BInput.attrs []
+                                                        else
+                                                            BInput.danger
                                                       , BInput.attrs [ HAttrs.style "height" "14px"
                                                                      , HAttrs.style "width" "40px"
                                                                      , HAttrs.style "font-size" "95%"
@@ -879,6 +963,10 @@ viewSettingPanel model =
                                       , html <|
                                           BInput.text [ BInput.onInput SetPixelHeight
                                                       , BInput.small
+                                                      , if (Maybe.withDefault 0 (String.toInt model.tempSetting.height)) > 0 then
+                                                            BInput.attrs []
+                                                        else
+                                                            BInput.danger
                                                       , BInput.attrs [ HAttrs.style "height" "14px"
                                                                      , HAttrs.style "width" "40px"
                                                                      , HAttrs.style "font-size" "95%"
@@ -894,7 +982,7 @@ viewSettingPanel model =
                        ]
               --panel position--
               , column [ centerX 
-                       , spacing 10
+                       , E.spacing 10
                        ]
                        [ E.el [ Font.size 14
                               , Font.color <| shiroIro
@@ -907,10 +995,10 @@ viewSettingPanel model =
                                 , Font.color <| shiroIro
                                 , centerX
                                 , htmlAttribute <| HAttrs.style "letter-spacing" "0.03.em"
-                                , spacing 7
+                                , E.spacing 7
                                 ]
                                 [ column [ centerX
-                                         , spacing 4
+                                         , E.spacing 4
                                          ]
                                          [ E.el [centerX] <|
                                             E.text "Setting"
@@ -919,7 +1007,7 @@ viewSettingPanel model =
                                                 viewSettingPalettePositionSelect SettingPanel model.tempSetting
                                          ]
                                 , column [ centerX
-                                         , spacing 4
+                                         , E.spacing 4
                                          ]
                                          [ E.el [centerX] <|
                                              E.text "Palette"
@@ -928,7 +1016,7 @@ viewSettingPanel model =
                                                 viewSettingPalettePositionSelect PalettePanel model.tempSetting
                                          ]
                                 , column [ centerX
-                                         , spacing 4
+                                         , E.spacing 4
                                          ]
                                          [ E.el [ centerX ] <|
                                             E.text "Campus"
@@ -1043,7 +1131,7 @@ viewSettingPalettePositionSelect panel_ tempSetting =
 viewPalettePanel : Model -> Element Msg
 viewPalettePanel model =
         column [ E.width <| px 110
-               , E.height fill
+               , E.height E.fill
                , case model.setting.panelPosition.palettePanel of
                   Right ->
                       case model.setting.panelPosition.settingPanel of
@@ -1062,17 +1150,17 @@ viewPalettePanel model =
                , debugLine False
                ]
                [ row [ Font.color <| shiroIro
-                     , Font.size <| 17
+                     , Font.size <| 16
                      , centerX
-                     , padding 2
+                     , E.padding 2
                      , htmlAttribute <| HAttrs.style "letter-spacing" "0.05em"
-                     , spacing 2
+                     , E.spacing 2
                      ] 
                      [ E.image [ htmlAttribute <| HAttrs.style "filter" "invert(100%)" 
                                --, htmlAttribute <| HAttrs.style "width" "16px"
                                --, htmlAttribute <| HAttrs.style "height" "16px"
                                ]
-                               { src = "file/paint-palette-svgrepo-com.svg"
+                               { src = "file/palette.svg"
                                , description = ""
                                }
                      , E.text "Palette"
@@ -1080,7 +1168,7 @@ viewPalettePanel model =
                , panelHr
                , column [ centerX
                         , padding 3
-                        , spacing 5
+                        , E.spacing 5
                         ] 
                         [ E.el [ Font.color <| shiroIro
                                , Font.size <| 14
@@ -1093,6 +1181,13 @@ viewPalettePanel model =
                               ] <|
                                   html <|
                                       BInput.text [ BInput.onInput ColorValue
+                                                  , if isColor model.colorValue then
+                                                        BInput.attrs []
+                                                    else
+                                                        if String.isEmpty model.colorValue then
+                                                            BInput.attrs []
+                                                        else
+                                                            BInput.danger
                                                   , BInput.attrs [ HAttrs.style "height" "14px" 
                                                                  , HAttrs.style "width" "80px"
                                                                  , HAttrs.style "font-size" "0.7em"
@@ -1107,7 +1202,7 @@ viewPalettePanel model =
                                                     ""
                                                 else
                                                     if String.isEmpty model.colorValue then
-                                                        "Is Empty"
+                                                        ""
                                                     else
                                                         "Isn't Color"
                                     ]
@@ -1121,8 +1216,9 @@ viewPalettePanel model =
                                                              , Border.rounded 5
                                                              , padding 2
                                                              ]
-                                                             [ E.el [ Font.color <| shiroIro
+                                                             [ E.el [ Font.color <| rouIro
                                                                     , Font.size <| 14
+                                                                    , Font.color <| shiroIro
                                                                     ] <|
                                                                         E.text "Add "
                                                              , html <|
@@ -1151,8 +1247,8 @@ viewPalettePanel model =
                                                     }
                         ]
                , column [ centerX
-                        , padding 3
-                        , spacing 5
+                        , E.padding 3
+                        , E.spacing 5
                         ]
                         [ E.el [ Font.color <| shiroIro
                                , Font.size <| 14
@@ -1171,8 +1267,8 @@ viewPalettePanel model =
                                            ] 
                                            [] 
                         ]
-               , column [ paddingEach { top = 2, right = 0, left = 0, bottom = 2 }
-                        , spacing 5
+               , column [ E.paddingEach { top = 2, right = 0, left = 0, bottom = 2 }
+                        , E.spacing 5
                         , centerX
                         ]
                         [ E.el [ Font.color <| shiroIro
@@ -1184,7 +1280,7 @@ viewPalettePanel model =
                         , panelHr
                         , column [ E.width <| px 95
                                  ]
-                                 [ wrappedRow [ spacing 3 
+                                 [ wrappedRow [ E.spacing 3 
                                               , centerX
                                               ] <|
                                      List.map (\plt -> E.el [] <|
@@ -1265,7 +1361,7 @@ getCampusColor model (x, y) =
 viewCampus : Model -> Points -> Html Msg
 viewCampus model (width, height) =
     if model.didCreateCampus then
-        div [ id "campus" ]
+        div [ HAttrs.id "campus" ]
             [ div [] <|
                 List.map (\y -> div [] <|
                     List.map ( \x -> div [ HAttrs.style "float" "left"
@@ -1297,12 +1393,12 @@ displayPalette : Model -> Html Msg
 displayPalette model =
     div [] <| 
         List.map ( \plt -> div []
-                               [ div [ id "palette_square"
+                               [ div [ HAttrs.id "palette_square"
                                      , HEvents.onClick <| SetMainPalette (plt - 1)
                                      , HAttrs.style "background-color" <| getPaletteColor model (plt - 1)
                                      ] 
                                      []
-                               , div [ id "palette_color_name" ] 
+                               , div [ HAttrs.id "palette_color_name" ] 
                                      []
                                ]
                  ) <| 
