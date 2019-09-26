@@ -31,6 +31,7 @@ import Bootstrap.Form.Input as BInput
 import Bootstrap.Form.Select as BSelect
 import Bootstrap.Form.Radio as BRadio
 import Json.Decode as JD
+import Json.Encode as JE
 css path =
   H.node "link" [rel "stylesheet", href path] []
 
@@ -771,6 +772,8 @@ closedSettingPanel model =
                                  , Border.width <| 1
                                  , Border.rounded 1
                                  , htmlAttribute <| HAttrs.style "padding" "2px"
+                                 , htmlAttribute <| HAttrs.class "button hint-bottom"
+                                 , htmlAttribute <| HAttrs.property "aria-label" (JE.string "Bottom")
                                  ]
                                  { onPress = Just OpenSettingPanel
                                  , label = el [ centerX ] <|
