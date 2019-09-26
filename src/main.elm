@@ -720,6 +720,8 @@ viewToolsPanel model =
                    , padding 2
                    , centerY
                    , htmlAttribute <| HAttrs.style "letter-spacing" "0.05em"
+                   , htmlAttribute <| HAttrs.class "button hint-bottom"
+                   , htmlAttribute <| HAttrs.property "aria-label" (JE.string "Bottom")
                    ] <|
                       row [ E.spacing 2 
                           ]
@@ -772,8 +774,6 @@ closedSettingPanel model =
                                  , Border.width <| 1
                                  , Border.rounded 1
                                  , htmlAttribute <| HAttrs.style "padding" "2px"
-                                 , htmlAttribute <| HAttrs.class "button hint-bottom"
-                                 , htmlAttribute <| HAttrs.property "aria-label" (JE.string "Bottom")
                                  ]
                                  { onPress = Just OpenSettingPanel
                                  , label = el [ centerX ] <|
@@ -1034,29 +1034,35 @@ openSettingPanel model =
                      ] <|
                   if isCorrectSetting model.tempSetting then
                       Input.button [ htmlAttribute <| HAttrs.style "color" "white"
+                                   , Border.color <| shiroIro
+                                   , Border.width <| 2
+                                   , Border.rounded 5
+                                   , E.width <| px 60
+                                   , E.height <| px 30
                                    ]
                                    { onPress = Just ApplySetting
                                    , label = E.el [ Font.color <| shiroIro
                                                   , Font.size <| 14
-                                                  , Border.color <| shiroIro
-                                                  , Border.width <| 1
-                                                  , Border.rounded 5
-                                                  , padding 2
+                                                  , centerY
+                                                  , centerX
                                                   ] <|
                                                       E.text "Apply"
                                    }
                   else
                       Input.button [ htmlAttribute <| HAttrs.style "opacity" "0.6" 
                                    , htmlAttribute <| HAttrs.style "color" "white"
+                                   , Border.color <| shiroIro
+                                   , Border.width <| 2
+                                   , Border.rounded 5
+                                   , E.width <| px 60
+                                   , E.height <| px 30
                                    ]
                                    { onPress = Nothing
                                    , label = E.el [ Font.color <| shiroIro
                                                   , Font.size <| 14
-                                                  , Border.color <| shiroIro
-                                                  , Border.width <| 1
-                                                  , Border.rounded 5
-                                                  , padding 2
                                                   , Font.strike
+                                                  , centerY
+                                                  , centerX
                                                   ] <| 
                                                       E.text "Apply"
                                    }
@@ -1068,11 +1074,11 @@ viewCampusPositionSetting tempSetting =
         tempDiv : CampusPosition -> Html Msg
         tempDiv position_ =
             div [ onClick (SetCampusPosition position_)
-                , HAttrs.style "border" "1px solid black"
+                , HAttrs.style "border" "none"
                 , HAttrs.style "width" "15px"
                 , HAttrs.style "height" "15px"
                 , if (tempSetting.panelPosition.campus == position_) then
-                      HAttrs.style "background-color" "#c3d825"
+                      HAttrs.style "background-color" "#47885e"
                   else
                       HAttrs.style "background-color" "white"
                 , HAttrs.style "float" "left"
@@ -1100,18 +1106,18 @@ viewSettingPalettePositionSelect panel_ tempSetting =
         temp_ : Position -> Html Msg
         temp_ position_ =
             div [ onClick (ChangePanelPosition panel_ position_)
-                , HAttrs.style "border" "1px solid black"
+                , HAttrs.style "border" "none"
                 , HAttrs.style "width" "15px"
                 , HAttrs.style "height" "15px"
                 , case panel_ of
                     SettingPanel ->
                         if (tempSetting.panelPosition.settingPanel == position_) then
-                            HAttrs.style "background-color" "#c3d825"
+                            HAttrs.style "background-color" "#47885e"
                         else
                           HAttrs.style "background-color" "white"
                     PalettePanel ->
                         if (tempSetting.panelPosition.palettePanel == position_) then
-                            HAttrs.style "background-color" "#c3d825"
+                            HAttrs.style "background-color" "#47885e"
                         else
                           HAttrs.style "background-color" "white"
                 , HAttrs.style "float" "left"
@@ -1213,16 +1219,21 @@ viewPalettePanel model =
                         , el [ centerX ] <|
                               if isColor <| model.colorValue then
                                   Input.button [ htmlAttribute <| HAttrs.style "color" "white"
+                                               , Border.color <| shiroIro
+                                               , Border.width <| 2
+                                               , Border.rounded 5
+                                               , E.width <| px 60
+                                               , E.height <| px 30
                                                ] 
                                                { onPress = Just (AddColorToSubPalette model.colorValue)
-                                               , label = row [ Border.color <| shiroIro
-                                                             , Border.width <| 1
-                                                             , Border.rounded 5
-                                                             , padding 2
-                                                             ]
+                                               , label = row [ centerX
+                                                             , centerY
+                                                             ]  
                                                              [ E.el [ Font.color <| rouIro
                                                                     , Font.size <| 14
                                                                     , Font.color <| shiroIro
+                                                                    , centerX
+                                                                    , centerY
                                                                     ] <|
                                                                         E.text "Add "
                                                              , html <|
@@ -1238,18 +1249,30 @@ viewPalettePanel model =
                                   E.el [ htmlAttribute <| HAttrs.style "opacity" "0.6"] <|
                                       Input.button [ Region.description "Add"
                                                    , htmlAttribute <| HAttrs.style "color" "white"
+                                                   , Border.color <| shiroIro
+                                                   , Border.width <| 2
+                                                   , Border.rounded 5
+                                                   , E.width <| px 60
+                                                   , E.height <| px 30
                                                    ] 
-                                                   { onPress = Just ForDisabled
-                                                   , label = E.el [ Font.color <| shiroIro
-                                                                  , Font.size <| 14
-                                                                  , Border.color <| shiroIro
-                                                                  , Border.width <| 1
-                                                                  , Border.rounded 5
-                                                                  , padding 2
-                                                                  , Font.strike
-                                                                  ] <| 
-                                                                      E.text "Add"
-                                                    }
+                                                   { onPress = Nothing
+                                                   , label = row [ centerX
+                                                                 , centerY
+                                                                 ] 
+                                                                 [ E.el [ Font.color <| rouIro
+                                                                        , Font.size <| 14
+                                                                        , Font.color <| shiroIro
+                                                                        , Font.strike
+                                                                        ] <|
+                                                                            E.text "Add "
+                                                                 , html <|
+                                                                    div [ HAttrs.style "width" "14px"
+                                                                        , HAttrs.style "height" "14px"
+                                                                        , HAttrs.style "background-color" "white"
+                                                                        ]
+                                                                        []
+                                                                 ] 
+                                                   }
                         ]
                , column [ centerX
                         , E.padding 3
@@ -1283,10 +1306,10 @@ viewPalettePanel model =
                                ] <|
                                   E.text "Sub Palette"
                         , panelHr
-                        , column [ E.width <| px 95
+                        , column [ centerX
                                  ]
                                  [ wrappedRow [ E.spacing 3 
-                                              , centerX
+                                              , E.width <| px 81
                                               ] <|
                                      List.map (\plt -> E.el [] <|
                                                            html <|
