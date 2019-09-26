@@ -239,7 +239,7 @@ update msg model =
 
         ColorValue value ->
             ( { model | colorValue = if String.isEmpty model.colorValue then
-                                        "white"
+                                        value
                                      else
                                         String.toLower value
               }
@@ -1053,8 +1053,9 @@ openSettingPanel model =
                                                   , Border.width <| 1
                                                   , Border.rounded 5
                                                   , padding 2
+                                                  , Font.strike
                                                   ] <| 
-                                                      E.text "disabled"
+                                                      E.text "Apply"
                                    }
               ]
 
@@ -1232,7 +1233,7 @@ viewPalettePanel model =
                                                } 
                               else
                                   E.el [ htmlAttribute <| HAttrs.style "opacity" "0.6"] <|
-                                      Input.button [ Region.description "disabled"
+                                      Input.button [ Region.description "Add"
                                                    , htmlAttribute <| HAttrs.style "color" "white"
                                                    ] 
                                                    { onPress = Just ForDisabled
@@ -1242,8 +1243,9 @@ viewPalettePanel model =
                                                                   , Border.width <| 1
                                                                   , Border.rounded 5
                                                                   , padding 2
+                                                                  , Font.strike
                                                                   ] <| 
-                                                                      E.text "disabled"
+                                                                      E.text "Add"
                                                     }
                         ]
                , column [ centerX
