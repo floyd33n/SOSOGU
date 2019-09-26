@@ -549,7 +549,7 @@ view model =
                             , E.spacing 6
                             ]
                             [ newTabLink []
-                                         { url = ""
+                                         { url = "https:/floyd33n.github.io"
                                          , label = E.row [ E.spacing 3 ]
                                                          [ E.image [ htmlAttribute <| HAttrs.style "filter" "invert(100%)" ]
                                                                    { src = "file/home.svg"
