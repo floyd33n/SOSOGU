@@ -4456,6 +4456,7 @@ var author$project$Main$CampusSize = F2(
 	function (width, height) {
 		return {height: height, width: width};
 	});
+var author$project$Main$Close = {$: 'Close'};
 var author$project$Main$TempCampusSize = F2(
 	function (width, height) {
 		return {height: height, width: width};
@@ -5211,6 +5212,7 @@ var author$project$Main$init = function (_n0) {
 			modalVisibility: EdutainmentLIVE$elm_bootstrap$Bootstrap$Modal$hidden,
 			openingModalWindow: EdutainmentLIVE$elm_bootstrap$Bootstrap$Modal$shown,
 			setting: author$project$Main$initSetting,
+			settingPanelStatus: author$project$Main$Close,
 			subPalette: author$project$Main$initSubPalette,
 			tempCampusSize: A2(author$project$Main$TempCampusSize, '', ''),
 			tempSetting: author$project$Main$initSetting,
@@ -5226,6 +5228,7 @@ var author$project$Main$campusImageUrlToElm = _Platform_incomingPort('campusImag
 var author$project$Main$subscriptions = function (model) {
 	return author$project$Main$campusImageUrlToElm(author$project$Main$GetImageUrl);
 };
+var author$project$Main$Open = {$: 'Open'};
 var elm$core$Dict$sizeHelp = F2(
 	function (n, dict) {
 		sizeHelp:
@@ -5931,7 +5934,7 @@ var author$project$Main$update = F2(
 					_Utils_update(
 						model,
 						{
-							colorValue: elm$core$String$isEmpty(model.colorValue) ? 'white' : elm$core$String$toLower(value)
+							colorValue: elm$core$String$isEmpty(model.colorValue) ? value : elm$core$String$toLower(value)
 						}),
 					elm$core$Platform$Cmd$none);
 			case 'AddColorToSubPalette':
@@ -6236,12 +6239,24 @@ var author$project$Main$update = F2(
 								model.history)
 						}),
 					elm$core$Platform$Cmd$none);
-			default:
+			case 'GetImageUrl':
 				var url = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{campusImageUrl: url}),
+					elm$core$Platform$Cmd$none);
+			case 'OpenSettingPanel':
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{settingPanelStatus: author$project$Main$Open}),
+					elm$core$Platform$Cmd$none);
+			default:
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{settingPanelStatus: author$project$Main$Close}),
 					elm$core$Platform$Cmd$none);
 		}
 	});
@@ -8183,8 +8198,8 @@ var author$project$Main$debugLine = function (bool) {
 		_Debug_todo(
 			'Main',
 			{
-				start: {line: 1186, column: 17},
-				end: {line: 1186, column: 27}
+				start: {line: 1377, column: 17},
+				end: {line: 1377, column: 27}
 			})) : mdgriffith$elm_ui$Element$htmlAttribute(
 		A2(elm$html$Html$Attributes$style, '', ''));
 };
@@ -8198,11 +8213,6 @@ var mdgriffith$elm_ui$Element$rgb255 = F3(
 	});
 var author$project$Main$rouIro = A3(mdgriffith$elm_ui$Element$rgb255, 43, 43, 43);
 var author$project$Main$shiroIro = A3(mdgriffith$elm_ui$Element$rgb255, 255, 255, 255);
-var mdgriffith$elm_ui$Internal$Model$AlignY = function (a) {
-	return {$: 'AlignY', a: a};
-};
-var mdgriffith$elm_ui$Internal$Model$Bottom = {$: 'Bottom'};
-var mdgriffith$elm_ui$Element$alignBottom = mdgriffith$elm_ui$Internal$Model$AlignY(mdgriffith$elm_ui$Internal$Model$Bottom);
 var mdgriffith$elm_ui$Internal$Model$AlignX = function (a) {
 	return {$: 'AlignX', a: a};
 };
@@ -8210,12 +8220,13 @@ var mdgriffith$elm_ui$Internal$Model$Left = {$: 'Left'};
 var mdgriffith$elm_ui$Element$alignLeft = mdgriffith$elm_ui$Internal$Model$AlignX(mdgriffith$elm_ui$Internal$Model$Left);
 var mdgriffith$elm_ui$Internal$Model$Right = {$: 'Right'};
 var mdgriffith$elm_ui$Element$alignRight = mdgriffith$elm_ui$Internal$Model$AlignX(mdgriffith$elm_ui$Internal$Model$Right);
+var mdgriffith$elm_ui$Internal$Model$AlignY = function (a) {
+	return {$: 'AlignY', a: a};
+};
 var mdgriffith$elm_ui$Internal$Model$Top = {$: 'Top'};
 var mdgriffith$elm_ui$Element$alignTop = mdgriffith$elm_ui$Internal$Model$AlignY(mdgriffith$elm_ui$Internal$Model$Top);
 var mdgriffith$elm_ui$Internal$Model$CenterX = {$: 'CenterX'};
 var mdgriffith$elm_ui$Element$centerX = mdgriffith$elm_ui$Internal$Model$AlignX(mdgriffith$elm_ui$Internal$Model$CenterX);
-var mdgriffith$elm_ui$Internal$Model$CenterY = {$: 'CenterY'};
-var mdgriffith$elm_ui$Element$centerY = mdgriffith$elm_ui$Internal$Model$AlignY(mdgriffith$elm_ui$Internal$Model$CenterY);
 var author$project$Main$campusPosition = function (setting) {
 	var _n0 = setting.panelPosition.campus;
 	switch (_n0.$) {
@@ -8225,27 +8236,9 @@ var author$project$Main$campusPosition = function (setting) {
 		case 'TopRight':
 			return _List_fromArray(
 				[mdgriffith$elm_ui$Element$alignRight, mdgriffith$elm_ui$Element$alignTop]);
-		case 'TopLeft':
-			return _List_fromArray(
-				[mdgriffith$elm_ui$Element$alignLeft, mdgriffith$elm_ui$Element$alignTop]);
-		case 'CenterCenter':
-			return _List_fromArray(
-				[mdgriffith$elm_ui$Element$centerX, mdgriffith$elm_ui$Element$centerY]);
-		case 'CenterRight':
-			return _List_fromArray(
-				[mdgriffith$elm_ui$Element$alignRight, mdgriffith$elm_ui$Element$centerY]);
-		case 'CenterLeft':
-			return _List_fromArray(
-				[mdgriffith$elm_ui$Element$alignLeft, mdgriffith$elm_ui$Element$centerY]);
-		case 'BottomCenter':
-			return _List_fromArray(
-				[mdgriffith$elm_ui$Element$centerX, mdgriffith$elm_ui$Element$alignBottom]);
-		case 'BottomRight':
-			return _List_fromArray(
-				[mdgriffith$elm_ui$Element$alignRight, mdgriffith$elm_ui$Element$alignBottom]);
 		default:
 			return _List_fromArray(
-				[mdgriffith$elm_ui$Element$alignLeft, mdgriffith$elm_ui$Element$alignBottom]);
+				[mdgriffith$elm_ui$Element$alignLeft, mdgriffith$elm_ui$Element$alignTop]);
 	}
 };
 var author$project$Main$shironezuIro = A3(mdgriffith$elm_ui$Element$rgb255, 220, 221, 221);
@@ -8322,7 +8315,17 @@ var author$project$Main$Undo = function (a) {
 var elm$core$Basics$ge = _Utils_ge;
 var elm$html$Html$a = _VirtualDom_node('a');
 var elm$html$Html$Attributes$hidden = elm$html$Html$Attributes$boolProperty('hidden');
+var elm$virtual_dom$VirtualDom$property = F2(
+	function (key, value) {
+		return A2(
+			_VirtualDom_property,
+			_VirtualDom_noInnerHtmlOrFormAction(key),
+			_VirtualDom_noJavaScriptOrHtmlUri(value));
+	});
+var elm$html$Html$Attributes$property = elm$virtual_dom$VirtualDom$property;
 var elm$html$Html$Attributes$target = elm$html$Html$Attributes$stringProperty('target');
+var mdgriffith$elm_ui$Internal$Model$CenterY = {$: 'CenterY'};
+var mdgriffith$elm_ui$Element$centerY = mdgriffith$elm_ui$Internal$Model$AlignY(mdgriffith$elm_ui$Internal$Model$CenterY);
 var mdgriffith$elm_ui$Internal$Model$Height = function (a) {
 	return {$: 'Height', a: a};
 };
@@ -8825,13 +8828,6 @@ var mdgriffith$elm_ui$Internal$Model$renderFocusStyle = function (focus) {
 					])))
 		]);
 };
-var elm$virtual_dom$VirtualDom$property = F2(
-	function (key, value) {
-		return A2(
-			_VirtualDom_property,
-			_VirtualDom_noInnerHtmlOrFormAction(key),
-			_VirtualDom_noJavaScriptOrHtmlUri(value));
-	});
 var mdgriffith$elm_ui$Internal$Style$Batch = function (a) {
 	return {$: 'Batch', a: a};
 };
@@ -13643,6 +13639,57 @@ var elm$core$Basics$composeL = F3(
 	});
 var mdgriffith$elm_ui$Internal$Model$unstyled = A2(elm$core$Basics$composeL, mdgriffith$elm_ui$Internal$Model$Unstyled, elm$core$Basics$always);
 var mdgriffith$elm_ui$Element$html = mdgriffith$elm_ui$Internal$Model$unstyled;
+var elm$html$Html$Attributes$alt = elm$html$Html$Attributes$stringProperty('alt');
+var elm$html$Html$Attributes$src = function (url) {
+	return A2(
+		elm$html$Html$Attributes$stringProperty,
+		'src',
+		_VirtualDom_noJavaScriptOrHtmlUri(url));
+};
+var mdgriffith$elm_ui$Element$image = F2(
+	function (attrs, _n0) {
+		var src = _n0.src;
+		var description = _n0.description;
+		var imageAttributes = A2(
+			elm$core$List$filter,
+			function (a) {
+				switch (a.$) {
+					case 'Width':
+						return true;
+					case 'Height':
+						return true;
+					default:
+						return false;
+				}
+			},
+			attrs);
+		return A4(
+			mdgriffith$elm_ui$Internal$Model$element,
+			mdgriffith$elm_ui$Internal$Model$asEl,
+			mdgriffith$elm_ui$Internal$Model$div,
+			A2(
+				elm$core$List$cons,
+				mdgriffith$elm_ui$Internal$Model$htmlClass(mdgriffith$elm_ui$Internal$Style$classes.imageContainer),
+				attrs),
+			mdgriffith$elm_ui$Internal$Model$Unkeyed(
+				_List_fromArray(
+					[
+						A4(
+						mdgriffith$elm_ui$Internal$Model$element,
+						mdgriffith$elm_ui$Internal$Model$asEl,
+						mdgriffith$elm_ui$Internal$Model$NodeName('img'),
+						_Utils_ap(
+							_List_fromArray(
+								[
+									mdgriffith$elm_ui$Internal$Model$Attr(
+									elm$html$Html$Attributes$src(src)),
+									mdgriffith$elm_ui$Internal$Model$Attr(
+									elm$html$Html$Attributes$alt(description))
+								]),
+							imageAttributes),
+						mdgriffith$elm_ui$Internal$Model$Unkeyed(_List_Nil))
+					])));
+	});
 var mdgriffith$elm_ui$Internal$Model$Empty = {$: 'Empty'};
 var mdgriffith$elm_ui$Element$none = mdgriffith$elm_ui$Internal$Model$Empty;
 var mdgriffith$elm_ui$Internal$Flag$padding = mdgriffith$elm_ui$Internal$Flag$flag(2);
@@ -14057,8 +14104,34 @@ var author$project$Main$viewToolsPanel = function (model) {
 				mdgriffith$elm_ui$Element$width(mdgriffith$elm_ui$Element$fill),
 				mdgriffith$elm_ui$Element$height(
 				mdgriffith$elm_ui$Element$px(36)),
-				mdgriffith$elm_ui$Element$Border$widthEach(
-				{bottom: 1, left: 0, right: 0, top: 1}),
+				function () {
+				var _n0 = _Utils_Tuple2(model.setting.panelPosition.settingPanel, model.setting.panelPosition.palettePanel);
+				if (_n0.a.$ === 'Right') {
+					if (_n0.b.$ === 'Right') {
+						var _n1 = _n0.a;
+						var _n2 = _n0.b;
+						return mdgriffith$elm_ui$Element$Border$widthEach(
+							{bottom: 1, left: 1, right: 0, top: 1});
+					} else {
+						var _n5 = _n0.a;
+						var _n6 = _n0.b;
+						return mdgriffith$elm_ui$Element$Border$widthEach(
+							{bottom: 1, left: 0, right: 0, top: 1});
+					}
+				} else {
+					if (_n0.b.$ === 'Left') {
+						var _n3 = _n0.a;
+						var _n4 = _n0.b;
+						return mdgriffith$elm_ui$Element$Border$widthEach(
+							{bottom: 1, left: 0, right: 1, top: 1});
+					} else {
+						var _n7 = _n0.a;
+						var _n8 = _n0.b;
+						return mdgriffith$elm_ui$Element$Border$widthEach(
+							{bottom: 1, left: 0, right: 0, top: 1});
+					}
+				}
+			}(),
 				mdgriffith$elm_ui$Element$Border$color(author$project$Main$shiroIro),
 				mdgriffith$elm_ui$Element$Background$color(author$project$Main$rouIro)
 			]),
@@ -14069,11 +14142,37 @@ var author$project$Main$viewToolsPanel = function (model) {
 				_List_fromArray(
 					[
 						mdgriffith$elm_ui$Element$Font$color(author$project$Main$shiroIro),
-						mdgriffith$elm_ui$Element$Font$size(17),
+						mdgriffith$elm_ui$Element$Font$size(16),
 						mdgriffith$elm_ui$Element$padding(2),
-						mdgriffith$elm_ui$Element$centerY
+						mdgriffith$elm_ui$Element$centerY,
+						mdgriffith$elm_ui$Element$htmlAttribute(
+						A2(elm$html$Html$Attributes$style, 'letter-spacing', '0.05em')),
+						mdgriffith$elm_ui$Element$htmlAttribute(
+						elm$html$Html$Attributes$class('button hint-bottom')),
+						mdgriffith$elm_ui$Element$htmlAttribute(
+						A2(
+							elm$html$Html$Attributes$property,
+							'aria-label',
+							elm$json$Json$Encode$string('Bottom')))
 					]),
-				mdgriffith$elm_ui$Element$text('Tools')),
+				A2(
+					mdgriffith$elm_ui$Element$row,
+					_List_fromArray(
+						[
+							mdgriffith$elm_ui$Element$spacing(2)
+						]),
+					_List_fromArray(
+						[
+							A2(
+							mdgriffith$elm_ui$Element$image,
+							_List_fromArray(
+								[
+									mdgriffith$elm_ui$Element$htmlAttribute(
+									A2(elm$html$Html$Attributes$style, 'filter', 'invert(100%)'))
+								]),
+							{description: '', src: 'file/tools.svg'}),
+							mdgriffith$elm_ui$Element$text('Tools')
+						]))),
 				A2(
 				mdgriffith$elm_ui$Element$row,
 				_List_fromArray(
@@ -14126,7 +14225,7 @@ var author$project$Main$viewCampusPanel = function (model) {
 				mdgriffith$elm_ui$Element$el,
 				A2(
 					elm$core$List$cons,
-					mdgriffith$elm_ui$Element$padding(0),
+					mdgriffith$elm_ui$Element$padding(3),
 					author$project$Main$campusPosition(model.setting)),
 				mdgriffith$elm_ui$Element$html(
 					A2(
@@ -14135,6 +14234,18 @@ var author$project$Main$viewCampusPanel = function (model) {
 						_Utils_Tuple2(model.campusSize.width, model.campusSize.height))))
 			]));
 };
+var EdutainmentLIVE$elm_bootstrap$Bootstrap$Form$Input$Attrs = function (a) {
+	return {$: 'Attrs', a: a};
+};
+var EdutainmentLIVE$elm_bootstrap$Bootstrap$Form$Input$attrs = function (attrs_) {
+	return EdutainmentLIVE$elm_bootstrap$Bootstrap$Form$Input$Attrs(attrs_);
+};
+var EdutainmentLIVE$elm_bootstrap$Bootstrap$Form$FormInternal$Danger = {$: 'Danger'};
+var EdutainmentLIVE$elm_bootstrap$Bootstrap$Form$Input$Validation = function (a) {
+	return {$: 'Validation', a: a};
+};
+var EdutainmentLIVE$elm_bootstrap$Bootstrap$Form$Input$danger = EdutainmentLIVE$elm_bootstrap$Bootstrap$Form$Input$Validation(EdutainmentLIVE$elm_bootstrap$Bootstrap$Form$FormInternal$Danger);
+var EdutainmentLIVE$elm_bootstrap$Bootstrap$Form$Input$text = EdutainmentLIVE$elm_bootstrap$Bootstrap$Form$Input$input(EdutainmentLIVE$elm_bootstrap$Bootstrap$Form$Input$Text);
 var author$project$Main$AddColorToSubPalette = function (a) {
 	return {$: 'AddColorToSubPalette', a: a};
 };
@@ -14144,7 +14255,6 @@ var author$project$Main$ColorValue = function (a) {
 var author$project$Main$DeleteSubPalette = function (a) {
 	return {$: 'DeleteSubPalette', a: a};
 };
-var author$project$Main$ForDisabled = {$: 'ForDisabled'};
 var author$project$Main$SetMainPalette = function (a) {
 	return {$: 'SetMainPalette', a: a};
 };
@@ -14363,6 +14473,18 @@ var mdgriffith$elm_ui$Element$wrappedRow = F2(
 			}
 		}
 	});
+var mdgriffith$elm_ui$Internal$Flag$borderRound = mdgriffith$elm_ui$Internal$Flag$flag(17);
+var mdgriffith$elm_ui$Element$Border$rounded = function (radius) {
+	return A2(
+		mdgriffith$elm_ui$Internal$Model$StyleClass,
+		mdgriffith$elm_ui$Internal$Flag$borderRound,
+		A3(
+			mdgriffith$elm_ui$Internal$Model$Single,
+			'br-' + elm$core$String$fromInt(radius),
+			'border-radius',
+			elm$core$String$fromInt(radius) + 'px'));
+};
+var mdgriffith$elm_ui$Element$Font$strike = mdgriffith$elm_ui$Internal$Model$htmlClass(mdgriffith$elm_ui$Internal$Style$classes.strike);
 var mdgriffith$elm_ui$Internal$Model$Label = function (a) {
 	return {$: 'Label', a: a};
 };
@@ -14373,9 +14495,28 @@ var author$project$Main$viewPalettePanel = function (model) {
 		_List_fromArray(
 			[
 				mdgriffith$elm_ui$Element$width(
-				mdgriffith$elm_ui$Element$px(100)),
+				mdgriffith$elm_ui$Element$px(110)),
 				mdgriffith$elm_ui$Element$height(mdgriffith$elm_ui$Element$fill),
-				mdgriffith$elm_ui$Element$Border$width(1),
+				function () {
+				var _n0 = model.setting.panelPosition.palettePanel;
+				if (_n0.$ === 'Right') {
+					var _n1 = model.setting.panelPosition.settingPanel;
+					if (_n1.$ === 'Right') {
+						return mdgriffith$elm_ui$Element$Border$widthEach(
+							{bottom: 1, left: 1, right: 0, top: 1});
+					} else {
+						return mdgriffith$elm_ui$Element$Border$width(1);
+					}
+				} else {
+					var _n2 = model.setting.panelPosition.settingPanel;
+					if (_n2.$ === 'Right') {
+						return mdgriffith$elm_ui$Element$Border$width(1);
+					} else {
+						return mdgriffith$elm_ui$Element$Border$widthEach(
+							{bottom: 1, left: 0, right: 1, top: 1});
+					}
+				}
+			}(),
 				mdgriffith$elm_ui$Element$Border$color(author$project$Main$shiroIro),
 				mdgriffith$elm_ui$Element$Background$color(author$project$Main$rouIro),
 				author$project$Main$debugLine(false)
@@ -14383,15 +14524,29 @@ var author$project$Main$viewPalettePanel = function (model) {
 		_List_fromArray(
 			[
 				A2(
-				mdgriffith$elm_ui$Element$el,
+				mdgriffith$elm_ui$Element$row,
 				_List_fromArray(
 					[
 						mdgriffith$elm_ui$Element$Font$color(author$project$Main$shiroIro),
-						mdgriffith$elm_ui$Element$Font$size(17),
+						mdgriffith$elm_ui$Element$Font$size(16),
 						mdgriffith$elm_ui$Element$centerX,
-						mdgriffith$elm_ui$Element$padding(2)
+						mdgriffith$elm_ui$Element$padding(2),
+						mdgriffith$elm_ui$Element$htmlAttribute(
+						A2(elm$html$Html$Attributes$style, 'letter-spacing', '0.05em')),
+						mdgriffith$elm_ui$Element$spacing(2)
 					]),
-				mdgriffith$elm_ui$Element$text('Palette')),
+				_List_fromArray(
+					[
+						A2(
+						mdgriffith$elm_ui$Element$image,
+						_List_fromArray(
+							[
+								mdgriffith$elm_ui$Element$htmlAttribute(
+								A2(elm$html$Html$Attributes$style, 'filter', 'invert(100%)'))
+							]),
+						{description: '', src: 'file/palette.svg'}),
+						mdgriffith$elm_ui$Element$text('Palette')
+					])),
 				author$project$Main$panelHr,
 				A2(
 				mdgriffith$elm_ui$Element$column,
@@ -14409,31 +14564,29 @@ var author$project$Main$viewPalettePanel = function (model) {
 							[
 								mdgriffith$elm_ui$Element$Font$color(author$project$Main$shiroIro),
 								mdgriffith$elm_ui$Element$Font$size(14),
-								mdgriffith$elm_ui$Element$centerX
+								mdgriffith$elm_ui$Element$centerX,
+								mdgriffith$elm_ui$Element$htmlAttribute(
+								A2(elm$html$Html$Attributes$style, 'letter-spacing', '0.03em'))
 							]),
 						mdgriffith$elm_ui$Element$text('Add Color')),
 						author$project$Main$panelHr,
 						A2(
 						mdgriffith$elm_ui$Element$el,
 						_List_fromArray(
-							[
-								mdgriffith$elm_ui$Element$width(
-								mdgriffith$elm_ui$Element$px(90))
-							]),
+							[mdgriffith$elm_ui$Element$centerX]),
 						mdgriffith$elm_ui$Element$html(
-							A2(
-								elm$html$Html$input,
+							EdutainmentLIVE$elm_bootstrap$Bootstrap$Form$Input$text(
 								_List_fromArray(
 									[
-										elm$html$Html$Events$onInput(author$project$Main$ColorValue),
-										A2(elm$html$Html$Attributes$style, 'width', '80px'),
-										A2(elm$html$Html$Attributes$style, 'height', '14px'),
-										A2(elm$html$Html$Attributes$style, 'font-size', '0.7em'),
-										A2(elm$html$Html$Attributes$style, 'margin', '0 auto')
-									]),
-								_List_fromArray(
-									[
-										elm$html$Html$text(model.colorValue)
+										EdutainmentLIVE$elm_bootstrap$Bootstrap$Form$Input$onInput(author$project$Main$ColorValue),
+										author$project$Main$isColor(model.colorValue) ? EdutainmentLIVE$elm_bootstrap$Bootstrap$Form$Input$attrs(_List_Nil) : (elm$core$String$isEmpty(model.colorValue) ? EdutainmentLIVE$elm_bootstrap$Bootstrap$Form$Input$attrs(_List_Nil) : EdutainmentLIVE$elm_bootstrap$Bootstrap$Form$Input$danger),
+										EdutainmentLIVE$elm_bootstrap$Bootstrap$Form$Input$attrs(
+										_List_fromArray(
+											[
+												A2(elm$html$Html$Attributes$style, 'height', '14px'),
+												A2(elm$html$Html$Attributes$style, 'width', '80px'),
+												A2(elm$html$Html$Attributes$style, 'font-size', '0.7em')
+											]))
 									])))),
 						A2(
 						mdgriffith$elm_ui$Element$el,
@@ -14450,7 +14603,7 @@ var author$project$Main$viewPalettePanel = function (model) {
 								_List_fromArray(
 									[
 										elm$html$Html$text(
-										author$project$Main$isColor(model.colorValue) ? '' : (elm$core$String$isEmpty(model.colorValue) ? 'Is Empty' : 'Isn\'t Color'))
+										author$project$Main$isColor(model.colorValue) ? '' : (elm$core$String$isEmpty(model.colorValue) ? '' : 'Isn\'t Color'))
 									])))),
 						A2(
 						mdgriffith$elm_ui$Element$el,
@@ -14461,20 +14614,31 @@ var author$project$Main$viewPalettePanel = function (model) {
 							_List_fromArray(
 								[
 									mdgriffith$elm_ui$Element$htmlAttribute(
-									A2(elm$html$Html$Attributes$style, 'color', 'white'))
+									A2(elm$html$Html$Attributes$style, 'color', 'white')),
+									mdgriffith$elm_ui$Element$Border$color(author$project$Main$shiroIro),
+									mdgriffith$elm_ui$Element$Border$width(2),
+									mdgriffith$elm_ui$Element$Border$rounded(5),
+									mdgriffith$elm_ui$Element$width(
+									mdgriffith$elm_ui$Element$px(60)),
+									mdgriffith$elm_ui$Element$height(
+									mdgriffith$elm_ui$Element$px(30))
 								]),
 							{
 								label: A2(
 									mdgriffith$elm_ui$Element$row,
-									_List_Nil,
+									_List_fromArray(
+										[mdgriffith$elm_ui$Element$centerX, mdgriffith$elm_ui$Element$centerY]),
 									_List_fromArray(
 										[
 											A2(
 											mdgriffith$elm_ui$Element$el,
 											_List_fromArray(
 												[
+													mdgriffith$elm_ui$Element$Font$color(author$project$Main$rouIro),
+													mdgriffith$elm_ui$Element$Font$size(14),
 													mdgriffith$elm_ui$Element$Font$color(author$project$Main$shiroIro),
-													mdgriffith$elm_ui$Element$Font$size(14)
+													mdgriffith$elm_ui$Element$centerX,
+													mdgriffith$elm_ui$Element$centerY
 												]),
 											mdgriffith$elm_ui$Element$text('Add ')),
 											mdgriffith$elm_ui$Element$html(
@@ -14501,20 +14665,46 @@ var author$project$Main$viewPalettePanel = function (model) {
 								mdgriffith$elm_ui$Element$Input$button,
 								_List_fromArray(
 									[
-										mdgriffith$elm_ui$Element$Region$description('disabled'),
+										mdgriffith$elm_ui$Element$Region$description('Add'),
 										mdgriffith$elm_ui$Element$htmlAttribute(
-										A2(elm$html$Html$Attributes$style, 'color', 'white'))
+										A2(elm$html$Html$Attributes$style, 'color', 'white')),
+										mdgriffith$elm_ui$Element$Border$color(author$project$Main$shiroIro),
+										mdgriffith$elm_ui$Element$Border$width(2),
+										mdgriffith$elm_ui$Element$Border$rounded(5),
+										mdgriffith$elm_ui$Element$width(
+										mdgriffith$elm_ui$Element$px(60)),
+										mdgriffith$elm_ui$Element$height(
+										mdgriffith$elm_ui$Element$px(30))
 									]),
 								{
 									label: A2(
-										mdgriffith$elm_ui$Element$el,
+										mdgriffith$elm_ui$Element$row,
+										_List_fromArray(
+											[mdgriffith$elm_ui$Element$centerX, mdgriffith$elm_ui$Element$centerY]),
 										_List_fromArray(
 											[
-												mdgriffith$elm_ui$Element$Font$color(author$project$Main$shiroIro),
-												mdgriffith$elm_ui$Element$Font$size(14)
-											]),
-										mdgriffith$elm_ui$Element$text('disabled')),
-									onPress: elm$core$Maybe$Just(author$project$Main$ForDisabled)
+												A2(
+												mdgriffith$elm_ui$Element$el,
+												_List_fromArray(
+													[
+														mdgriffith$elm_ui$Element$Font$color(author$project$Main$rouIro),
+														mdgriffith$elm_ui$Element$Font$size(14),
+														mdgriffith$elm_ui$Element$Font$color(author$project$Main$shiroIro),
+														mdgriffith$elm_ui$Element$Font$strike
+													]),
+												mdgriffith$elm_ui$Element$text('Add ')),
+												mdgriffith$elm_ui$Element$html(
+												A2(
+													elm$html$Html$div,
+													_List_fromArray(
+														[
+															A2(elm$html$Html$Attributes$style, 'width', '14px'),
+															A2(elm$html$Html$Attributes$style, 'height', '14px'),
+															A2(elm$html$Html$Attributes$style, 'background-color', 'white')
+														]),
+													_List_Nil))
+											])),
+									onPress: elm$core$Maybe$Nothing
 								})))
 					])),
 				A2(
@@ -14533,7 +14723,9 @@ var author$project$Main$viewPalettePanel = function (model) {
 							[
 								mdgriffith$elm_ui$Element$Font$color(author$project$Main$shiroIro),
 								mdgriffith$elm_ui$Element$Font$size(14),
-								mdgriffith$elm_ui$Element$centerX
+								mdgriffith$elm_ui$Element$centerX,
+								mdgriffith$elm_ui$Element$htmlAttribute(
+								A2(elm$html$Html$Attributes$style, 'letter-spacing', '0.03em'))
 							]),
 						mdgriffith$elm_ui$Element$text('Main Palette')),
 						author$project$Main$panelHr,
@@ -14557,10 +14749,10 @@ var author$project$Main$viewPalettePanel = function (model) {
 				mdgriffith$elm_ui$Element$column,
 				_List_fromArray(
 					[
-						mdgriffith$elm_ui$Element$centerX,
 						mdgriffith$elm_ui$Element$paddingEach(
 						{bottom: 2, left: 0, right: 0, top: 2}),
-						mdgriffith$elm_ui$Element$spacing(5)
+						mdgriffith$elm_ui$Element$spacing(5),
+						mdgriffith$elm_ui$Element$centerX
 					]),
 				_List_fromArray(
 					[
@@ -14570,7 +14762,9 @@ var author$project$Main$viewPalettePanel = function (model) {
 							[
 								mdgriffith$elm_ui$Element$Font$color(author$project$Main$shiroIro),
 								mdgriffith$elm_ui$Element$Font$size(14),
-								mdgriffith$elm_ui$Element$centerX
+								mdgriffith$elm_ui$Element$centerX,
+								mdgriffith$elm_ui$Element$htmlAttribute(
+								A2(elm$html$Html$Attributes$style, 'letter-spacing', '0.03em'))
 							]),
 						mdgriffith$elm_ui$Element$text('Sub Palette')),
 						author$project$Main$panelHr,
@@ -14584,7 +14778,9 @@ var author$project$Main$viewPalettePanel = function (model) {
 								mdgriffith$elm_ui$Element$wrappedRow,
 								_List_fromArray(
 									[
-										mdgriffith$elm_ui$Element$spacing(3)
+										mdgriffith$elm_ui$Element$spacing(3),
+										mdgriffith$elm_ui$Element$width(
+										mdgriffith$elm_ui$Element$px(81))
 									]),
 								A2(
 									elm$core$List$map,
@@ -14619,6 +14815,214 @@ var author$project$Main$viewPalettePanel = function (model) {
 					]))
 			]));
 };
+var author$project$Main$OpenSettingPanel = {$: 'OpenSettingPanel'};
+var author$project$Main$closedSettingPanel = function (model) {
+	return A2(
+		mdgriffith$elm_ui$Element$column,
+		_List_fromArray(
+			[
+				mdgriffith$elm_ui$Element$width(
+				mdgriffith$elm_ui$Element$px(50)),
+				mdgriffith$elm_ui$Element$height(mdgriffith$elm_ui$Element$fill),
+				mdgriffith$elm_ui$Element$Border$width(1),
+				mdgriffith$elm_ui$Element$Border$color(author$project$Main$shiroIro),
+				mdgriffith$elm_ui$Element$Background$color(author$project$Main$rouIro),
+				mdgriffith$elm_ui$Element$spacing(2),
+				mdgriffith$elm_ui$Element$padding(1)
+			]),
+		_List_fromArray(
+			[
+				A2(
+				mdgriffith$elm_ui$Element$el,
+				_List_fromArray(
+					[
+						mdgriffith$elm_ui$Element$centerX,
+						mdgriffith$elm_ui$Element$padding(1)
+					]),
+				A2(
+					mdgriffith$elm_ui$Element$Input$button,
+					_List_fromArray(
+						[
+							mdgriffith$elm_ui$Element$Border$color(author$project$Main$shiroIro),
+							mdgriffith$elm_ui$Element$Border$width(1),
+							mdgriffith$elm_ui$Element$Border$rounded(1),
+							mdgriffith$elm_ui$Element$htmlAttribute(
+							A2(elm$html$Html$Attributes$style, 'padding', '2px'))
+						]),
+					{
+						label: A2(
+							mdgriffith$elm_ui$Element$el,
+							_List_fromArray(
+								[mdgriffith$elm_ui$Element$centerX]),
+							A2(
+								mdgriffith$elm_ui$Element$image,
+								_List_fromArray(
+									[
+										mdgriffith$elm_ui$Element$htmlAttribute(
+										A2(elm$html$Html$Attributes$style, 'filter', 'invert(100%)')),
+										mdgriffith$elm_ui$Element$width(
+										mdgriffith$elm_ui$Element$px(15)),
+										mdgriffith$elm_ui$Element$height(
+										mdgriffith$elm_ui$Element$px(15))
+									]),
+								{description: '', src: 'file/settings.svg'})),
+						onPress: elm$core$Maybe$Just(author$project$Main$OpenSettingPanel)
+					}))
+			]));
+};
+var EdutainmentLIVE$elm_bootstrap$Bootstrap$Form$Select$Attrs = function (a) {
+	return {$: 'Attrs', a: a};
+};
+var EdutainmentLIVE$elm_bootstrap$Bootstrap$Form$Select$attrs = function (attrs_) {
+	return EdutainmentLIVE$elm_bootstrap$Bootstrap$Form$Select$Attrs(attrs_);
+};
+var EdutainmentLIVE$elm_bootstrap$Bootstrap$Form$Select$Item = function (a) {
+	return {$: 'Item', a: a};
+};
+var elm$html$Html$option = _VirtualDom_node('option');
+var EdutainmentLIVE$elm_bootstrap$Bootstrap$Form$Select$item = F2(
+	function (attributes, children) {
+		return EdutainmentLIVE$elm_bootstrap$Bootstrap$Form$Select$Item(
+			A2(elm$html$Html$option, attributes, children));
+	});
+var EdutainmentLIVE$elm_bootstrap$Bootstrap$Form$Select$OnChange = function (a) {
+	return {$: 'OnChange', a: a};
+};
+var EdutainmentLIVE$elm_bootstrap$Bootstrap$Form$Select$onChange = function (toMsg) {
+	return EdutainmentLIVE$elm_bootstrap$Bootstrap$Form$Select$OnChange(toMsg);
+};
+var EdutainmentLIVE$elm_bootstrap$Bootstrap$Form$Select$Select = function (a) {
+	return {$: 'Select', a: a};
+};
+var EdutainmentLIVE$elm_bootstrap$Bootstrap$Form$Select$create = F2(
+	function (options, items) {
+		return EdutainmentLIVE$elm_bootstrap$Bootstrap$Form$Select$Select(
+			{items: items, options: options});
+	});
+var EdutainmentLIVE$elm_bootstrap$Bootstrap$Form$Select$applyModifier = F2(
+	function (modifier, options) {
+		switch (modifier.$) {
+			case 'Size':
+				var size_ = modifier.a;
+				return _Utils_update(
+					options,
+					{
+						size: elm$core$Maybe$Just(size_)
+					});
+			case 'Id':
+				var id_ = modifier.a;
+				return _Utils_update(
+					options,
+					{
+						id: elm$core$Maybe$Just(id_)
+					});
+			case 'Custom':
+				return _Utils_update(
+					options,
+					{custom: true});
+			case 'Disabled':
+				var val = modifier.a;
+				return _Utils_update(
+					options,
+					{disabled: val});
+			case 'OnChange':
+				var onChange_ = modifier.a;
+				return _Utils_update(
+					options,
+					{
+						onChange: elm$core$Maybe$Just(onChange_)
+					});
+			case 'Validation':
+				var validation_ = modifier.a;
+				return _Utils_update(
+					options,
+					{
+						validation: elm$core$Maybe$Just(validation_)
+					});
+			default:
+				var attrs_ = modifier.a;
+				return _Utils_update(
+					options,
+					{
+						attributes: _Utils_ap(options.attributes, attrs_)
+					});
+		}
+	});
+var EdutainmentLIVE$elm_bootstrap$Bootstrap$Form$Select$customEventOnChange = function (tagger) {
+	return A2(
+		elm$html$Html$Events$on,
+		'change',
+		A2(elm$json$Json$Decode$map, tagger, elm$html$Html$Events$targetValue));
+};
+var EdutainmentLIVE$elm_bootstrap$Bootstrap$Form$Select$defaultOptions = {attributes: _List_Nil, custom: false, disabled: false, id: elm$core$Maybe$Nothing, onChange: elm$core$Maybe$Nothing, size: elm$core$Maybe$Nothing, validation: elm$core$Maybe$Nothing};
+var EdutainmentLIVE$elm_bootstrap$Bootstrap$Form$Select$sizeAttribute = F2(
+	function (isCustom, size_) {
+		var prefix = isCustom ? 'custom-select-' : 'form-control-';
+		return A2(
+			elm$core$Maybe$map,
+			function (s) {
+				return elm$html$Html$Attributes$class(
+					_Utils_ap(prefix, s));
+			},
+			EdutainmentLIVE$elm_bootstrap$Bootstrap$General$Internal$screenSizeOption(size_));
+	});
+var EdutainmentLIVE$elm_bootstrap$Bootstrap$Form$Select$validationAttribute = function (validation_) {
+	return elm$html$Html$Attributes$class(
+		EdutainmentLIVE$elm_bootstrap$Bootstrap$Form$FormInternal$validationToString(validation_));
+};
+var EdutainmentLIVE$elm_bootstrap$Bootstrap$Form$Select$toAttributes = function (modifiers) {
+	var options = A3(elm$core$List$foldl, EdutainmentLIVE$elm_bootstrap$Bootstrap$Form$Select$applyModifier, EdutainmentLIVE$elm_bootstrap$Bootstrap$Form$Select$defaultOptions, modifiers);
+	return _Utils_ap(
+		_List_fromArray(
+			[
+				elm$html$Html$Attributes$classList(
+				_List_fromArray(
+					[
+						_Utils_Tuple2('form-control', !options.custom),
+						_Utils_Tuple2('custom-select', options.custom)
+					])),
+				elm$html$Html$Attributes$disabled(options.disabled)
+			]),
+		_Utils_ap(
+			A2(
+				elm$core$List$filterMap,
+				elm$core$Basics$identity,
+				_List_fromArray(
+					[
+						A2(elm$core$Maybe$map, elm$html$Html$Attributes$id, options.id),
+						A2(
+						elm$core$Maybe$andThen,
+						EdutainmentLIVE$elm_bootstrap$Bootstrap$Form$Select$sizeAttribute(options.custom),
+						options.size),
+						A2(elm$core$Maybe$map, EdutainmentLIVE$elm_bootstrap$Bootstrap$Form$Select$customEventOnChange, options.onChange),
+						A2(elm$core$Maybe$map, EdutainmentLIVE$elm_bootstrap$Bootstrap$Form$Select$validationAttribute, options.validation)
+					])),
+			options.attributes));
+};
+var elm$html$Html$select = _VirtualDom_node('select');
+var EdutainmentLIVE$elm_bootstrap$Bootstrap$Form$Select$view = function (_n0) {
+	var options = _n0.a.options;
+	var items = _n0.a.items;
+	return A2(
+		elm$html$Html$select,
+		EdutainmentLIVE$elm_bootstrap$Bootstrap$Form$Select$toAttributes(options),
+		A2(
+			elm$core$List$map,
+			function (_n1) {
+				var e = _n1.a;
+				return e;
+			},
+			items));
+};
+var EdutainmentLIVE$elm_bootstrap$Bootstrap$Form$Select$select = F2(
+	function (options, items) {
+		return EdutainmentLIVE$elm_bootstrap$Bootstrap$Form$Select$view(
+			A2(EdutainmentLIVE$elm_bootstrap$Bootstrap$Form$Select$create, options, items));
+	});
+var EdutainmentLIVE$elm_bootstrap$Bootstrap$Form$Select$Size = function (a) {
+	return {$: 'Size', a: a};
+};
+var EdutainmentLIVE$elm_bootstrap$Bootstrap$Form$Select$small = EdutainmentLIVE$elm_bootstrap$Bootstrap$Form$Select$Size(EdutainmentLIVE$elm_bootstrap$Bootstrap$General$Internal$SM);
 var author$project$Main$ApplySetting = {$: 'ApplySetting'};
 var author$project$Main$BorderColorValue = function (a) {
 	return {$: 'BorderColorValue', a: a};
@@ -14626,10 +15030,7 @@ var author$project$Main$BorderColorValue = function (a) {
 var author$project$Main$Change = function (a) {
 	return {$: 'Change', a: a};
 };
-var author$project$Main$ChangePanelPosition = F2(
-	function (a, b) {
-		return {$: 'ChangePanelPosition', a: a, b: b};
-	});
+var author$project$Main$CloseSettingPanel = {$: 'CloseSettingPanel'};
 var author$project$Main$PalettePanel = {$: 'PalettePanel'};
 var author$project$Main$SetPixelHeight = function (a) {
 	return {$: 'SetPixelHeight', a: a};
@@ -14638,18 +15039,6 @@ var author$project$Main$SetPixelWidth = function (a) {
 	return {$: 'SetPixelWidth', a: a};
 };
 var author$project$Main$SettingPanel = {$: 'SettingPanel'};
-var author$project$Main$onChangeH = function (handler) {
-	return A2(
-		elm$html$Html$Events$on,
-		'change',
-		A2(elm$json$Json$Decode$map, handler, elm$html$Html$Events$targetValue));
-};
-var author$project$Main$BottomCenter = {$: 'BottomCenter'};
-var author$project$Main$BottomLeft = {$: 'BottomLeft'};
-var author$project$Main$BottomRight = {$: 'BottomRight'};
-var author$project$Main$CenterCenter = {$: 'CenterCenter'};
-var author$project$Main$CenterLeft = {$: 'CenterLeft'};
-var author$project$Main$CenterRight = {$: 'CenterRight'};
 var author$project$Main$SetCampusPosition = function (a) {
 	return {$: 'SetCampusPosition', a: a};
 };
@@ -14663,12 +15052,22 @@ var author$project$Main$viewCampusPositionSetting = function (tempSetting) {
 				[
 					elm$html$Html$Events$onClick(
 					author$project$Main$SetCampusPosition(position_)),
-					A2(elm$html$Html$Attributes$style, 'border', '1px solid black'),
+					A2(elm$html$Html$Attributes$style, 'border', 'none'),
 					A2(elm$html$Html$Attributes$style, 'width', '15px'),
 					A2(elm$html$Html$Attributes$style, 'height', '15px'),
-					_Utils_eq(tempSetting.panelPosition.campus, position_) ? A2(elm$html$Html$Attributes$style, 'background-color', '#c3d825') : A2(elm$html$Html$Attributes$style, 'background-color', 'white'),
+					_Utils_eq(tempSetting.panelPosition.campus, position_) ? A2(elm$html$Html$Attributes$style, 'background-color', '#47885e') : A2(elm$html$Html$Attributes$style, 'background-color', 'white'),
 					A2(elm$html$Html$Attributes$style, 'float', 'left'),
-					A2(elm$html$Html$Attributes$style, 'margin', '-1px')
+					A2(elm$html$Html$Attributes$style, 'margin', '-1px'),
+					function () {
+					switch (position_.$) {
+						case 'TopLeft':
+							return A2(elm$html$Html$Attributes$style, 'border-radius', '5px 0 0 5px');
+						case 'TopRight':
+							return A2(elm$html$Html$Attributes$style, 'border-radius', '0 5px 5px 0');
+						default:
+							return A2(elm$html$Html$Attributes$style, '', '');
+					}
+				}()
 				]),
 			_List_Nil);
 	};
@@ -14680,47 +15079,65 @@ var author$project$Main$viewCampusPositionSetting = function (tempSetting) {
 			]),
 		_List_fromArray(
 			[
-				A2(
-				elm$html$Html$div,
-				_List_Nil,
-				_List_fromArray(
-					[
-						tempDiv(author$project$Main$TopLeft),
-						tempDiv(author$project$Main$TopCenter),
-						tempDiv(author$project$Main$TopRight)
-					])),
-				A2(
-				elm$html$Html$div,
-				_List_Nil,
-				_List_fromArray(
-					[
-						tempDiv(author$project$Main$CenterLeft),
-						tempDiv(author$project$Main$CenterCenter),
-						tempDiv(author$project$Main$CenterRight)
-					])),
-				A2(
-				elm$html$Html$div,
-				_List_Nil,
-				_List_fromArray(
-					[
-						tempDiv(author$project$Main$BottomLeft),
-						tempDiv(author$project$Main$BottomCenter),
-						tempDiv(author$project$Main$BottomRight)
-					]))
+				tempDiv(author$project$Main$TopLeft),
+				tempDiv(author$project$Main$TopCenter),
+				tempDiv(author$project$Main$TopRight)
 			]));
 };
-var elm$html$Html$br = _VirtualDom_node('br');
-var elm$html$Html$option = _VirtualDom_node('option');
-var elm$html$Html$select = _VirtualDom_node('select');
-var elm$html$Html$Attributes$checked = elm$html$Html$Attributes$boolProperty('checked');
-var elm$html$Html$Attributes$name = elm$html$Html$Attributes$stringProperty('name');
-var author$project$Main$viewSettingPanel = function (model) {
+var author$project$Main$ChangePanelPosition = F2(
+	function (a, b) {
+		return {$: 'ChangePanelPosition', a: a, b: b};
+	});
+var author$project$Main$viewSettingPalettePositionSelect = F2(
+	function (panel_, tempSetting) {
+		var temp_ = function (position_) {
+			return A2(
+				elm$html$Html$div,
+				_List_fromArray(
+					[
+						elm$html$Html$Events$onClick(
+						A2(author$project$Main$ChangePanelPosition, panel_, position_)),
+						A2(elm$html$Html$Attributes$style, 'border', 'none'),
+						A2(elm$html$Html$Attributes$style, 'width', '15px'),
+						A2(elm$html$Html$Attributes$style, 'height', '15px'),
+						function () {
+						if (panel_.$ === 'SettingPanel') {
+							return _Utils_eq(tempSetting.panelPosition.settingPanel, position_) ? A2(elm$html$Html$Attributes$style, 'background-color', '#47885e') : A2(elm$html$Html$Attributes$style, 'background-color', 'white');
+						} else {
+							return _Utils_eq(tempSetting.panelPosition.palettePanel, position_) ? A2(elm$html$Html$Attributes$style, 'background-color', '#47885e') : A2(elm$html$Html$Attributes$style, 'background-color', 'white');
+						}
+					}(),
+						A2(elm$html$Html$Attributes$style, 'float', 'left'),
+						A2(elm$html$Html$Attributes$style, 'margin', '-1px'),
+						_Utils_eq(position_, author$project$Main$Left) ? A2(elm$html$Html$Attributes$style, 'border-radius', '5px 0 0 5px') : (_Utils_eq(position_, author$project$Main$Right) ? A2(elm$html$Html$Attributes$style, 'border-radius', '0 5px 5px 0') : A2(elm$html$Html$Attributes$style, '', ''))
+					]),
+				_List_Nil);
+		};
+		return A2(
+			elm$html$Html$div,
+			_List_fromArray(
+				[
+					A2(elm$html$Html$Attributes$style, 'float', 'left')
+				]),
+			_List_fromArray(
+				[
+					A2(
+					elm$html$Html$div,
+					_List_Nil,
+					_List_fromArray(
+						[
+							temp_(author$project$Main$Left),
+							temp_(author$project$Main$Right)
+						]))
+				]));
+	});
+var author$project$Main$openSettingPanel = function (model) {
 	return A2(
 		mdgriffith$elm_ui$Element$column,
 		_List_fromArray(
 			[
 				mdgriffith$elm_ui$Element$width(
-				mdgriffith$elm_ui$Element$px(100)),
+				mdgriffith$elm_ui$Element$px(110)),
 				mdgriffith$elm_ui$Element$height(mdgriffith$elm_ui$Element$fill),
 				mdgriffith$elm_ui$Element$Border$width(1),
 				mdgriffith$elm_ui$Element$Border$color(author$project$Main$shiroIro),
@@ -14733,18 +15150,64 @@ var author$project$Main$viewSettingPanel = function (model) {
 				_List_fromArray(
 					[
 						mdgriffith$elm_ui$Element$Font$color(author$project$Main$shiroIro),
-						mdgriffith$elm_ui$Element$Font$size(17),
+						mdgriffith$elm_ui$Element$Font$size(16),
 						mdgriffith$elm_ui$Element$centerX,
-						mdgriffith$elm_ui$Element$padding(2)
+						mdgriffith$elm_ui$Element$padding(2),
+						mdgriffith$elm_ui$Element$htmlAttribute(
+						A2(elm$html$Html$Attributes$style, 'letter-spacing', '0.05em'))
 					]),
-				mdgriffith$elm_ui$Element$text('Setting')),
+				A2(
+					mdgriffith$elm_ui$Element$el,
+					_List_Nil,
+					A2(
+						mdgriffith$elm_ui$Element$Input$button,
+						_List_Nil,
+						{
+							label: A2(
+								mdgriffith$elm_ui$Element$el,
+								_List_fromArray(
+									[mdgriffith$elm_ui$Element$centerX]),
+								A2(
+									mdgriffith$elm_ui$Element$row,
+									_List_fromArray(
+										[
+											mdgriffith$elm_ui$Element$spacing(2)
+										]),
+									_List_fromArray(
+										[
+											A2(
+											mdgriffith$elm_ui$Element$el,
+											_List_fromArray(
+												[
+													mdgriffith$elm_ui$Element$Border$color(author$project$Main$shiroIro),
+													mdgriffith$elm_ui$Element$Border$width(1),
+													mdgriffith$elm_ui$Element$Border$rounded(1),
+													mdgriffith$elm_ui$Element$htmlAttribute(
+													A2(elm$html$Html$Attributes$style, 'padding', '0px'))
+												]),
+											A2(
+												mdgriffith$elm_ui$Element$image,
+												_List_fromArray(
+													[
+														mdgriffith$elm_ui$Element$htmlAttribute(
+														A2(elm$html$Html$Attributes$style, 'filter', 'invert(100%)')),
+														mdgriffith$elm_ui$Element$width(
+														mdgriffith$elm_ui$Element$px(17)),
+														mdgriffith$elm_ui$Element$height(
+														mdgriffith$elm_ui$Element$px(17))
+													]),
+												{description: '', src: 'file/x.svg'})),
+											mdgriffith$elm_ui$Element$text('Setting')
+										]))),
+							onPress: elm$core$Maybe$Just(author$project$Main$CloseSettingPanel)
+						}))),
 				author$project$Main$panelHr,
 				A2(
 				mdgriffith$elm_ui$Element$column,
 				_List_fromArray(
 					[
 						mdgriffith$elm_ui$Element$centerX,
-						mdgriffith$elm_ui$Element$spacing(5),
+						mdgriffith$elm_ui$Element$spacing(4),
 						mdgriffith$elm_ui$Element$padding(3)
 					]),
 				_List_fromArray(
@@ -14755,32 +15218,29 @@ var author$project$Main$viewSettingPanel = function (model) {
 							[
 								mdgriffith$elm_ui$Element$Font$size(14),
 								mdgriffith$elm_ui$Element$Font$color(author$project$Main$shiroIro),
-								mdgriffith$elm_ui$Element$centerX
+								mdgriffith$elm_ui$Element$centerX,
+								mdgriffith$elm_ui$Element$htmlAttribute(
+								A2(elm$html$Html$Attributes$style, 'letter-spacing', '0.03em'))
 							]),
 						mdgriffith$elm_ui$Element$text('Border Color')),
 						author$project$Main$panelHr,
 						A2(
 						mdgriffith$elm_ui$Element$el,
 						_List_fromArray(
-							[
-								mdgriffith$elm_ui$Element$width(
-								mdgriffith$elm_ui$Element$px(90))
-							]),
+							[mdgriffith$elm_ui$Element$centerX]),
 						mdgriffith$elm_ui$Element$html(
-							A2(
-								elm$html$Html$input,
+							EdutainmentLIVE$elm_bootstrap$Bootstrap$Form$Input$text(
 								_List_fromArray(
 									[
-										elm$html$Html$Events$onInput(author$project$Main$BorderColorValue),
-										A2(elm$html$Html$Attributes$style, 'width', '80px'),
-										A2(elm$html$Html$Attributes$style, 'height', '14px'),
-										A2(elm$html$Html$Attributes$style, 'font-size', '0.7em'),
-										elm$html$Html$Attributes$placeholder('black'),
-										A2(elm$html$Html$Attributes$style, 'margin', '0 auto')
-									]),
-								_List_fromArray(
-									[
-										elm$html$Html$text(model.tempSetting.borderColor)
+										EdutainmentLIVE$elm_bootstrap$Bootstrap$Form$Input$onInput(author$project$Main$BorderColorValue),
+										author$project$Main$isColor(model.tempSetting.borderColor) ? EdutainmentLIVE$elm_bootstrap$Bootstrap$Form$Input$attrs(_List_Nil) : EdutainmentLIVE$elm_bootstrap$Bootstrap$Form$Input$danger,
+										EdutainmentLIVE$elm_bootstrap$Bootstrap$Form$Input$attrs(
+										_List_fromArray(
+											[
+												A2(elm$html$Html$Attributes$style, 'height', '14px'),
+												A2(elm$html$Html$Attributes$style, 'width', '80px'),
+												A2(elm$html$Html$Attributes$style, 'font-size', '0.7em')
+											]))
 									])))),
 						A2(
 						mdgriffith$elm_ui$Element$el,
@@ -14815,62 +15275,60 @@ var author$project$Main$viewSettingPanel = function (model) {
 						_List_fromArray(
 							[
 								mdgriffith$elm_ui$Element$Font$size(14),
-								mdgriffith$elm_ui$Element$Font$color(author$project$Main$shiroIro)
+								mdgriffith$elm_ui$Element$Font$color(author$project$Main$shiroIro),
+								mdgriffith$elm_ui$Element$htmlAttribute(
+								A2(elm$html$Html$Attributes$style, 'letter-spacing', '0.03em'))
 							]),
 						mdgriffith$elm_ui$Element$text('Border Style')),
 						author$project$Main$panelHr,
 						A2(
 						mdgriffith$elm_ui$Element$el,
-						_List_fromArray(
-							[
-								mdgriffith$elm_ui$Element$centerX,
-								mdgriffith$elm_ui$Element$height(
-								mdgriffith$elm_ui$Element$px(14)),
-								mdgriffith$elm_ui$Element$Font$size(14)
-							]),
+						_List_Nil,
 						mdgriffith$elm_ui$Element$html(
 							function () {
-								var option_ = F2(
+								var item_ = F2(
 									function (value_, text_) {
 										return A2(
-											elm$html$Html$option,
+											EdutainmentLIVE$elm_bootstrap$Bootstrap$Form$Select$item,
 											_List_fromArray(
 												[
-													elm$html$Html$Attributes$value(value_)
+													elm$html$Html$Attributes$value(value_),
+													A2(elm$html$Html$Attributes$style, 'height', '13px'),
+													A2(elm$html$Html$Attributes$style, 'position', 'relative'),
+													A2(elm$html$Html$Attributes$style, 'text-align', 'center'),
+													A2(elm$html$Html$Attributes$style, 'font-size', '13px'),
+													A2(elm$html$Html$Attributes$style, 'padding', '0px')
 												]),
 											_List_fromArray(
 												[
 													elm$html$Html$text(text_)
 												]));
 									});
-								var handler = function (selectedValue) {
-									return author$project$Main$Change(selectedValue);
-								};
 								return A2(
-									elm$html$Html$div,
+									EdutainmentLIVE$elm_bootstrap$Bootstrap$Form$Select$select,
 									_List_fromArray(
 										[
-											A2(elm$html$Html$Attributes$style, 'height', '14px'),
-											A2(elm$html$Html$Attributes$style, 'font-size', '14px')
+											EdutainmentLIVE$elm_bootstrap$Bootstrap$Form$Select$onChange(author$project$Main$Change),
+											EdutainmentLIVE$elm_bootstrap$Bootstrap$Form$Select$small,
+											EdutainmentLIVE$elm_bootstrap$Bootstrap$Form$Select$attrs(
+											_List_fromArray(
+												[
+													A2(elm$html$Html$Attributes$style, '', ''),
+													A2(elm$html$Html$Attributes$style, 'height', '18px'),
+													A2(elm$html$Html$Attributes$style, 'width', '80px'),
+													A2(elm$html$Html$Attributes$style, 'font-size', '13px'),
+													A2(elm$html$Html$Attributes$style, 'padding', '0px')
+												]))
 										]),
 									_List_fromArray(
 										[
-											A2(
-											elm$html$Html$select,
-											_List_fromArray(
-												[
-													author$project$Main$onChangeH(handler)
-												]),
-											_List_fromArray(
-												[
-													A2(option_, 'solid 1px', 'solid'),
-													A2(option_, 'none', 'none'),
-													A2(option_, 'double', 'double'),
-													A2(option_, 'groove', 'groove'),
-													A2(option_, 'ridge', 'ridge'),
-													A2(option_, 'dashed 1px', 'dashed'),
-													A2(option_, 'dotted 1px', 'dotted')
-												]))
+											A2(item_, 'solid 1px', 'solid'),
+											A2(item_, 'none', 'none'),
+											A2(item_, 'dotted 1px', 'dotted'),
+											A2(item_, 'dashed 1px', 'dashed'),
+											A2(item_, 'double', 'double'),
+											A2(item_, 'groove', 'groove'),
+											A2(item_, 'ridge', 'ridge')
 										]));
 							}()))
 					])),
@@ -14890,7 +15348,9 @@ var author$project$Main$viewSettingPanel = function (model) {
 							[
 								mdgriffith$elm_ui$Element$Font$size(14),
 								mdgriffith$elm_ui$Element$Font$color(author$project$Main$shiroIro),
-								mdgriffith$elm_ui$Element$centerX
+								mdgriffith$elm_ui$Element$centerX,
+								mdgriffith$elm_ui$Element$htmlAttribute(
+								A2(elm$html$Html$Attributes$style, 'letter-spacing', '0.03em'))
 							]),
 						mdgriffith$elm_ui$Element$text('Pixel Size')),
 						author$project$Main$panelHr,
@@ -14912,81 +15372,97 @@ var author$project$Main$viewSettingPanel = function (model) {
 							};
 							return _List_fromArray(
 								[
+									A2(
+									mdgriffith$elm_ui$Element$row,
+									_List_fromArray(
+										[
+											mdgriffith$elm_ui$Element$Font$color(author$project$Main$shiroIro),
+											mdgriffith$elm_ui$Element$Font$size(14),
+											mdgriffith$elm_ui$Element$centerX
+										]),
+									_List_fromArray(
+										[
+											A2(
+											mdgriffith$elm_ui$Element$el,
+											_List_Nil,
+											mdgriffith$elm_ui$Element$text('width : ')),
+											mdgriffith$elm_ui$Element$html(
+											EdutainmentLIVE$elm_bootstrap$Bootstrap$Form$Input$text(
+												_List_fromArray(
+													[
+														EdutainmentLIVE$elm_bootstrap$Bootstrap$Form$Input$onInput(author$project$Main$SetPixelWidth),
+														EdutainmentLIVE$elm_bootstrap$Bootstrap$Form$Input$small,
+														(A2(
+														elm$core$Maybe$withDefault,
+														0,
+														elm$core$String$toInt(model.tempSetting.width)) > 0) ? EdutainmentLIVE$elm_bootstrap$Bootstrap$Form$Input$attrs(_List_Nil) : EdutainmentLIVE$elm_bootstrap$Bootstrap$Form$Input$danger,
+														EdutainmentLIVE$elm_bootstrap$Bootstrap$Form$Input$attrs(
+														_List_fromArray(
+															[
+																A2(elm$html$Html$Attributes$style, 'height', '14px'),
+																A2(elm$html$Html$Attributes$style, 'width', '40px'),
+																A2(elm$html$Html$Attributes$style, 'font-size', '95%')
+															]))
+													])))
+										])),
 									mdgriffith$elm_ui$Element$html(
 									A2(
 										elm$html$Html$div,
 										_List_fromArray(
 											[
-												A2(elm$html$Html$Attributes$style, 'color', 'white'),
-												A2(elm$html$Html$Attributes$style, 'font-size', '14px'),
-												A2(elm$html$Html$Attributes$style, 'padding', '3px')
+												A2(elm$html$Html$Attributes$style, 'color', '#e2041b'),
+												A2(elm$html$Html$Attributes$style, 'font-size', '13px')
 											]),
 										_List_fromArray(
 											[
-												elm$html$Html$text('width : '),
-												A2(
-												elm$html$Html$input,
-												_List_fromArray(
-													[
-														A2(elm$html$Html$Attributes$style, '', ''),
-														A2(elm$html$Html$Attributes$style, 'width', '30px'),
-														A2(elm$html$Html$Attributes$style, 'height', '14px'),
-														A2(elm$html$Html$Attributes$style, 'font-size', '95%'),
-														elm$html$Html$Attributes$placeholder(model.setting.width),
-														elm$html$Html$Events$onInput(author$project$Main$SetPixelWidth)
-													]),
-												_List_fromArray(
-													[
-														elm$html$Html$text(model.tempSetting.width)
-													])),
-												A2(
-												elm$html$Html$div,
-												_List_fromArray(
-													[
-														A2(elm$html$Html$Attributes$style, 'color', '#e2041b'),
-														A2(elm$html$Html$Attributes$style, 'font-size', '13px')
-													]),
-												_List_fromArray(
-													[
-														elm$html$Html$text(
-														pixelSizeErr(model.tempSetting.width))
-													]))
+												elm$html$Html$text(
+												pixelSizeErr(model.tempSetting.width))
 											]))),
+									A2(
+									mdgriffith$elm_ui$Element$row,
+									_List_fromArray(
+										[
+											mdgriffith$elm_ui$Element$Font$color(author$project$Main$shiroIro),
+											mdgriffith$elm_ui$Element$Font$size(14),
+											mdgriffith$elm_ui$Element$centerX
+										]),
+									_List_fromArray(
+										[
+											A2(
+											mdgriffith$elm_ui$Element$el,
+											_List_Nil,
+											mdgriffith$elm_ui$Element$text('height : ')),
+											mdgriffith$elm_ui$Element$html(
+											EdutainmentLIVE$elm_bootstrap$Bootstrap$Form$Input$text(
+												_List_fromArray(
+													[
+														EdutainmentLIVE$elm_bootstrap$Bootstrap$Form$Input$onInput(author$project$Main$SetPixelHeight),
+														EdutainmentLIVE$elm_bootstrap$Bootstrap$Form$Input$small,
+														(A2(
+														elm$core$Maybe$withDefault,
+														0,
+														elm$core$String$toInt(model.tempSetting.height)) > 0) ? EdutainmentLIVE$elm_bootstrap$Bootstrap$Form$Input$attrs(_List_Nil) : EdutainmentLIVE$elm_bootstrap$Bootstrap$Form$Input$danger,
+														EdutainmentLIVE$elm_bootstrap$Bootstrap$Form$Input$attrs(
+														_List_fromArray(
+															[
+																A2(elm$html$Html$Attributes$style, 'height', '14px'),
+																A2(elm$html$Html$Attributes$style, 'width', '40px'),
+																A2(elm$html$Html$Attributes$style, 'font-size', '95%')
+															]))
+													])))
+										])),
 									mdgriffith$elm_ui$Element$html(
 									A2(
 										elm$html$Html$div,
 										_List_fromArray(
 											[
-												A2(elm$html$Html$Attributes$style, 'color', 'white'),
-												A2(elm$html$Html$Attributes$style, 'font-size', '14px'),
-												A2(elm$html$Html$Attributes$style, 'padding', '3px')
+												A2(elm$html$Html$Attributes$style, 'color', '#e2041b'),
+												A2(elm$html$Html$Attributes$style, 'font-size', '13px')
 											]),
 										_List_fromArray(
 											[
-												elm$html$Html$text('height : '),
-												A2(
-												elm$html$Html$input,
-												_List_fromArray(
-													[
-														A2(elm$html$Html$Attributes$style, 'width', '30px'),
-														A2(elm$html$Html$Attributes$style, 'height', '14px'),
-														A2(elm$html$Html$Attributes$style, 'font-size', '95%'),
-														elm$html$Html$Attributes$placeholder(model.setting.height),
-														elm$html$Html$Events$onInput(author$project$Main$SetPixelHeight)
-													]),
-												_List_Nil),
-												A2(
-												elm$html$Html$div,
-												_List_fromArray(
-													[
-														A2(elm$html$Html$Attributes$style, 'color', '#e2041b'),
-														A2(elm$html$Html$Attributes$style, 'font-size', '13px')
-													]),
-												_List_fromArray(
-													[
-														elm$html$Html$text(
-														pixelSizeErr(model.tempSetting.height))
-													]))
+												elm$html$Html$text(
+												pixelSizeErr(model.tempSetting.height))
 											])))
 								]);
 						}())
@@ -14996,8 +15472,7 @@ var author$project$Main$viewSettingPanel = function (model) {
 				_List_fromArray(
 					[
 						mdgriffith$elm_ui$Element$centerX,
-						mdgriffith$elm_ui$Element$padding(3),
-						mdgriffith$elm_ui$Element$spacing(5)
+						mdgriffith$elm_ui$Element$spacing(10)
 					]),
 				_List_fromArray(
 					[
@@ -15007,125 +15482,111 @@ var author$project$Main$viewSettingPanel = function (model) {
 							[
 								mdgriffith$elm_ui$Element$Font$size(14),
 								mdgriffith$elm_ui$Element$Font$color(author$project$Main$shiroIro),
-								mdgriffith$elm_ui$Element$centerX
+								mdgriffith$elm_ui$Element$centerX,
+								mdgriffith$elm_ui$Element$htmlAttribute(
+								A2(elm$html$Html$Attributes$style, 'letter-spacing', '0.03em'))
 							]),
 						mdgriffith$elm_ui$Element$text('Position')),
 						author$project$Main$panelHr,
 						A2(
-						mdgriffith$elm_ui$Element$el,
+						mdgriffith$elm_ui$Element$column,
 						_List_fromArray(
-							[mdgriffith$elm_ui$Element$centerX]),
-						mdgriffith$elm_ui$Element$html(
-							A2(
-								elm$html$Html$div,
-								_List_Nil,
+							[
+								mdgriffith$elm_ui$Element$Font$size(14),
+								mdgriffith$elm_ui$Element$Font$color(author$project$Main$shiroIro),
+								mdgriffith$elm_ui$Element$centerX,
+								mdgriffith$elm_ui$Element$htmlAttribute(
+								A2(elm$html$Html$Attributes$style, 'letter-spacing', '0.03.em')),
+								mdgriffith$elm_ui$Element$spacing(7)
+							]),
+						_List_fromArray(
+							[
+								A2(
+								mdgriffith$elm_ui$Element$column,
+								_List_fromArray(
+									[
+										mdgriffith$elm_ui$Element$centerX,
+										mdgriffith$elm_ui$Element$spacing(4)
+									]),
 								_List_fromArray(
 									[
 										A2(
-										elm$html$Html$div,
+										mdgriffith$elm_ui$Element$el,
 										_List_fromArray(
-											[
-												A2(elm$html$Html$Attributes$style, 'color', 'white'),
-												A2(elm$html$Html$Attributes$style, 'font-size', '14px')
-											]),
-										_List_fromArray(
-											[
-												elm$html$Html$text('Setting'),
-												A2(elm$html$Html$br, _List_Nil, _List_Nil),
-												elm$html$Html$text('R'),
-												A2(
-												elm$html$Html$input,
-												_List_fromArray(
-													[
-														elm$html$Html$Attributes$type_('radio'),
-														elm$html$Html$Attributes$value('right'),
-														elm$html$Html$Attributes$name('settingpanel'),
-														elm$html$Html$Events$onClick(
-														A2(author$project$Main$ChangePanelPosition, author$project$Main$SettingPanel, author$project$Main$Right)),
-														elm$html$Html$Attributes$checked(
-														_Utils_eq(model.tempSetting.panelPosition.settingPanel, author$project$Main$Right))
-													]),
-												_List_Nil),
-												elm$html$Html$text('L'),
-												A2(
-												elm$html$Html$input,
-												_List_fromArray(
-													[
-														elm$html$Html$Attributes$type_('radio'),
-														elm$html$Html$Attributes$value(''),
-														elm$html$Html$Attributes$name('settingpanel'),
-														elm$html$Html$Events$onClick(
-														A2(author$project$Main$ChangePanelPosition, author$project$Main$SettingPanel, author$project$Main$Left)),
-														elm$html$Html$Attributes$checked(
-														_Utils_eq(model.tempSetting.panelPosition.settingPanel, author$project$Main$Left))
-													]),
-												_List_Nil)
-											])),
+											[mdgriffith$elm_ui$Element$centerX]),
+										mdgriffith$elm_ui$Element$text('Setting')),
 										A2(
-										elm$html$Html$div,
+										mdgriffith$elm_ui$Element$el,
 										_List_fromArray(
-											[
-												A2(elm$html$Html$Attributes$style, 'color', 'white'),
-												A2(elm$html$Html$Attributes$style, 'font-size', '14px')
-											]),
-										_List_fromArray(
-											[
-												elm$html$Html$text('Palette'),
-												A2(elm$html$Html$br, _List_Nil, _List_Nil),
-												elm$html$Html$text('R'),
-												A2(
-												elm$html$Html$input,
-												_List_fromArray(
-													[
-														elm$html$Html$Attributes$type_('radio'),
-														elm$html$Html$Attributes$value(''),
-														elm$html$Html$Attributes$name('paletteposition'),
-														elm$html$Html$Events$onClick(
-														A2(author$project$Main$ChangePanelPosition, author$project$Main$PalettePanel, author$project$Main$Right)),
-														elm$html$Html$Attributes$checked(
-														_Utils_eq(model.tempSetting.panelPosition.palettePanel, author$project$Main$Right))
-													]),
-												_List_Nil),
-												elm$html$Html$text('L'),
-												A2(
-												elm$html$Html$input,
-												_List_fromArray(
-													[
-														elm$html$Html$Attributes$type_('radio'),
-														elm$html$Html$Attributes$value(''),
-														elm$html$Html$Attributes$name('paletteposition'),
-														elm$html$Html$Events$onClick(
-														A2(author$project$Main$ChangePanelPosition, author$project$Main$PalettePanel, author$project$Main$Left)),
-														elm$html$Html$Attributes$checked(
-														_Utils_eq(model.tempSetting.panelPosition.palettePanel, author$project$Main$Left))
-													]),
-												_List_Nil)
-											])),
+											[mdgriffith$elm_ui$Element$centerX]),
+										mdgriffith$elm_ui$Element$html(
+											A2(author$project$Main$viewSettingPalettePositionSelect, author$project$Main$SettingPanel, model.tempSetting)))
+									])),
+								A2(
+								mdgriffith$elm_ui$Element$column,
+								_List_fromArray(
+									[
+										mdgriffith$elm_ui$Element$centerX,
+										mdgriffith$elm_ui$Element$spacing(4)
+									]),
+								_List_fromArray(
+									[
 										A2(
-										elm$html$Html$div,
+										mdgriffith$elm_ui$Element$el,
 										_List_fromArray(
-											[
-												A2(elm$html$Html$Attributes$style, 'color', 'white'),
-												A2(elm$html$Html$Attributes$style, 'font-size', '14px')
-											]),
+											[mdgriffith$elm_ui$Element$centerX]),
+										mdgriffith$elm_ui$Element$text('Palette')),
+										A2(
+										mdgriffith$elm_ui$Element$el,
 										_List_fromArray(
-											[
-												elm$html$Html$text('Campus'),
-												A2(elm$html$Html$br, _List_Nil, _List_Nil),
-												author$project$Main$viewCampusPositionSetting(model.tempSetting)
-											]))
-									]))))
+											[mdgriffith$elm_ui$Element$centerX]),
+										mdgriffith$elm_ui$Element$html(
+											A2(author$project$Main$viewSettingPalettePositionSelect, author$project$Main$PalettePanel, model.tempSetting)))
+									])),
+								A2(
+								mdgriffith$elm_ui$Element$column,
+								_List_fromArray(
+									[
+										mdgriffith$elm_ui$Element$centerX,
+										mdgriffith$elm_ui$Element$spacing(4)
+									]),
+								_List_fromArray(
+									[
+										A2(
+										mdgriffith$elm_ui$Element$el,
+										_List_fromArray(
+											[mdgriffith$elm_ui$Element$centerX]),
+										mdgriffith$elm_ui$Element$text('Campus')),
+										A2(
+										mdgriffith$elm_ui$Element$el,
+										_List_fromArray(
+											[mdgriffith$elm_ui$Element$centerX]),
+										mdgriffith$elm_ui$Element$html(
+											author$project$Main$viewCampusPositionSetting(model.tempSetting)))
+									]))
+							]))
 					])),
 				A2(
 				mdgriffith$elm_ui$Element$el,
 				_List_fromArray(
-					[mdgriffith$elm_ui$Element$centerX]),
+					[
+						mdgriffith$elm_ui$Element$centerX,
+						mdgriffith$elm_ui$Element$paddingEach(
+						{bottom: 0, left: 0, right: 0, top: 20})
+					]),
 				author$project$Main$isCorrectSetting(model.tempSetting) ? A2(
 					mdgriffith$elm_ui$Element$Input$button,
 					_List_fromArray(
 						[
 							mdgriffith$elm_ui$Element$htmlAttribute(
-							A2(elm$html$Html$Attributes$style, 'color', 'white'))
+							A2(elm$html$Html$Attributes$style, 'color', 'white')),
+							mdgriffith$elm_ui$Element$Border$color(author$project$Main$shiroIro),
+							mdgriffith$elm_ui$Element$Border$width(2),
+							mdgriffith$elm_ui$Element$Border$rounded(5),
+							mdgriffith$elm_ui$Element$width(
+							mdgriffith$elm_ui$Element$px(60)),
+							mdgriffith$elm_ui$Element$height(
+							mdgriffith$elm_ui$Element$px(30))
 						]),
 					{
 						label: A2(
@@ -15133,7 +15594,9 @@ var author$project$Main$viewSettingPanel = function (model) {
 							_List_fromArray(
 								[
 									mdgriffith$elm_ui$Element$Font$color(author$project$Main$shiroIro),
-									mdgriffith$elm_ui$Element$Font$size(14)
+									mdgriffith$elm_ui$Element$Font$size(14),
+									mdgriffith$elm_ui$Element$centerY,
+									mdgriffith$elm_ui$Element$centerX
 								]),
 							mdgriffith$elm_ui$Element$text('Apply')),
 						onPress: elm$core$Maybe$Just(author$project$Main$ApplySetting)
@@ -15144,7 +15607,14 @@ var author$project$Main$viewSettingPanel = function (model) {
 							mdgriffith$elm_ui$Element$htmlAttribute(
 							A2(elm$html$Html$Attributes$style, 'opacity', '0.6')),
 							mdgriffith$elm_ui$Element$htmlAttribute(
-							A2(elm$html$Html$Attributes$style, 'color', 'white'))
+							A2(elm$html$Html$Attributes$style, 'color', 'white')),
+							mdgriffith$elm_ui$Element$Border$color(author$project$Main$shiroIro),
+							mdgriffith$elm_ui$Element$Border$width(2),
+							mdgriffith$elm_ui$Element$Border$rounded(5),
+							mdgriffith$elm_ui$Element$width(
+							mdgriffith$elm_ui$Element$px(60)),
+							mdgriffith$elm_ui$Element$height(
+							mdgriffith$elm_ui$Element$px(30))
 						]),
 					{
 						label: A2(
@@ -15152,12 +15622,23 @@ var author$project$Main$viewSettingPanel = function (model) {
 							_List_fromArray(
 								[
 									mdgriffith$elm_ui$Element$Font$color(author$project$Main$shiroIro),
-									mdgriffith$elm_ui$Element$Font$size(14)
+									mdgriffith$elm_ui$Element$Font$size(14),
+									mdgriffith$elm_ui$Element$Font$strike,
+									mdgriffith$elm_ui$Element$centerY,
+									mdgriffith$elm_ui$Element$centerX
 								]),
-							mdgriffith$elm_ui$Element$text('disabled')),
+							mdgriffith$elm_ui$Element$text('Apply')),
 						onPress: elm$core$Maybe$Nothing
 					}))
 			]));
+};
+var author$project$Main$viewSettingPanel = function (model) {
+	var _n0 = model.settingPanelStatus;
+	if (_n0.$ === 'Open') {
+		return author$project$Main$openSettingPanel(model);
+	} else {
+		return author$project$Main$closedSettingPanel(model);
+	}
 };
 var author$project$Main$viewPanels = function (model) {
 	var view_ = function () {
@@ -15213,57 +15694,6 @@ var author$project$Main$viewPanels = function (model) {
 			]),
 		view_);
 };
-var elm$html$Html$Attributes$alt = elm$html$Html$Attributes$stringProperty('alt');
-var elm$html$Html$Attributes$src = function (url) {
-	return A2(
-		elm$html$Html$Attributes$stringProperty,
-		'src',
-		_VirtualDom_noJavaScriptOrHtmlUri(url));
-};
-var mdgriffith$elm_ui$Element$image = F2(
-	function (attrs, _n0) {
-		var src = _n0.src;
-		var description = _n0.description;
-		var imageAttributes = A2(
-			elm$core$List$filter,
-			function (a) {
-				switch (a.$) {
-					case 'Width':
-						return true;
-					case 'Height':
-						return true;
-					default:
-						return false;
-				}
-			},
-			attrs);
-		return A4(
-			mdgriffith$elm_ui$Internal$Model$element,
-			mdgriffith$elm_ui$Internal$Model$asEl,
-			mdgriffith$elm_ui$Internal$Model$div,
-			A2(
-				elm$core$List$cons,
-				mdgriffith$elm_ui$Internal$Model$htmlClass(mdgriffith$elm_ui$Internal$Style$classes.imageContainer),
-				attrs),
-			mdgriffith$elm_ui$Internal$Model$Unkeyed(
-				_List_fromArray(
-					[
-						A4(
-						mdgriffith$elm_ui$Internal$Model$element,
-						mdgriffith$elm_ui$Internal$Model$asEl,
-						mdgriffith$elm_ui$Internal$Model$NodeName('img'),
-						_Utils_ap(
-							_List_fromArray(
-								[
-									mdgriffith$elm_ui$Internal$Model$Attr(
-									elm$html$Html$Attributes$src(src)),
-									mdgriffith$elm_ui$Internal$Model$Attr(
-									elm$html$Html$Attributes$alt(description))
-								]),
-							imageAttributes),
-						mdgriffith$elm_ui$Internal$Model$Unkeyed(_List_Nil))
-					])));
-	});
 var mdgriffith$elm_ui$Internal$Model$OnlyDynamic = F2(
 	function (a, b) {
 		return {$: 'OnlyDynamic', a: a, b: b};
@@ -15585,7 +16015,7 @@ var author$project$Main$view = function (model) {
 									mdgriffith$elm_ui$Element$height(
 									mdgriffith$elm_ui$Element$px(50)),
 									mdgriffith$elm_ui$Element$Background$color(author$project$Main$rouIro),
-									A2(mdgriffith$elm_ui$Element$paddingXY, 15, 0),
+									A2(mdgriffith$elm_ui$Element$paddingXY, 16, 0),
 									mdgriffith$elm_ui$Element$Border$widthEach(
 									{bottom: 0, left: 1, right: 1, top: 1}),
 									mdgriffith$elm_ui$Element$Border$color(author$project$Main$shiroIro)
@@ -15593,13 +16023,29 @@ var author$project$Main$view = function (model) {
 							_List_fromArray(
 								[
 									A2(
-									mdgriffith$elm_ui$Element$el,
+									mdgriffith$elm_ui$Element$row,
 									_List_fromArray(
 										[
 											mdgriffith$elm_ui$Element$alignLeft,
-											mdgriffith$elm_ui$Element$Font$color(author$project$Main$shiroIro)
+											mdgriffith$elm_ui$Element$Font$color(author$project$Main$shiroIro),
+											mdgriffith$elm_ui$Element$htmlAttribute(
+											A2(elm$html$Html$Attributes$style, 'letter-spacing', '0.06em')),
+											mdgriffith$elm_ui$Element$spacing(5)
 										]),
-									mdgriffith$elm_ui$Element$text('SOSOGU')),
+									_List_fromArray(
+										[
+											A2(
+											mdgriffith$elm_ui$Element$image,
+											_List_fromArray(
+												[
+													mdgriffith$elm_ui$Element$width(
+													mdgriffith$elm_ui$Element$px(25)),
+													mdgriffith$elm_ui$Element$height(
+													mdgriffith$elm_ui$Element$px(25))
+												]),
+											{description: '', src: 'file/icon.png'}),
+											mdgriffith$elm_ui$Element$text('SOSOGU')
+										])),
 									A2(
 									mdgriffith$elm_ui$Element$row,
 									_List_fromArray(
@@ -15634,11 +16080,13 @@ var author$project$Main$view = function (model) {
 															_List_fromArray(
 																[
 																	mdgriffith$elm_ui$Element$Font$color(author$project$Main$shiroIro),
-																	mdgriffith$elm_ui$Element$Font$size(16)
+																	mdgriffith$elm_ui$Element$Font$size(15),
+																	mdgriffith$elm_ui$Element$htmlAttribute(
+																	A2(elm$html$Html$Attributes$style, 'letter-spacing', '0.05em'))
 																]),
 															mdgriffith$elm_ui$Element$text('Home'))
 														])),
-												url: ''
+												url: 'https:/floyd33n.github.io'
 											}),
 											A2(
 											mdgriffith$elm_ui$Element$newTabLink,
@@ -15665,7 +16113,9 @@ var author$project$Main$view = function (model) {
 															_List_fromArray(
 																[
 																	mdgriffith$elm_ui$Element$Font$color(author$project$Main$shiroIro),
-																	mdgriffith$elm_ui$Element$Font$size(16)
+																	mdgriffith$elm_ui$Element$Font$size(15),
+																	mdgriffith$elm_ui$Element$htmlAttribute(
+																	A2(elm$html$Html$Attributes$style, 'letter-spacing', '0.05em'))
 																]),
 															mdgriffith$elm_ui$Element$text('Repository'))
 														])),
