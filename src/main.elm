@@ -261,7 +261,18 @@ update msg model =
             )
        
         DeleteSubPalette n ->
-            ( { model | subPalette = Dict.remove n model.subPalette
+            ( { model | subPalette = Dict.union
+                                        ( model.subPalette
+                                             |> Dict.toList
+                                             |> List.take (n-1)
+                                             |> Dict.fromList
+                                        )
+                                        ( model.subPalette
+                                             |> Dict.toList
+                                             |> List.drop n
+                                             |> Dict.fromList
+                                             |> DictEx.mapKeys (\m -> m - 1)
+                                        )
                       , mainPalette = "white"
               }
             , Cmd.none
@@ -1415,7 +1426,14 @@ viewCampus model (width, height) =
 
 addColorToSubPalette : Model -> CssColor -> SubPalette
 addColorToSubPalette model color =
-    Dict.insert (Dict.size model.subPalette) color model.subPalette
+    let
+        tempSubPalette = model.subPalette
+                            |> DictEx.mapKeys (\n -> n + 1)
+    in
+        Dict.insert
+            0
+              color
+                  tempSubPalette
 
 displayPalette : Model -> Html Msg
 displayPalette model =
