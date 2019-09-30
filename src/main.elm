@@ -32,6 +32,9 @@ import Result.Extra as ResultEX exposing (..)
 import Svg exposing (..)
 import Svg.Attributes as SAttrs exposing (..)
 import Task exposing (..)
+import File exposing (..)
+import File.Download as FileDL
+import File.Select as FileSel
 
 
 css path =
@@ -264,7 +267,9 @@ type Msg
     | GetImageUrl String
     | OpenSettingPanel
     | CloseSettingPanel
-
+    | DLSaveData
+    | UpSaveData
+    | LoadSaveData File
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
@@ -651,8 +656,62 @@ update msg model =
               }
             , Cmd.none
             )
+        
+        DLSaveData ->
+            ( model
+            , dlSaveData model
+            )
 
+        UpSaveData ->
+            ( model
+            , upSaveData
+            )
+        
+        LoadSaveData file ->
+            ( model
+            , Cmd.none
+            )
 
+dlSaveData : Model -> Cmd msg
+dlSaveData model =
+    FileDL.string "sosogu.json" "application/json" (makeSaveData model)
+upSaveData : Cmd Msg
+upSaveData =
+    FileSel.file ["application/json"] LoadSaveData
+
+makeSaveData : Model -> String
+makeSaveData model =
+    let
+        panelPositionField : String
+        panelPositionField =
+            JE.encode 4 <|
+                JE.object [ ( "settingPanel", JE.string "Left" )
+                          , ( "palettePanel", JE.string "Right" )
+                          , ( "campus", JE.string "TopCenter" )
+                          ]
+
+        settingField : String
+        settingField =
+            JE.encode 4 <|
+                 JE.object [ ( "borderColor", JE.string model.setting.borderColor)
+                           , ( "borderStyle", JE.string model.setting.borderStyle)
+                           , ( "width", JE.string model.setting.width)
+                           , ( "heihgt", JE.string model.setting.height)
+                           , ( "panelPosition", JE.string panelPositionField )
+                           ]
+
+        paletteField : String
+        paletteField =
+            JE.encode 4 <|
+               JE.object [ ("mainPalette", JE.string model.mainPalette)
+                         , ("subPalette", JE.string <| Debug.toString model.subPalette)
+                         ]
+    in
+        JE.encode 4 <|
+            JE.object [ ( "setting", JE.string <| settingField ) 
+                      , ( "palette", JE.string <| paletteField )
+                      , ( "campus", JE.string <| Debug.toString model.campus)
+                      ]
 
 --VIEW--
 
@@ -664,6 +723,8 @@ view model =
         ]
         [ css <| "../style.css"
         , createCampusWindow model
+        , H.button [ onClick DLSaveData ] [ H.text "download" ]
+        , H.button [ onClick UpSaveData ] [ H.text "upload" ]
         , layout
             [ debugLine False
             ]
@@ -787,7 +848,7 @@ viewCampusPanel model =
         , Background.color <| shironezuIro
         ]
         [ viewToolsPanel model
-        , el (padding 0 :: campusPosition model.setting) <|
+        , el (padding 3 :: campusPosition model.setting) <|
             html <|
                 viewCampus model ( model.campusSize.width, model.campusSize.height )
         ]
