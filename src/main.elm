@@ -67,6 +67,7 @@ type alias Model =
     , history : History
     , campusImageUrl : String
     , settingPanelStatus : PanelStatus
+    , loadedSaveData : String
     }
 
 
@@ -232,6 +233,7 @@ init _ =
       , history = initHistory
       , campusImageUrl = ""
       , settingPanelStatus = Close
+      , loadedSaveData = ""
       }
     , Cmd.none
     )
@@ -270,6 +272,7 @@ type Msg
     | DLSaveData
     | UpSaveData
     | LoadSaveData File
+    | ToStringSaveData String
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
@@ -667,14 +670,26 @@ update msg model =
             , upSaveData
             )
         
-        LoadSaveData file ->
+        LoadSaveData save ->
             ( model
+            , toStringSaveData save
+            )
+
+        ToStringSaveData save ->
+            ( { model 
+                | loadedSaveData = save
+              }
             , Cmd.none
             )
+
+toStringSaveData : File -> Cmd Msg
+toStringSaveData file =
+    Task.perform ToStringSaveData (File.toString file)
 
 dlSaveData : Model -> Cmd msg
 dlSaveData model =
     FileDL.string "sosogu.json" "application/json" (makeSaveData model)
+
 upSaveData : Cmd Msg
 upSaveData =
     FileSel.file ["application/json"] LoadSaveData
@@ -693,24 +708,24 @@ makeSaveData model =
         settingField : String
         settingField =
             JE.encode 4 <|
-                 JE.object [ ( "borderColor", JE.string model.setting.borderColor)
-                           , ( "borderStyle", JE.string model.setting.borderStyle)
-                           , ( "width", JE.string model.setting.width)
-                           , ( "heihgt", JE.string model.setting.height)
+                 JE.object [ ( "borderColor", JE.string model.setting.borderColor )
+                           , ( "borderStyle", JE.string model.setting.borderStyle )
+                           , ( "width", JE.string model.setting.width )
+                           , ( "heihgt", JE.string model.setting.height )
                            , ( "panelPosition", JE.string panelPositionField )
                            ]
 
         paletteField : String
         paletteField =
             JE.encode 4 <|
-               JE.object [ ("mainPalette", JE.string model.mainPalette)
-                         , ("subPalette", JE.string <| Debug.toString model.subPalette)
+               JE.object [ ( "mainPalette", JE.string model.mainPalette )
+                         , ( "subPalette", JE.string <| Debug.toString model.subPalette )
                          ]
     in
         JE.encode 4 <|
             JE.object [ ( "setting", JE.string <| settingField ) 
                       , ( "palette", JE.string <| paletteField )
-                      , ( "campus", JE.string <| Debug.toString model.campus)
+                      , ( "campus", JE.string <| Debug.toString model.campus )
                       ]
 
 --VIEW--
