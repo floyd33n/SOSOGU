@@ -20,6 +20,9 @@ import Element.Border as Border
 import Element.Font as Font
 import Element.Input as Input
 import Element.Region as Region
+import File exposing (..)
+import File.Download as FileDL
+import File.Select as FileSel
 import Html as H exposing (..)
 import Html.Attributes as HAttrs exposing (..)
 import Html.Events as HEvents exposing (..)
@@ -32,9 +35,6 @@ import Result.Extra as ResultEX exposing (..)
 import Svg exposing (..)
 import Svg.Attributes as SAttrs exposing (..)
 import Task exposing (..)
-import File exposing (..)
-import File.Download as FileDL
-import File.Select as FileSel
 
 
 css path =
@@ -105,10 +105,6 @@ initBorderColorValue =
 initCampus : Campus
 initCampus =
     Dict.empty
-
-
-
---Dict.fromList [((0, 0), "white")]
 
 
 type alias TempCampusSize =
@@ -273,6 +269,8 @@ type Msg
     | UpSaveData
     | LoadSaveData File
     | ToStringSaveData String
+    | UpdateBySaveData Model
+
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
@@ -659,7 +657,7 @@ update msg model =
               }
             , Cmd.none
             )
-        
+
         DLSaveData ->
             ( model
             , dlSaveData model
@@ -669,64 +667,101 @@ update msg model =
             ( model
             , upSaveData
             )
-        
+
         LoadSaveData save ->
             ( model
             , toStringSaveData save
             )
 
         ToStringSaveData save ->
-            ( { model 
+            ( { model
                 | loadedSaveData = save
+              }
+            , updateBySaveData model
+            )
+
+        UpdateBySaveData model_ ->
+            ( { model
+                | setting =
+                    { borderColor = loadBorderColor model
+                    , borderStyle = model.setting.borderStyle
+                    , width = model.setting.width
+                    , height = model.setting.height
+                    , panelPosition =
+                        { settingPanel = model.setting.panelPosition.settingPanel
+                        , palettePanel = model.setting.panelPosition.palettePanel
+                        , campus = model.setting.panelPosition.campus
+                        }
+                    }
               }
             , Cmd.none
             )
+
+
+updateBySaveData : Model -> Cmd Msg
+updateBySaveData model =
+    Task.perform UpdateBySaveData (Task.succeed model)
+
+
+loadBorderColor model =
+    case JD.decodeString (JD.field "setting" (JD.field "borderColor" JD.string)) model.loadedSaveData of
+        Ok a ->
+            a
+
+        Err _ ->
+            "black"
+
 
 toStringSaveData : File -> Cmd Msg
 toStringSaveData file =
     Task.perform ToStringSaveData (File.toString file)
 
+
 dlSaveData : Model -> Cmd msg
 dlSaveData model =
     FileDL.string "sosogu.json" "application/json" (makeSaveData model)
 
+
 upSaveData : Cmd Msg
 upSaveData =
-    FileSel.file ["application/json"] LoadSaveData
+    FileSel.file [ "application/json" ] LoadSaveData
+
 
 makeSaveData : Model -> String
 makeSaveData model =
-    let
-        panelPositionField : String
-        panelPositionField =
-            JE.encode 4 <|
-                JE.object [ ( "settingPanel", JE.string "Left" )
-                          , ( "palettePanel", JE.string "Right" )
-                          , ( "campus", JE.string "TopCenter" )
-                          ]
+    JE.encode 4 <|
+        JE.object
+            [ ( "setting"
+              , JE.object
+                    [ ( "borderColor", JE.string model.setting.borderColor )
+                    , ( "borderStyle", JE.string model.setting.borderStyle )
+                    , ( "width", JE.string model.setting.width )
+                    , ( "height", JE.string model.setting.height )
+                    , ( "panelPosition"
+                      , JE.object
+                            [ ( "settingPanel", JE.string "Left" )
+                            , ( "palettePanel", JE.string "Right" )
+                            , ( "campus", JE.string "TopCenter" )
+                            ]
+                      )
+                    ]
+              )
+            , ( "campusSize"
+              , JE.object
+                  [ ( "width", JE.int model.campusSize.width )
+                  , ( "height", JE.int model.campusSize.height )
+                  ]
+              )
+            , ( "campus", JE.string (Debug.toString model.campus) )
+            , ( "mainPalette", JE.string model.mainPalette )
+            , ( "subPalette", JE.string (Debug.toString model.subPalette) )
+            , ( "history", JE.string (Debug.toString model.history) )
+            , ( "toolsSetting"
+              , JE.object
+                  [ ( "isDisplayDlButton", JE.bool model.toolsSetting.isDisplayDlButton ) ] 
+              )
+            ]
 
-        settingField : String
-        settingField =
-            JE.encode 4 <|
-                 JE.object [ ( "borderColor", JE.string model.setting.borderColor )
-                           , ( "borderStyle", JE.string model.setting.borderStyle )
-                           , ( "width", JE.string model.setting.width )
-                           , ( "heihgt", JE.string model.setting.height )
-                           , ( "panelPosition", JE.string panelPositionField )
-                           ]
-
-        paletteField : String
-        paletteField =
-            JE.encode 4 <|
-               JE.object [ ( "mainPalette", JE.string model.mainPalette )
-                         , ( "subPalette", JE.string <| Debug.toString model.subPalette )
-                         ]
-    in
-        JE.encode 4 <|
-            JE.object [ ( "setting", JE.string <| settingField ) 
-                      , ( "palette", JE.string <| paletteField )
-                      , ( "campus", JE.string <| Debug.toString model.campus )
-                      ]
 
 --VIEW--
 
