@@ -402,8 +402,8 @@ update msg model =
                             , convertTemp model.tempCampusSize.height - 1
                             )
                 , campusSize =
-                    { width = convertTemp model.tempCampusSize.width - 1
-                    , height = convertTemp model.tempCampusSize.height - 1
+                    { width = convertTemp model.tempCampusSize.width
+                    , height = convertTemp model.tempCampusSize.height
                     }
                 , openingModalWindow = BModal.hidden
                 , didCreateCampus = True
@@ -1883,21 +1883,20 @@ viewCampus model ( width, height ) =
                                             [ HAttrs.style "width" (model.setting.width ++ "px")
                                             , HAttrs.style "height" (model.setting.height ++ "px")
                                             , HAttrs.style "border" (model.setting.borderColor ++ " " ++ model.setting.borderStyle)
-                                            , HAttrs.style "background-color" (getCampusColor model ( y, x ))
+                                            , HAttrs.style "background-color" (getCampusColor model ( x, y ))
                                             , HAttrs.style "padding" "0px"
                                             , HAttrs.style "margin" "-1px"
-                                            , HEvents.onClick (ChangeColor ( y, x ) model.mainPalette)
-
+                                            , HEvents.onClick (ChangeColor ( x, y ) model.mainPalette)
                                             --, HEvents.onDoubleClick (ChangeColor y x "white")
                                             ]
                                             []
                                         ]
                                 )
                             <|
-                                List.range 0 width
+                                List.range 0 (width - 1)
                     )
                 <|
-                    List.range 0 height
+                    List.range 0 (height - 1)
             ]
 
     else
