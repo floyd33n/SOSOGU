@@ -727,8 +727,32 @@ upSaveData =
     FileSel.file [ "application/json" ] LoadSaveData
 
 
+le =
+    []
+
+
+be model =
+    List.map (\x -> List.map (\y -> (::) (getCampusColor model ( x, y )) le))
+
+
 makeSaveData : Model -> String
 makeSaveData model =
+    let
+        pointEncoder : ( Int, Int ) -> JE.Value
+        pointEncoder ( v1, v2 ) =
+            JE.list identity [ JE.int v1, JE.int v2 ]
+
+        campusData =
+            List.map
+                (\x ->
+                    List.map
+                        (\y -> "(" ++ String.fromInt x ++ "," ++ String.fromInt y ++ ")" ++ "," ++ getCampusColor model ( y, x ))
+                    <|
+                        List.range 0 model.campusSize.width
+                )
+            <|
+                List.range 0 model.campusSize.height
+    in
     JE.encode 4 <|
         JE.object
             [ ( "setting"
@@ -748,19 +772,20 @@ makeSaveData model =
               )
             , ( "campusSize"
               , JE.object
-                  [ ( "width", JE.int model.campusSize.width )
-                  , ( "height", JE.int model.campusSize.height )
-                  ]
+                    [ ( "width", JE.int model.campusSize.width )
+                    , ( "height", JE.int model.campusSize.height )
+                    ]
               )
-            , ( "campus", JE.string (Debug.toString model.campus) )
+            , ( "campus", JE.list JE.string (List.concat campusData) )
             , ( "mainPalette", JE.string model.mainPalette )
             , ( "subPalette", JE.string (Debug.toString model.subPalette) )
             , ( "history", JE.string (Debug.toString model.history) )
             , ( "toolsSetting"
               , JE.object
-                  [ ( "isDisplayDlButton", JE.bool model.toolsSetting.isDisplayDlButton ) ] 
+                    [ ( "isDisplayDlButton", JE.bool model.toolsSetting.isDisplayDlButton ) ]
               )
             ]
+
 
 
 --VIEW--
@@ -775,6 +800,8 @@ view model =
         , createCampusWindow model
         , H.button [ onClick DLSaveData ] [ H.text "download" ]
         , H.button [ onClick UpSaveData ] [ H.text "upload" ]
+        , H.br [] []
+        , H.text (Debug.toString (be model))
         , layout
             [ debugLine False
             ]
