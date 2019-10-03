@@ -698,6 +698,7 @@ update msg model =
             )
 
 
+
 updateBySaveData : Model -> Cmd Msg
 updateBySaveData model =
     Task.perform UpdateBySaveData (Task.succeed model)
@@ -710,6 +711,15 @@ loadBorderColor model =
 
         Err _ ->
             "black"
+
+loadCampus model =
+    case JD.decodeString (JD.field "campus" (JD.list JD.string)) model.loadedSaveData of
+        Ok a ->
+            a
+
+        Err _ ->
+            []
+    
 
 
 toStringSaveData : File -> Cmd Msg
@@ -757,16 +767,16 @@ makeSaveData model =
                                     ++ getCampusColor model ( x, y )
                             )
                         <|
-                            List.range 0 model.campusSize.width
+                            List.range 0 (model.campusSize.width - 1)
                     )
                 <|
-                    List.range 0 model.campusSize.height
+                    List.range 0 (model.campusSize.height - 1)
 
         historyData : List String
         historyData =
             let
                 historyValue key =
-                    Maybe.withDefault ( ( 0, 0 ), "fk" ) <|
+                    Maybe.withDefault ( ( 0, 0 ), "white" ) <|
                         Dict.get (key - 1) model.history
 
                 historyX v =
@@ -850,7 +860,8 @@ view model =
         , H.button [ onClick DLSaveData ] [ H.text "download" ]
         , H.button [ onClick UpSaveData ] [ H.text "upload" ]
         , H.br [] []
-        , H.text (Debug.toString (be model))
+        , H.text (Debug.toString (loadCampus model)
+                 )
         , layout
             [ debugLine False
             ]
