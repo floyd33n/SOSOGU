@@ -332,7 +332,7 @@ update msg model =
 
         SetMainPalette n ->
             ( { model
-                | mainPalette = getPaletteColor model n
+                | mainPalette = getSubPaletteColor model n
               }
             , Cmd.none
             )
@@ -790,6 +790,17 @@ makeSaveData model =
                 )
             <|
                 List.range 0 (Dict.size model.history)
+
+        subPaletteData : List String
+        subPaletteData =
+            List.map
+                (\n ->
+                    String.fromInt n
+                        ++ ","
+                        ++ getSubPaletteColor model n
+                )
+            <|
+                List.range 0 (Dict.size model.subPalette - 1)
     in
     JE.encode 4 <|
         JE.object
@@ -816,7 +827,7 @@ makeSaveData model =
               )
             , ( "campus", JE.list JE.string campusData )
             , ( "mainPalette", JE.string model.mainPalette )
-            , ( "subPalette", JE.string (Debug.toString model.subPalette) )
+            , ( "subPalette", JE.list JE.string subPaletteData )
             , ( "history", JE.list JE.string historyData )
             , ( "toolsSetting"
               , JE.object
@@ -1808,7 +1819,7 @@ viewPalettePanel model =
                                     div
                                         [ HAttrs.style "width" "25px"
                                         , HAttrs.style "height" "25px"
-                                        , HAttrs.style "background-color" <| getPaletteColor model (plt - 1)
+                                        , HAttrs.style "background-color" <| getSubPaletteColor model (plt - 1)
                                         , HAttrs.style "border" "solid 1px black"
                                         , onDoubleClick (DeleteSubPalette plt)
                                         , onClick (SetMainPalette (plt - 1))
@@ -1893,8 +1904,8 @@ debugLine bool =
 --FUNC--
 
 
-getPaletteColor : Model -> Int -> String
-getPaletteColor model n =
+getSubPaletteColor : Model -> Int -> String
+getSubPaletteColor model n =
     Maybe.withDefault "white" (Dict.get n model.subPalette)
 
 
@@ -1964,7 +1975,7 @@ displayPalette model =
                     [ div
                         [ HAttrs.id "palette_square"
                         , HEvents.onClick <| SetMainPalette (plt - 1)
-                        , HAttrs.style "background-color" <| getPaletteColor model (plt - 1)
+                        , HAttrs.style "background-color" <| getSubPaletteColor model (plt - 1)
                         ]
                         []
                     , div [ HAttrs.id "palette_color_name" ]
