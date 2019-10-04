@@ -668,6 +668,7 @@ update msg model =
                 , campusSize = campusSizeFromSaveData model
                 , didCreateCampus = loadDidCreateCampus model
                 , toolsSetting = toolsSettingFromSaveData model
+                , subPalette = subPaletteFromSaveData model
               }
             , Cmd.none
             )
@@ -817,6 +818,29 @@ settingFromSaveData model =
     }
 
 
+loadSubPalette model =
+    case JD.decodeString (JD.field "subPalette" (JD.list JD.string)) model.loadedSaveData of
+        Ok subPalette ->
+            subPalette
+
+        Err _ ->
+            []
+
+
+subPaletteFromSaveData model =
+    let
+        getSerial n subPaletteData =
+            Maybe.withDefault 0 (String.toInt (Maybe.withDefault "0" (ListEx.getAt 0 (String.split "," (Maybe.withDefault "0,white" (ListEx.getAt n subPaletteData))))))
+
+        getColor n subPaletteData =
+            Maybe.withDefault "white" (ListEx.getAt 1 (String.split "," (Maybe.withDefault "0,white" (ListEx.getAt n subPaletteData))))
+
+        makeSubPalette n subPaletteData =
+            Tuple.pair (getSerial n subPaletteData) (getColor n subPaletteData)
+    in
+    Dict.fromList (List.map (\n -> makeSubPalette n (loadSubPalette model)) <| List.range 0 (List.length (loadSubPalette model) - 1))
+
+
 updateBySaveData : Model -> Cmd Msg
 updateBySaveData model =
     Task.perform UpdateBySaveData (Task.succeed model)
@@ -928,6 +952,9 @@ makeSaveData model =
                 )
             <|
                 List.range 0 (Dict.size model.history)
+
+        subPa =
+            JE.dict String.fromInt JE.string model.subPalette
 
         subPaletteData : List String
         subPaletteData =
