@@ -666,9 +666,19 @@ update msg model =
                 , campus = campusFromSaveData model
                 , mainPalette = mainPaletteFromSaveData model
                 , campusSize = campusSizeFromSaveData model
+                , didCreateCampus = loadDidCreateCampus model
               }
             , Cmd.none
             )
+
+loadDidCreateCampus : Model -> Bool
+loadDidCreateCampus model =
+    case JD.decodeString (JD.field "didCreateCampus" JD.bool) model.loadedSaveData of
+        Ok bool ->
+            bool
+        Err _ -> 
+            False
+
 
 campusSizeFromSaveData : Model -> CampusSize
 campusSizeFromSaveData model =
@@ -967,6 +977,7 @@ makeSaveData model =
                     ]
               )
             , ( "campus", JE.list JE.string campusData )
+            , ( "didCreateCampus", JE.bool model.didCreateCampus )
             , ( "mainPalette", JE.string model.mainPalette )
             , ( "subPalette", JE.list JE.string subPaletteData )
             , ( "history", JE.list JE.string historyData )
