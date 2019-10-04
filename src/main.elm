@@ -170,7 +170,7 @@ type alias Setting =
 type alias PanelPosition =
     { settingPanel : Position
     , palettePanel : Position
-    , campus : CampusPosition
+    , campusPanel : CampusPosition
     }
 
 
@@ -178,7 +178,7 @@ initPanelPosition : PanelPosition
 initPanelPosition =
     { settingPanel = Left
     , palettePanel = Right
-    , campus = TopCenter
+    , campusPanel = TopCenter
     }
 
 
@@ -514,7 +514,7 @@ update msg model =
                     { tempSetting_
                         | panelPosition =
                             { panelPosition_
-                                | campus = position_
+                                | campusPanel = position_
                             }
                     }
               }
@@ -662,50 +662,123 @@ update msg model =
 
         UpdateBySaveData model_ ->
             ( { model
-                | setting =
-                    { borderColor = loadBorderColor model
-                    , borderStyle = model.setting.borderStyle
-                    , width = model.setting.width
-                    , height = model.setting.height
-                    , panelPosition =
-                        { settingPanel = model.setting.panelPosition.settingPanel
-                        , palettePanel = model.setting.panelPosition.palettePanel
-                        , campus = model.setting.panelPosition.campus
-                        }
-                    }
+                | setting = settingFromSaveData model
+
+                {-
+                   { borderColor = model.setting.borderColor
+                   , borderStyle = model.setting.borderStyle
+                   , width = model.setting.width
+                   , height = model.setting.height
+                   , panelPosition =
+                       { settingPanel = model.setting.panelPosition.settingPanel
+                       , palettePanel = model.setting.panelPosition.palettePanel
+                       , campus = model.setting.panelPosition.campus
+                       }
+                   }
+                -}
                 , campus = campusFromSaveData model
               }
             , Cmd.none
             )
 
 
+settingFromSaveData : Model -> Setting
+settingFromSaveData model =
+    let
+        loadBorderColor =
+            case JD.decodeString (JD.field "setting" (JD.field "borderColor" JD.string)) model.loadedSaveData of
+                Ok color ->
+                    color
 
-{-
-   | tempSetting =
-       { borderColor = model.tempSetting.borderColor
-       , borderStyle = model.tempSetting.borderStyle
-       , width = model.tempSetting.width
-       , height = model.tempSetting.height
-       , panelPosition =
-           { settingPanel = model.tempSetting.panelPosition.settingPanel
-           , palettePanel = Left
-           , campus = model.tempSetting.panelPosition.campus
-           }
--}
+                Err _ ->
+                    "black"
+
+        loadBorderStyle =
+            case JD.decodeString (JD.field "setting" (JD.field "borderStyle" JD.string)) model.loadedSaveData of
+                Ok style ->
+                    style
+
+                Err _ ->
+                    "solid 1px"
+
+        loadWidth =
+            case JD.decodeString (JD.field "setting" (JD.field "width" JD.string)) model.loadedSaveData of
+                Ok width ->
+                    width
+
+                Err _ ->
+                    "20"
+
+        loadHeight =
+            case JD.decodeString (JD.field "setting" (JD.field "height" JD.string)) model.loadedSaveData of
+                Ok height ->
+                    height
+
+                Err _ ->
+                    "20"
+
+        loadPanelPosition =
+            { settingPanel =
+                case JD.decodeString (JD.field "setting" (JD.field "panelPosition" (JD.field "settingPanel" JD.string))) model.loadedSaveData of
+                    Ok settingPanel ->
+                        case settingPanel of
+                            "Right" ->
+                                Right
+
+                            "Left" ->
+                                Left
+
+                            _ ->
+                                Left
+
+                    Err _ ->
+                        Left
+            , palettePanel =
+                case JD.decodeString (JD.field "setting" (JD.field "panelPosition" (JD.field "palettePanel" JD.string))) model.loadedSaveData of
+                    Ok palettePanel ->
+                        case palettePanel of
+                            "Right" ->
+                                Right
+
+                            "Left" ->
+                                Left
+
+                            _ ->
+                                Right
+
+                    Err _ ->
+                        Right
+            , campusPanel =
+                case JD.decodeString (JD.field "setting" (JD.field "panelPositon" (JD.field "campusPanel" JD.string))) model.loadedSaveData of
+                    Ok campusPanel ->
+                        case campusPanel of
+                            "TopCenter" ->
+                                TopCenter
+
+                            "TopRight" ->
+                                TopRight
+
+                            "TopLeft" ->
+                                TopLeft
+
+                            _ ->
+                                TopCenter
+
+                    Err _ ->
+                        TopCenter
+            }
+    in
+    { borderColor = loadBorderColor
+    , borderStyle = loadBorderStyle
+    , width = loadWidth
+    , height = loadHeight
+    , panelPosition = loadPanelPosition
+    }
 
 
 updateBySaveData : Model -> Cmd Msg
 updateBySaveData model =
     Task.perform UpdateBySaveData (Task.succeed model)
-
-
-loadBorderColor model =
-    case JD.decodeString (JD.field "setting" (JD.field "borderColor" JD.string)) model.loadedSaveData of
-        Ok a ->
-            a
-
-        Err _ ->
-            "black"
 
 
 loadCampus model =
@@ -786,17 +859,6 @@ makeSaveData model =
                 <|
                     List.range 0 (model.campusSize.height - 1)
 
-        aData =
-            List.map
-                (\x ->
-                    List.map
-                        (\y -> Tuple.pair (Tuple.pair x y) (getCampusColor model ( x, y )))
-                    <|
-                        List.range 0 (model.campusSize.width - 1)
-                )
-            <|
-                List.range 0 (model.campusSize.height - 1)
-
         historyData : List String
         historyData =
             let
@@ -850,9 +912,36 @@ makeSaveData model =
                     , ( "height", JE.string model.setting.height )
                     , ( "panelPosition"
                       , JE.object
-                            [ ( "settingPanel", JE.string "Left" )
-                            , ( "palettePanel", JE.string "Right" )
-                            , ( "campus", JE.string "TopCenter" )
+                            [ ( "settingPanel"
+                              , JE.string <|
+                                    case model.setting.panelPosition.settingPanel of
+                                        Right ->
+                                            "Right"
+
+                                        Left ->
+                                            "Left"
+                              )
+                            , ( "palettePanel"
+                              , JE.string <|
+                                    case model.setting.panelPosition.palettePanel of
+                                        Right ->
+                                            "Right"
+
+                                        Left ->
+                                            "Left"
+                              )
+                            , ( "campusPanel"
+                              , JE.string <|
+                                    case model.setting.panelPosition.campusPanel of
+                                        TopCenter ->
+                                            "TopCenter"
+
+                                        TopRight ->
+                                            "TopRight"
+
+                                        TopLeft ->
+                                            "TopLeft"
+                              )
                             ]
                       )
                     ]
@@ -1023,7 +1112,7 @@ viewCampusPanel model =
 
 campusPosition : Setting -> List (E.Attribute Msg)
 campusPosition setting =
-    case setting.panelPosition.campus of
+    case setting.panelPosition.campusPanel of
         TopCenter ->
             [ centerX
             , alignTop
@@ -1567,7 +1656,7 @@ viewCampusPositionSetting tempSetting =
                 , HAttrs.style "border" "none"
                 , HAttrs.style "width" "15px"
                 , HAttrs.style "height" "15px"
-                , if tempSetting.panelPosition.campus == position_ then
+                , if tempSetting.panelPosition.campusPanel == position_ then
                     HAttrs.style "background-color" "#47885e"
 
                   else
