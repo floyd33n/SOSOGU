@@ -663,23 +663,37 @@ update msg model =
         UpdateBySaveData model_ ->
             ( { model
                 | setting = settingFromSaveData model
-
-                {-
-                   { borderColor = model.setting.borderColor
-                   , borderStyle = model.setting.borderStyle
-                   , width = model.setting.width
-                   , height = model.setting.height
-                   , panelPosition =
-                       { settingPanel = model.setting.panelPosition.settingPanel
-                       , palettePanel = model.setting.panelPosition.palettePanel
-                       , campus = model.setting.panelPosition.campus
-                       }
-                   }
-                -}
                 , campus = campusFromSaveData model
+                , mainPalette = mainPaletteFromSaveData model
+                , campusSize = campusSizeFromSaveData model
               }
             , Cmd.none
             )
+
+campusSizeFromSaveData : Model -> CampusSize
+campusSizeFromSaveData model =
+    { width =
+        case JD.decodeString (JD.field "campusSize" (JD.field "width" JD.int)) model.loadedSaveData of
+            Ok width ->
+                width
+            Err _ ->
+                8
+    , height =
+        case JD.decodeString (JD.field "campusSize" (JD.field "height" JD.int)) model.loadedSaveData of
+            Ok height ->
+                height
+            Err _ ->
+                8 
+    }
+
+
+mainPaletteFromSaveData : Model -> CssColor
+mainPaletteFromSaveData model =
+    case JD.decodeString (JD.field "mainPalette" JD.string) model.loadedSaveData of
+        Ok color ->
+            color
+        Err _ ->
+            "white"
 
 
 settingFromSaveData : Model -> Setting
