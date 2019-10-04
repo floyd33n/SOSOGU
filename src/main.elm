@@ -667,16 +667,30 @@ update msg model =
                 , mainPalette = mainPaletteFromSaveData model
                 , campusSize = campusSizeFromSaveData model
                 , didCreateCampus = loadDidCreateCampus model
+                , toolsSetting = toolsSettingFromSaveData model
               }
             , Cmd.none
             )
+
+
+toolsSettingFromSaveData model =
+    { isDisplayDlButton =
+        case JD.decodeString (JD.field "toolsSetting" (JD.field "isDisplayDlButton" JD.bool)) model.loadedSaveData of
+            Ok bool ->
+                bool
+
+            Err _ ->
+                False
+    }
+
 
 loadDidCreateCampus : Model -> Bool
 loadDidCreateCampus model =
     case JD.decodeString (JD.field "didCreateCampus" JD.bool) model.loadedSaveData of
         Ok bool ->
             bool
-        Err _ -> 
+
+        Err _ ->
             False
 
 
@@ -686,14 +700,16 @@ campusSizeFromSaveData model =
         case JD.decodeString (JD.field "campusSize" (JD.field "width" JD.int)) model.loadedSaveData of
             Ok width ->
                 width
+
             Err _ ->
                 8
     , height =
         case JD.decodeString (JD.field "campusSize" (JD.field "height" JD.int)) model.loadedSaveData of
             Ok height ->
                 height
+
             Err _ ->
-                8 
+                8
     }
 
 
@@ -702,6 +718,7 @@ mainPaletteFromSaveData model =
     case JD.decodeString (JD.field "mainPalette" JD.string) model.loadedSaveData of
         Ok color ->
             color
+
         Err _ ->
             "white"
 
