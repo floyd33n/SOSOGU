@@ -275,6 +275,16 @@ type Msg
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
+    let
+        setting_ =
+            model.setting
+
+        tempSetting_ =
+            model.tempSetting
+
+        panelPosition_ =
+            model.tempSetting.panelPosition
+    in
     case msg of
         ChangeColor ( x, y ) color ->
             ( { model
@@ -446,11 +456,8 @@ update msg model =
         Change str ->
             ( { model
                 | tempSetting =
-                    { borderColor = model.tempSetting.borderColor
-                    , borderStyle = str
-                    , width = model.tempSetting.width
-                    , height = model.tempSetting.height
-                    , panelPosition = model.tempSetting.panelPosition
+                    { tempSetting_
+                        | borderStyle = str
                     }
               }
             , Cmd.none
@@ -460,11 +467,9 @@ update msg model =
             if Maybe.withDefault 0 (String.toInt width_) * Maybe.withDefault 0 (String.toInt height_) > 0 then
                 ( { model
                     | tempSetting =
-                        { borderColor = model.tempSetting.borderColor
-                        , borderStyle = model.tempSetting.borderStyle
-                        , width = width_
-                        , height = height_
-                        , panelPosition = model.tempSetting.panelPosition
+                        { tempSetting_
+                            | width = width_
+                            , height = height_
                         }
                   }
                 , Cmd.none
@@ -476,16 +481,13 @@ update msg model =
         SetPixelWidth tempWidth_ ->
             ( { model
                 | tempSetting =
-                    { borderColor = model.tempSetting.borderColor
-                    , borderStyle = model.tempSetting.borderStyle
-                    , width =
-                        if String.isEmpty tempWidth_ then
-                            model.setting.width
+                    { tempSetting_
+                        | width =
+                            if String.isEmpty tempWidth_ then
+                                model.setting.width
 
-                        else
-                            tempWidth_
-                    , height = model.tempSetting.height
-                    , panelPosition = model.tempSetting.panelPosition
+                            else
+                                tempWidth_
                     }
               }
             , Cmd.none
@@ -494,16 +496,13 @@ update msg model =
         SetPixelHeight tempHeight_ ->
             ( { model
                 | tempSetting =
-                    { borderColor = model.tempSetting.borderColor
-                    , borderStyle = model.tempSetting.borderStyle
-                    , width = model.tempSetting.width
-                    , height =
-                        if String.isEmpty tempHeight_ then
-                            model.setting.height
+                    { tempSetting_
+                        | height =
+                            if String.isEmpty tempHeight_ then
+                                model.setting.height
 
-                        else
-                            tempHeight_
-                    , panelPosition = model.tempSetting.panelPosition
+                            else
+                                tempHeight_
                     }
               }
             , Cmd.none
@@ -512,15 +511,11 @@ update msg model =
         SetCampusPosition position_ ->
             ( { model
                 | tempSetting =
-                    { borderColor = model.tempSetting.borderColor
-                    , borderStyle = model.tempSetting.borderStyle
-                    , width = model.tempSetting.width
-                    , height = model.tempSetting.height
-                    , panelPosition =
-                        { settingPanel = model.tempSetting.panelPosition.settingPanel
-                        , palettePanel = model.tempSetting.panelPosition.palettePanel
-                        , campus = position_
-                        }
+                    { tempSetting_
+                        | panelPosition =
+                            { panelPosition_
+                                | campus = position_
+                            }
                     }
               }
             , Cmd.none
@@ -545,15 +540,11 @@ update msg model =
                         Right ->
                             ( { model
                                 | tempSetting =
-                                    { borderColor = model.tempSetting.borderColor
-                                    , borderStyle = model.tempSetting.borderStyle
-                                    , width = model.tempSetting.width
-                                    , height = model.tempSetting.height
-                                    , panelPosition =
-                                        { settingPanel = Right
-                                        , palettePanel = model.tempSetting.panelPosition.palettePanel
-                                        , campus = model.tempSetting.panelPosition.campus
-                                        }
+                                    { tempSetting_
+                                        | panelPosition =
+                                            { panelPosition_
+                                                | settingPanel = Right
+                                            }
                                     }
                               }
                             , Cmd.none
@@ -562,15 +553,11 @@ update msg model =
                         Left ->
                             ( { model
                                 | tempSetting =
-                                    { borderColor = model.tempSetting.borderColor
-                                    , borderStyle = model.tempSetting.borderStyle
-                                    , width = model.tempSetting.width
-                                    , height = model.tempSetting.height
-                                    , panelPosition =
-                                        { settingPanel = Left
-                                        , palettePanel = model.tempSetting.panelPosition.palettePanel
-                                        , campus = model.tempSetting.panelPosition.campus
-                                        }
+                                    { tempSetting_
+                                        | panelPosition =
+                                            { panelPosition_
+                                                | settingPanel = Left
+                                            }
                                     }
                               }
                             , Cmd.none
@@ -581,15 +568,11 @@ update msg model =
                         Right ->
                             ( { model
                                 | tempSetting =
-                                    { borderColor = model.tempSetting.borderColor
-                                    , borderStyle = model.tempSetting.borderStyle
-                                    , width = model.tempSetting.width
-                                    , height = model.tempSetting.height
-                                    , panelPosition =
-                                        { settingPanel = model.tempSetting.panelPosition.settingPanel
-                                        , palettePanel = Right
-                                        , campus = model.tempSetting.panelPosition.campus
-                                        }
+                                    { tempSetting_
+                                        | panelPosition =
+                                            { panelPosition_
+                                                | palettePanel = Right
+                                            }
                                     }
                               }
                             , Cmd.none
@@ -598,15 +581,11 @@ update msg model =
                         Left ->
                             ( { model
                                 | tempSetting =
-                                    { borderColor = model.tempSetting.borderColor
-                                    , borderStyle = model.tempSetting.borderStyle
-                                    , width = model.tempSetting.width
-                                    , height = model.tempSetting.height
-                                    , panelPosition =
-                                        { settingPanel = model.tempSetting.panelPosition.settingPanel
-                                        , palettePanel = Left
-                                        , campus = model.tempSetting.panelPosition.campus
-                                        }
+                                    { tempSetting_
+                                        | panelPosition =
+                                            { panelPosition_
+                                                | palettePanel = Left
+                                            }
                                     }
                               }
                             , Cmd.none
@@ -698,6 +677,21 @@ update msg model =
               }
             , Cmd.none
             )
+
+
+
+{-
+   | tempSetting =
+       { borderColor = model.tempSetting.borderColor
+       , borderStyle = model.tempSetting.borderStyle
+       , width = model.tempSetting.width
+       , height = model.tempSetting.height
+       , panelPosition =
+           { settingPanel = model.tempSetting.panelPosition.settingPanel
+           , palettePanel = Left
+           , campus = model.tempSetting.panelPosition.campus
+           }
+-}
 
 
 updateBySaveData : Model -> Cmd Msg
