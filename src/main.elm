@@ -30,6 +30,7 @@ import Html.Lazy as HLazy exposing (..)
 import Json.Decode as JD
 import Json.Encode as JE
 import List.Extra as ListEx exposing (..)
+import Parser as P exposing (..)
 import Regex exposing (..)
 import Result.Extra as ResultEX exposing (..)
 import Svg exposing (..)
@@ -693,10 +694,10 @@ update msg model =
                         , campus = model.setting.panelPosition.campus
                         }
                     }
+                , campus = campusFromSaveData model
               }
             , Cmd.none
             )
-
 
 
 updateBySaveData : Model -> Cmd Msg
@@ -712,6 +713,7 @@ loadBorderColor model =
         Err _ ->
             "black"
 
+
 loadCampus model =
     case JD.decodeString (JD.field "campus" (JD.list JD.string)) model.loadedSaveData of
         Ok a ->
@@ -719,7 +721,33 @@ loadCampus model =
 
         Err _ ->
             []
-    
+
+
+campusFromSaveData : Model -> Campus
+campusFromSaveData model =
+    let
+        getPoint : Int -> List String -> Point
+        getPoint n campusData =
+            let
+                getX : Int
+                getX =
+                    Maybe.withDefault 0 (String.toInt (String.slice 1 2 (Maybe.withDefault "0" (ListEx.getAt n campusData))))
+
+                getY : Int
+                getY =
+                    Maybe.withDefault 0 (String.toInt (String.slice 3 4 (Maybe.withDefault "0" (ListEx.getAt n campusData))))
+            in
+            ( getX, getY )
+
+        getColor : Int -> List String -> CssColor
+        getColor n campusData =
+            Maybe.withDefault "black" (ListEx.getAt 2 (String.split "," (Maybe.withDefault "white" (ListEx.getAt n campusData))))
+
+        makeCampusList : Int -> List String -> ( Point, CssColor )
+        makeCampusList n campusData =
+            Tuple.pair (getPoint n campusData) (getColor n campusData)
+    in
+    Dict.fromList (List.map (\n -> makeCampusList n (loadCampus model)) <| List.range 0 (List.length (loadCampus model) - 1))
 
 
 toStringSaveData : File -> Cmd Msg
@@ -735,14 +763,6 @@ dlSaveData model =
 upSaveData : Cmd Msg
 upSaveData =
     FileSel.file [ "application/json" ] LoadSaveData
-
-
-le =
-    []
-
-
-be model =
-    List.map (\x -> List.map (\y -> (::) (getCampusColor model ( x, y )) le))
 
 
 makeSaveData : Model -> String
@@ -771,6 +791,17 @@ makeSaveData model =
                     )
                 <|
                     List.range 0 (model.campusSize.height - 1)
+
+        aData =
+            List.map
+                (\x ->
+                    List.map
+                        (\y -> Tuple.pair (Tuple.pair x y) (getCampusColor model ( x, y )))
+                    <|
+                        List.range 0 (model.campusSize.width - 1)
+                )
+            <|
+                List.range 0 (model.campusSize.height - 1)
 
         historyData : List String
         historyData =
@@ -811,6 +842,9 @@ makeSaveData model =
                 )
             <|
                 List.range 0 (Dict.size model.subPalette - 1)
+
+        aEn =
+            ( ( JE.int, JE.int ), JE.string )
     in
     JE.encode 4 <|
         JE.object
@@ -860,8 +894,10 @@ view model =
         , H.button [ onClick DLSaveData ] [ H.text "download" ]
         , H.button [ onClick UpSaveData ] [ H.text "upload" ]
         , H.br [] []
-        , H.text (Debug.toString (loadCampus model)
-                 )
+
+        --, H.text (Debug.toString (loadCampus model))
+        , H.text
+            (Debug.toString (loadCampus model))
         , layout
             [ debugLine False
             ]
