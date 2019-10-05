@@ -11,6 +11,7 @@ import Bootstrap.Grid.Col as BCol
 import Bootstrap.Grid.Row as BRow
 import Bootstrap.Modal as BModal
 import Browser
+import Bytes exposing (..)
 import Debug exposing (..)
 import Dict exposing (..)
 import Dict.Extra as DictEx
@@ -253,7 +254,6 @@ type Msg
     | SetCampusWidth String
     | SetCampusHeight String
     | CreateCampus
-    | ForDisabled
     | ShowModal
     | CloseModal
     | BorderColorValue String
@@ -262,8 +262,7 @@ type Msg
     | SetPixelWidth String
     | SetPixelHeight String
     | SetCampusPosition CampusPosition
-    | CreateCampusPicture
-    | DisplayDlButton
+    | GenerateImage
     | ChangePanelPosition Panel Position
     | ApplySetting
     | Undo Point
@@ -426,9 +425,6 @@ update msg model =
             , Cmd.none
             )
 
-        ForDisabled ->
-            ( model, Cmd.none )
-
         ShowModal ->
             ( { model | modalVisibility = BModal.shown }
             , Cmd.none
@@ -525,16 +521,18 @@ update msg model =
             , Cmd.none
             )
 
-        CreateCampusPicture ->
-            ( model, generateCampusImage () )
-
-        DisplayDlButton ->
+        GenerateImage ->
             ( { model
                 | toolsSetting =
                     { isDisplayDlButton = True
                     }
               }
             , generateCampusImage ()
+            )
+
+        GetImageUrl url ->
+            ( { model | campusImageUrl = url }
+            , Cmd.none
             )
 
         ChangePanelPosition panel_ position_ ->
@@ -620,11 +618,6 @@ update msg model =
                         model.campus
                 , history = Dict.remove (Dict.size model.history - 1) model.history
               }
-            , Cmd.none
-            )
-
-        GetImageUrl url ->
-            ( { model | campusImageUrl = url }
             , Cmd.none
             )
 
@@ -1120,9 +1113,7 @@ view model =
     div
         [ HAttrs.style "height" "100%"
         ]
-        [ css <| "../style.css"
-        , createCampusWindow model
-        , layout
+        [ layout
             [ debugLine False
             ]
           <|
@@ -1193,6 +1184,8 @@ view model =
                     ]
                 , viewPanels model
                 ]
+        , css <| "../style.css"
+        , createCampusWindow model
         ]
 
 
@@ -1245,7 +1238,7 @@ viewCampusPanel model =
         , Background.color <| shironezuIro
         ]
         [ viewToolsPanel model
-        , el (padding 3 :: campusPosition model.setting) <|
+        , E.el (padding 3 :: campusPosition model.setting) <|
             html <|
                 viewCampus model ( model.campusSize.width, model.campusSize.height )
         ]
@@ -1273,45 +1266,71 @@ campusPosition setting =
 viewToolsPanel : Model -> Element Msg
 viewToolsPanel model =
     let
-        gendlButton : String -> Element Msg
-        gendlButton bText =
-            let
-                tempButton : Maybe Msg -> String -> String -> String -> H.Attribute Msg -> H.Attribute Msg -> Element Msg
-                tempButton msg oValue dValue id_ attr1 attr2 =
-                    Input.button []
-                        { onPress = msg
-                        , label =
-                            E.el [] <|
-                                html <|
-                                    H.a
-                                        [ HAttrs.style "color" "white"
-                                        , HAttrs.style "font-size" "14px"
-                                        , HAttrs.style "opacity" oValue
-                                        , HAttrs.style "text-decoration" dValue
-                                        , HAttrs.id id_
-                                        , attr1
-                                        , attr2
-                                        ]
-                                        [ H.text bText ]
-                        }
-            in
-            case bText of
-                "Gen" ->
-                    if Dict.size model.campus >= 1 then
-                        tempButton (Just DisplayDlButton) "1" "none" "" (HAttrs.style "" "") (hidden False)
+        generateButton : Element Msg
+        generateButton =
+            if model.didCreateCampus then
+                Input.button []
+                    { onPress = Just GenerateImage
+                    , label =
+                        E.el
+                            [ Font.color <| shiroIro
+                            , Font.size <| 14
+                            ]
+                        <|
+                            E.text "Gen"
+                    }
 
-                    else
-                        tempButton Nothing "0.6" "line-through" "" (HAttrs.style "" "") (hidden False)
+            else
+                Input.button []
+                    { onPress = Nothing
+                    , label =
+                        E.el
+                            [ Font.color <| shiroIro
+                            , Font.size <| 14
+                            , Font.strike
+                            , E.alpha 0.6
+                            ]
+                        <|
+                            E.text "Gen"
+                    }
 
-                "DL" ->
-                    if model.toolsSetting.isDisplayDlButton then
-                        tempButton Nothing "1" "none" "dl" (href model.campusImageUrl) (HAttrs.target "_blank")
+        dlButton : Element Msg
+        dlButton =
+            if model.toolsSetting.isDisplayDlButton then
+                Input.button []
+                    { onPress = Nothing
+                    , label =
+                        E.el
+                            [ Font.color <| shiroIro
+                            , Font.size <| 14
+                            , htmlAttribute <| HAttrs.href model.campusImageUrl
+                            ]
+                        <|
+                            html <|
+                                H.a
+                                    [ HAttrs.style "color" "white"
+                                    , HAttrs.style "font-size" "14px"
+                                    , HAttrs.href model.campusImageUrl
+                                    , HAttrs.target "_blank"
+                                    , HAttrs.id "downloadImage"
+                                    , HAttrs.download "campus.png"
+                                    ]
+                                    [ H.text "DL" ]
+                    }
 
-                    else
-                        tempButton Nothing "0.6" "line-through" "" (HAttrs.style "" "") (hidden False)
-
-                _ ->
-                    E.none
+            else
+                Input.button []
+                    { onPress = Nothing
+                    , label =
+                        E.el
+                            [ Font.color <| shiroIro
+                            , Font.size <| 14
+                            , Font.strike
+                            , E.alpha 0.6
+                            ]
+                        <|
+                            E.text "DL"
+                    }
 
         viewUndoButton : Element Msg
         viewUndoButton =
@@ -1408,8 +1427,8 @@ viewToolsPanel model =
             [ saveButton
             , loadButton
             , verticalLine
-            , gendlButton "Gen"
-            , gendlButton "DL"
+            , generateButton
+            , dlButton
             , verticalLine
             , viewUndoButton
             ]
@@ -1808,11 +1827,10 @@ openSettingPanel model =
 
             else
                 Input.button
-                    [ htmlAttribute <| HAttrs.style "opacity" "0.6"
-                    , htmlAttribute <| HAttrs.style "color" "white"
-                    , Border.color <| shiroIro
+                    [ Border.color <| shiroIro
                     , Border.width <| 2
                     , Border.rounded 5
+                    , E.alpha 0.6
                     , E.width <| px 60
                     , E.height <| px 30
                     ]
@@ -2044,7 +2062,7 @@ viewPalettePanel model =
                         }
 
                 else
-                    E.el [ htmlAttribute <| HAttrs.style "opacity" "0.6" ] <|
+                    E.el [ E.alpha 0.6 ] <|
                         Input.button
                             [ Region.description "Add"
                             , htmlAttribute <| HAttrs.style "color" "white"
