@@ -669,6 +669,7 @@ update msg model =
                 , didCreateCampus = loadDidCreateCampus model
                 , toolsSetting = toolsSettingFromSaveData model
                 , subPalette = subPaletteFromSaveData model
+                , history = historyFromSaveData model
               }
             , Cmd.none
             )
@@ -818,6 +819,40 @@ settingFromSaveData model =
     }
 
 
+loadHistory model =
+    case JD.decodeString (JD.field "history" (JD.list JD.string)) model.loadedSaveData of
+        Ok history ->
+            history
+
+        Err _ ->
+            []
+
+
+historyFromSaveData : Model -> History
+historyFromSaveData model =
+    let
+        getSerial n historyData =
+            Maybe.withDefault 0 (String.toInt (Maybe.withDefault "0" (ListEx.getAt 0 (String.split "," (Maybe.withDefault "0,(0,0),white" (ListEx.getAt n historyData))))))
+
+        getPoint n historyData =
+            let
+                getX =
+                    Maybe.withDefault 0 (String.toInt (String.dropLeft 1 (Maybe.withDefault "(0" (ListEx.getAt 1 (String.split "," (Maybe.withDefault "0,(0,0),white" (ListEx.getAt n historyData)))))))
+
+                getY =
+                    Maybe.withDefault 0 (String.toInt (String.dropRight 1 (Maybe.withDefault "0)" (ListEx.getAt 2 (String.split "," (Maybe.withDefault "0,(0,0),white" (ListEx.getAt n historyData)))))))
+            in
+            ( getX, getY )
+
+        getColor n historyData =
+            Maybe.withDefault "white" (ListEx.getAt 3 (String.split "," (Maybe.withDefault "0,(0,0),white" (ListEx.getAt n historyData))))
+
+        makeHistory n historyData =
+            Tuple.pair (getSerial n historyData) (Tuple.pair (getPoint n historyData) (getColor n historyData))
+    in
+    Dict.fromList (List.map (\n -> makeHistory n (loadHistory model)) <| List.range 0 (List.length (loadHistory model) - 1))
+
+
 loadSubPalette model =
     case JD.decodeString (JD.field "subPalette" (JD.list JD.string)) model.loadedSaveData of
         Ok subPalette ->
@@ -943,7 +978,7 @@ makeSaveData model =
             List.map
                 (\n ->
                     String.fromInt n
-                        ++ "("
+                        ++ ",("
                         ++ String.fromInt (historyX (historyValue n))
                         ++ ","
                         ++ String.fromInt (historyY (historyValue n))
