@@ -68,7 +68,7 @@ type alias Model =
     , history : History
     , campusImageUrl : String
     , settingPanelStatus : PanelStatus
-    , loadedSaveData : String
+    , loadedSavedata : Savedata
     }
 
 
@@ -159,7 +159,7 @@ initHistory =
 
 
 type alias Setting =
-    { borderColor : String
+    { borderColor : CssColor
     , borderStyle : String
     , width : String
     , height : String
@@ -208,6 +208,10 @@ type PanelStatus
     | Close
 
 
+type alias Savedata =
+    String
+
+
 
 --INIT--
 
@@ -230,7 +234,7 @@ init _ =
       , history = initHistory
       , campusImageUrl = ""
       , settingPanelStatus = Close
-      , loadedSaveData = ""
+      , loadedSavedata = ""
       }
     , Cmd.none
     )
@@ -266,11 +270,11 @@ type Msg
     | GetImageUrl String
     | OpenSettingPanel
     | CloseSettingPanel
-    | DLSaveData
-    | UpSaveData
-    | LoadSaveData File
-    | ToStringSaveData String
-    | UpdateBySaveData Model
+    | DLSavedata
+    | UpSavedata
+    | LoadSavedata File
+    | ToStringSavedata String
+    | ApplySavedata Model
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -638,46 +642,49 @@ update msg model =
             , Cmd.none
             )
 
-        DLSaveData ->
+        DLSavedata ->
             ( model
-            , dlSaveData model
+            , dlSavedata model
             )
 
-        UpSaveData ->
+        UpSavedata ->
             ( model
-            , upSaveData
+            , upSavedata
             )
 
-        LoadSaveData save ->
+        LoadSavedata savedata ->
             ( model
-            , toStringSaveData save
+            , toStringSaveData savedata
             )
 
-        ToStringSaveData save ->
+        ToStringSavedata savedata ->
             ( { model
-                | loadedSaveData = save
+                | loadedSavedata = savedata
               }
-            , updateBySaveData model
+            , applySavedata model
             )
 
-        UpdateBySaveData model_ ->
+        ApplySavedata model_ ->
             ( { model
-                | setting = settingFromSaveData model
-                , campus = campusFromSaveData model
-                , mainPalette = mainPaletteFromSaveData model
-                , campusSize = campusSizeFromSaveData model
-                , didCreateCampus = loadDidCreateCampus model
-                , toolsSetting = toolsSettingFromSaveData model
-                , subPalette = subPaletteFromSaveData model
-                , history = historyFromSaveData model
+                | setting = settingFromSavedata model.loadedSavedata
+                , campus = campusFromSavedata model.loadedSavedata
+                , mainPalette = mainPaletteFromSavedata model.loadedSavedata
+                , campusSize = campusSizeFromSavedata model.loadedSavedata
+                , didCreateCampus = didCreateCampusFromSavedata model.loadedSavedata
+                , toolsSetting = toolsSettingFromSavedata model.loadedSavedata
+                , subPalette = subPaletteFromSavedata model.loadedSavedata
+                , history = historyFromSavedata model.loadedSavedata
               }
             , Cmd.none
             )
 
 
-toolsSettingFromSaveData model =
+toolsSettingFromSavedata : Savedata -> ToolsSetting
+toolsSettingFromSavedata savedata =
     { isDisplayDlButton =
-        case JD.decodeString (JD.field "toolsSetting" (JD.field "isDisplayDlButton" JD.bool)) model.loadedSaveData of
+        case
+            JD.decodeString (JD.field "toolsSetting" (JD.field "isDisplayDlButton" JD.bool)) savedata
+        of
             Ok bool ->
                 bool
 
@@ -686,9 +693,11 @@ toolsSettingFromSaveData model =
     }
 
 
-loadDidCreateCampus : Model -> Bool
-loadDidCreateCampus model =
-    case JD.decodeString (JD.field "didCreateCampus" JD.bool) model.loadedSaveData of
+didCreateCampusFromSavedata : Savedata -> Bool
+didCreateCampusFromSavedata savedata =
+    case
+        JD.decodeString (JD.field "didCreateCampus" JD.bool) savedata
+    of
         Ok bool ->
             bool
 
@@ -696,17 +705,21 @@ loadDidCreateCampus model =
             False
 
 
-campusSizeFromSaveData : Model -> CampusSize
-campusSizeFromSaveData model =
+campusSizeFromSavedata : Savedata -> CampusSize
+campusSizeFromSavedata savedata =
     { width =
-        case JD.decodeString (JD.field "campusSize" (JD.field "width" JD.int)) model.loadedSaveData of
+        case
+            JD.decodeString (JD.field "campusSize" (JD.field "width" JD.int)) savedata
+        of
             Ok width ->
                 width
 
             Err _ ->
                 8
     , height =
-        case JD.decodeString (JD.field "campusSize" (JD.field "height" JD.int)) model.loadedSaveData of
+        case
+            JD.decodeString (JD.field "campusSize" (JD.field "height" JD.int)) savedata
+        of
             Ok height ->
                 height
 
@@ -715,9 +728,11 @@ campusSizeFromSaveData model =
     }
 
 
-mainPaletteFromSaveData : Model -> CssColor
-mainPaletteFromSaveData model =
-    case JD.decodeString (JD.field "mainPalette" JD.string) model.loadedSaveData of
+mainPaletteFromSavedata : Savedata -> CssColor
+mainPaletteFromSavedata savedata =
+    case
+        JD.decodeString (JD.field "mainPalette" JD.string) savedata
+    of
         Ok color ->
             color
 
@@ -725,44 +740,59 @@ mainPaletteFromSaveData model =
             "white"
 
 
-settingFromSaveData : Model -> Setting
-settingFromSaveData model =
+settingFromSavedata : Savedata -> Setting
+settingFromSavedata savedata =
     let
-        loadBorderColor =
-            case JD.decodeString (JD.field "setting" (JD.field "borderColor" JD.string)) model.loadedSaveData of
+        decodeBorderColor : CssColor
+        decodeBorderColor =
+            case
+                JD.decodeString (JD.field "setting" (JD.field "borderColor" JD.string)) savedata
+            of
                 Ok color ->
                     color
 
                 Err _ ->
                     "black"
 
-        loadBorderStyle =
-            case JD.decodeString (JD.field "setting" (JD.field "borderStyle" JD.string)) model.loadedSaveData of
+        decodeBorderStyle : String
+        decodeBorderStyle =
+            case
+                JD.decodeString (JD.field "setting" (JD.field "borderStyle" JD.string)) savedata
+            of
                 Ok style ->
                     style
 
                 Err _ ->
                     "solid 1px"
 
-        loadWidth =
-            case JD.decodeString (JD.field "setting" (JD.field "width" JD.string)) model.loadedSaveData of
+        decodeWidth : String
+        decodeWidth =
+            case
+                JD.decodeString (JD.field "setting" (JD.field "width" JD.string)) savedata
+            of
                 Ok width ->
                     width
 
                 Err _ ->
                     "20"
 
-        loadHeight =
-            case JD.decodeString (JD.field "setting" (JD.field "height" JD.string)) model.loadedSaveData of
+        decodeHeight : String
+        decodeHeight =
+            case
+                JD.decodeString (JD.field "setting" (JD.field "height" JD.string)) savedata
+            of
                 Ok height ->
                     height
 
                 Err _ ->
                     "20"
 
-        loadPanelPosition =
+        decodePanelPosition : PanelPosition
+        decodePanelPosition =
             { settingPanel =
-                case JD.decodeString (JD.field "setting" (JD.field "panelPosition" (JD.field "settingPanel" JD.string))) model.loadedSaveData of
+                case
+                    JD.decodeString (JD.field "setting" (JD.field "panelPosition" (JD.field "settingPanel" JD.string))) savedata
+                of
                     Ok settingPanel ->
                         case settingPanel of
                             "Right" ->
@@ -777,7 +807,9 @@ settingFromSaveData model =
                     Err _ ->
                         Left
             , palettePanel =
-                case JD.decodeString (JD.field "setting" (JD.field "panelPosition" (JD.field "palettePanel" JD.string))) model.loadedSaveData of
+                case
+                    JD.decodeString (JD.field "setting" (JD.field "panelPosition" (JD.field "palettePanel" JD.string))) savedata
+                of
                     Ok palettePanel ->
                         case palettePanel of
                             "Right" ->
@@ -792,7 +824,9 @@ settingFromSaveData model =
                     Err _ ->
                         Right
             , campusPanel =
-                case JD.decodeString (JD.field "setting" (JD.field "panelPositon" (JD.field "campusPanel" JD.string))) model.loadedSaveData of
+                case
+                    JD.decodeString (JD.field "setting" (JD.field "panelPositon" (JD.field "campusPanel" JD.string))) savedata
+                of
                     Ok campusPanel ->
                         case campusPanel of
                             "TopCenter" ->
@@ -811,26 +845,28 @@ settingFromSaveData model =
                         TopCenter
             }
     in
-    { borderColor = loadBorderColor
-    , borderStyle = loadBorderStyle
-    , width = loadWidth
-    , height = loadHeight
-    , panelPosition = loadPanelPosition
+    { borderColor = decodeBorderColor
+    , borderStyle = decodeBorderStyle
+    , width = decodeWidth
+    , height = decodeHeight
+    , panelPosition = decodePanelPosition
     }
 
 
-loadHistory model =
-    case JD.decodeString (JD.field "history" (JD.list JD.string)) model.loadedSaveData of
-        Ok history ->
-            history
-
-        Err _ ->
-            []
-
-
-historyFromSaveData : Model -> History
-historyFromSaveData model =
+historyFromSavedata : Savedata -> History
+historyFromSavedata savedata =
     let
+        decodeHistory : List String
+        decodeHistory =
+            case
+                JD.decodeString (JD.field "history" (JD.list JD.string)) savedata
+            of
+                Ok history ->
+                    history
+
+                Err _ ->
+                    []
+
         getSerial n historyData =
             Maybe.withDefault 0 (String.toInt (Maybe.withDefault "0" (ListEx.getAt 0 (String.split "," (Maybe.withDefault "0,(0,0),white" (ListEx.getAt n historyData))))))
 
@@ -850,20 +886,25 @@ historyFromSaveData model =
         makeHistory n historyData =
             Tuple.pair (getSerial n historyData) (Tuple.pair (getPoint n historyData) (getColor n historyData))
     in
-    Dict.fromList (List.map (\n -> makeHistory n (loadHistory model)) <| List.range 0 (List.length (loadHistory model) - 1))
+    Dict.fromList <|
+        List.map (\n -> makeHistory n decodeHistory) <|
+            List.range 0 (List.length decodeHistory - 1)
 
 
-loadSubPalette model =
-    case JD.decodeString (JD.field "subPalette" (JD.list JD.string)) model.loadedSaveData of
-        Ok subPalette ->
-            subPalette
-
-        Err _ ->
-            []
-
-
-subPaletteFromSaveData model =
+subPaletteFromSavedata : Savedata -> SubPalette
+subPaletteFromSavedata savedata =
     let
+        decodeSubPalette : List String
+        decodeSubPalette =
+            case
+                JD.decodeString (JD.field "subPalette" (JD.list JD.string)) savedata
+            of
+                Ok subPalette ->
+                    subPalette
+
+                Err _ ->
+                    []
+
         getSerial n subPaletteData =
             Maybe.withDefault 0 (String.toInt (Maybe.withDefault "0" (ListEx.getAt 0 (String.split "," (Maybe.withDefault "0,white" (ListEx.getAt n subPaletteData))))))
 
@@ -873,26 +914,30 @@ subPaletteFromSaveData model =
         makeSubPalette n subPaletteData =
             Tuple.pair (getSerial n subPaletteData) (getColor n subPaletteData)
     in
-    Dict.fromList (List.map (\n -> makeSubPalette n (loadSubPalette model)) <| List.range 0 (List.length (loadSubPalette model) - 1))
+    Dict.fromList <|
+        List.map (\n -> makeSubPalette n decodeSubPalette) <|
+            List.range 0 (List.length decodeSubPalette - 1)
 
 
-updateBySaveData : Model -> Cmd Msg
-updateBySaveData model =
-    Task.perform UpdateBySaveData (Task.succeed model)
+applySavedata : Model -> Cmd Msg
+applySavedata model =
+    Task.perform ApplySavedata (Task.succeed model)
 
 
-loadCampus model =
-    case JD.decodeString (JD.field "campus" (JD.list JD.string)) model.loadedSaveData of
-        Ok a ->
-            a
-
-        Err _ ->
-            []
-
-
-campusFromSaveData : Model -> Campus
-campusFromSaveData model =
+campusFromSavedata : Savedata -> Campus
+campusFromSavedata savedata =
     let
+        decodeCampus : List String
+        decodeCampus =
+            case
+                JD.decodeString (JD.field "campus" (JD.list JD.string)) savedata
+            of
+                Ok campus ->
+                    campus
+
+                Err _ ->
+                    []
+
         getPoint : Int -> List String -> Point
         getPoint n campusData =
             let
@@ -914,26 +959,28 @@ campusFromSaveData model =
         makeCampusList n campusData =
             Tuple.pair (getPoint n campusData) (getColor n campusData)
     in
-    Dict.fromList (List.map (\n -> makeCampusList n (loadCampus model)) <| List.range 0 (List.length (loadCampus model) - 1))
+    Dict.fromList <|
+        List.map (\n -> makeCampusList n decodeCampus) <|
+            List.range 0 (List.length decodeCampus - 1)
 
 
 toStringSaveData : File -> Cmd Msg
 toStringSaveData file =
-    Task.perform ToStringSaveData (File.toString file)
+    Task.perform ToStringSavedata (File.toString file)
 
 
-dlSaveData : Model -> Cmd msg
-dlSaveData model =
-    FileDL.string "sosogu.json" "application/json" (makeSaveData model)
+dlSavedata : Model -> Cmd msg
+dlSavedata model =
+    FileDL.string "sosogu.json" "application/json" (makeSavedata model)
 
 
-upSaveData : Cmd Msg
-upSaveData =
-    FileSel.file [ "application/json" ] LoadSaveData
+upSavedata : Cmd Msg
+upSavedata =
+    FileSel.file [ "application/json" ] LoadSavedata
 
 
-makeSaveData : Model -> String
-makeSaveData model =
+makeSavedata : Model -> String
+makeSavedata model =
     let
         pointEncoder : ( Int, Int ) -> JE.Value
         pointEncoder ( v1, v2 ) =
@@ -987,9 +1034,6 @@ makeSaveData model =
                 )
             <|
                 List.range 0 (Dict.size model.history)
-
-        subPa =
-            JE.dict String.fromInt JE.string model.subPalette
 
         subPaletteData : List String
         subPaletteData =
@@ -1078,13 +1122,6 @@ view model =
         ]
         [ css <| "../style.css"
         , createCampusWindow model
-        , H.button [ onClick DLSaveData ] [ H.text "download" ]
-        , H.button [ onClick UpSaveData ] [ H.text "upload" ]
-        , H.br [] []
-
-        --, H.text (Debug.toString (loadCampus model))
-        , H.text
-            (Debug.toString (loadCampus model))
         , layout
             [ debugLine False
             ]
@@ -1297,6 +1334,34 @@ viewToolsPanel model =
                         E.text <|
                             "Undo"
                 }
+
+        saveButton : Element Msg
+        saveButton =
+            Input.button []
+                { onPress = Just DLSavedata
+                , label =
+                    E.el
+                        [ Font.color <| shiroIro
+                        , Font.size <| 14
+                        ]
+                    <|
+                        E.text <|
+                            "Save"
+                }
+
+        loadButton : Element Msg
+        loadButton =
+            Input.button []
+                { onPress = Just UpSavedata
+                , label =
+                    E.el
+                        [ Font.color <| shiroIro
+                        , Font.size <| 14
+                        ]
+                    <|
+                        E.text <|
+                            "Load"
+                }
     in
     row
         [ E.width E.fill
@@ -1340,11 +1405,27 @@ viewToolsPanel model =
             , paddingXY 20 0
             , E.spacing 5
             ]
-            [ gendlButton "Gen"
+            [ saveButton
+            , loadButton
+            , verticalLine
+            , gendlButton "Gen"
             , gendlButton "DL"
+            , verticalLine
             , viewUndoButton
             ]
         ]
+
+
+verticalLine : Element Msg
+verticalLine =
+    E.el
+        [ E.width <| px 1
+        , E.height <| px 16
+        , Border.color <| shiroIro
+        , Border.widthEach { top = 0, right = 1, left = 0, bottom = 0 }
+        ]
+    <|
+        E.text ""
 
 
 panelHr : Element Msg
