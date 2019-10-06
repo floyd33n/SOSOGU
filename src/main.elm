@@ -1,5 +1,7 @@
 port module Main exposing (..)
 
+--import Debug exposing (..)
+
 import Array exposing (..)
 import Bootstrap.Button as BBtn
 import Bootstrap.CDN as BCDN
@@ -9,10 +11,13 @@ import Bootstrap.Form.Select as BSelect
 import Bootstrap.Grid as BGrid
 import Bootstrap.Grid.Col as BCol
 import Bootstrap.Grid.Row as BRow
+import Bootstrap.Text as BText
+import Bootstrap.General.HAlign as BGHAlign
 import Bootstrap.Modal as BModal
+import Bootstrap.Utilities.Spacing as BUtilsSpacing
+import Bootstrap.Utilities.Flex as BUtilsFlex
 import Browser
 import Bytes exposing (..)
-import Debug exposing (..)
 import Dict exposing (..)
 import Dict.Extra as DictEx
 import Element as E exposing (..)
@@ -667,6 +672,7 @@ update msg model =
                 , toolsSetting = toolsSettingFromSavedata model.loadedSavedata
                 , subPalette = subPaletteFromSavedata model.loadedSavedata
                 , history = historyFromSavedata model.loadedSavedata
+                , openingModalWindow = BModal.hidden
               }
             , Cmd.none
             )
@@ -1114,13 +1120,11 @@ view model =
         [ HAttrs.style "height" "100%"
         ]
         [ layout
-            [ debugLine False
-            ]
+            []
           <|
-            column [ E.width E.fill, E.height E.fill, debugLine False ]
+            column [ E.width E.fill, E.height E.fill ]
                 [ row
-                    [ debugLine False
-                    , E.width E.fill
+                    [ E.width E.fill
                     , E.height <| px 50
                     , Background.color <| rouIro
                     , paddingXY 16 0
@@ -1953,7 +1957,6 @@ viewPalettePanel model =
                         Border.widthEach { top = 1, right = 1, left = 0, bottom = 1 }
         , Border.color <| shiroIro
         , Background.color <| rouIro
-        , debugLine False
         ]
         [ row
             [ Font.color <| shiroIro
@@ -1965,9 +1968,6 @@ viewPalettePanel model =
             ]
             [ E.image
                 [ htmlAttribute <| HAttrs.style "filter" "invert(100%)"
-
-                --, htmlAttribute <| HAttrs.style "width" "16px"
-                --, htmlAttribute <| HAttrs.style "height" "16px"
                 ]
                 { src = "file/palette.svg"
                 , description = ""
@@ -2178,9 +2178,8 @@ createCampusWindow model =
             |> BModal.hideOnBackdropClick False
             |> BModal.small
             |> BModal.h5
-                [ HAttrs.style "margin" "0 auto"
-                ]
-                [ H.text "Enter Campus Size" ]
+                [ HAttrs.style "padding-left" "20px"]
+                [ H.text "Let's Start SOSOGU" ]
             |> BModal.body []
                 [ BGrid.containerFluid []
                     [ BGrid.row []
@@ -2201,39 +2200,44 @@ createCampusWindow model =
                                 ]
                             ]
                         ]
-                    ]
-                ]
-            |> BModal.footer [ HAttrs.style "margin" "auto" ]
-                [ BBtn.button
-                    [ BBtn.outlinePrimary
-                    , if isCorrectWidthHeight model.tempCampusSize.width model.tempCampusSize.height then
-                        BBtn.primary
-
-                      else
-                        BBtn.secondary
-                    , BBtn.attrs [ onClick CreateCampus ]
-                    , BBtn.disabled <| not (isCorrectWidthHeight model.tempCampusSize.width model.tempCampusSize.height)
-                    ]
-                    [ H.text "Create!" ]
-                ]
+                  , BGrid.row []
+                        [ BGrid.col [ BCol.textAlign BText.alignXsCenter 
+                                    , BCol.attrs [ BUtilsSpacing.p2 ]
+                                    ]
+                            [BBtn.button
+                            [ BBtn.outlinePrimary
+                            , BBtn.primary
+                            , BBtn.attrs [ onClick CreateCampus ]
+                            , BBtn.disabled <| not (isCorrectWidthHeight model.tempCampusSize.width model.tempCampusSize.height)
+                            ]
+                            [ H.text "Create Campus" ]]
+                        ]
+                  , BGrid.row []
+                      [ BGrid.col[ BCol.textAlign BText.alignXsCenter 
+                                 , BCol.attrs []
+                                 ]
+                          [ div [] [ H.text "or" ] ]
+                      ]
+                  , BGrid.row []
+                      [ BGrid.col [ BCol.textAlign BText.alignXsCenter
+                                  , BCol.attrs [ BUtilsSpacing.p2 ]
+                                  ]
+                          [ BBtn.button
+                            [ BBtn.outlinePrimary
+                            , BBtn.secondary
+                            , BBtn.attrs [ onClick UpSavedata ]
+                            ]
+                            [ H.text "Load Savedata" ]
+                          ]
+                      ]
+                  ]
+              ]
             |> BModal.view model.openingModalWindow
         ]
 
 
 
 --DEBUG--
-
-
-debugLine : Bool -> E.Attribute Msg
-debugLine bool =
-    if bool then
-        explain Debug.todo
-
-    else
-        htmlAttribute <| HAttrs.style "" ""
-
-
-
 --FUNC--
 
 
@@ -2269,7 +2273,6 @@ viewCampus model ( width, height ) =
                                             , HAttrs.style "padding" "0px"
                                             , HAttrs.style "margin" "-1px"
                                             , HEvents.onClick (ChangeColor ( x, y ) model.mainPalette)
-
                                             --, HEvents.onDoubleClick (ChangeColor y x "white")
                                             ]
                                             []
