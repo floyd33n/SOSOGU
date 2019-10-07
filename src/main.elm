@@ -8,14 +8,14 @@ import Bootstrap.CDN as BCDN
 import Bootstrap.Form.Input as BInput
 import Bootstrap.Form.Radio as BRadio
 import Bootstrap.Form.Select as BSelect
+import Bootstrap.General.HAlign as BGHAlign
 import Bootstrap.Grid as BGrid
 import Bootstrap.Grid.Col as BCol
 import Bootstrap.Grid.Row as BRow
-import Bootstrap.Text as BText
-import Bootstrap.General.HAlign as BGHAlign
 import Bootstrap.Modal as BModal
-import Bootstrap.Utilities.Spacing as BUtilsSpacing
+import Bootstrap.Text as BText
 import Bootstrap.Utilities.Flex as BUtilsFlex
+import Bootstrap.Utilities.Spacing as BUtilsSpacing
 import Browser
 import Bytes exposing (..)
 import Dict exposing (..)
@@ -46,12 +46,6 @@ import Task exposing (..)
 
 css path =
     H.node "link" [ rel "stylesheet", href path ] []
-
-
-onChangeH : (String -> msg) -> H.Attribute msg
-onChangeH handler =
-    on "change" (JD.map handler HEvents.targetValue)
-
 
 
 --MODEL--
@@ -981,10 +975,6 @@ upSavedata =
 makeSavedata : Model -> String
 makeSavedata model =
     let
-        pointEncoder : ( Int, Int ) -> JE.Value
-        pointEncoder ( v1, v2 ) =
-            JE.list identity [ JE.int v1, JE.int v2 ]
-
         campusData : List String
         campusData =
             List.concat <|
@@ -1335,6 +1325,7 @@ viewToolsPanel model =
                         <|
                             E.text "DL"
                     }
+
 
         viewUndoButton : Element Msg
         viewUndoButton =
@@ -2178,7 +2169,7 @@ createCampusWindow model =
             |> BModal.hideOnBackdropClick False
             |> BModal.small
             |> BModal.h5
-                [ HAttrs.style "padding-left" "20px"]
+                [ HAttrs.style "padding-left" "20px" ]
                 [ H.text "Let's Start SOSOGU" ]
             |> BModal.body []
                 [ BGrid.containerFluid []
@@ -2200,38 +2191,42 @@ createCampusWindow model =
                                 ]
                             ]
                         ]
-                  , BGrid.row []
-                        [ BGrid.col [ BCol.textAlign BText.alignXsCenter 
-                                    , BCol.attrs [ BUtilsSpacing.p2 ]
-                                    ]
-                            [BBtn.button
-                            [ BBtn.outlinePrimary
-                            , BBtn.primary
-                            , BBtn.attrs [ onClick CreateCampus ]
-                            , BBtn.disabled <| not (isCorrectWidthHeight model.tempCampusSize.width model.tempCampusSize.height)
+                    , BGrid.row []
+                        [ BGrid.col
+                            [ BCol.textAlign BText.alignXsCenter
+                            , BCol.attrs [ BUtilsSpacing.p2 ]
                             ]
-                            [ H.text "Create Campus" ]]
+                            [ BBtn.button
+                                [ BBtn.outlinePrimary
+                                , BBtn.primary
+                                , BBtn.attrs [ onClick CreateCampus ]
+                                , BBtn.disabled <| not (isCorrectWidthHeight model.tempCampusSize.width model.tempCampusSize.height)
+                                ]
+                                [ H.text "Create Campus" ]
+                            ]
                         ]
-                  , BGrid.row []
-                      [ BGrid.col[ BCol.textAlign BText.alignXsCenter 
-                                 , BCol.attrs []
-                                 ]
-                          [ div [] [ H.text "or" ] ]
-                      ]
-                  , BGrid.row []
-                      [ BGrid.col [ BCol.textAlign BText.alignXsCenter
-                                  , BCol.attrs [ BUtilsSpacing.p2 ]
-                                  ]
-                          [ BBtn.button
-                            [ BBtn.outlinePrimary
-                            , BBtn.secondary
-                            , BBtn.attrs [ onClick UpSavedata ]
+                    , BGrid.row []
+                        [ BGrid.col
+                            [ BCol.textAlign BText.alignXsCenter
+                            , BCol.attrs []
                             ]
-                            [ H.text "Load Savedata" ]
-                          ]
-                      ]
-                  ]
-              ]
+                            [ div [] [ H.text "or" ] ]
+                        ]
+                    , BGrid.row []
+                        [ BGrid.col
+                            [ BCol.textAlign BText.alignXsCenter
+                            , BCol.attrs [ BUtilsSpacing.p2 ]
+                            ]
+                            [ BBtn.button
+                                [ BBtn.outlinePrimary
+                                , BBtn.secondary
+                                , BBtn.attrs [ onClick UpSavedata ]
+                                ]
+                                [ H.text "Load Savedata" ]
+                            ]
+                        ]
+                    ]
+                ]
             |> BModal.view model.openingModalWindow
         ]
 
@@ -2273,7 +2268,6 @@ viewCampus model ( width, height ) =
                                             , HAttrs.style "padding" "0px"
                                             , HAttrs.style "margin" "-1px"
                                             , HEvents.onClick (ChangeColor ( x, y ) model.mainPalette)
-                                            --, HEvents.onDoubleClick (ChangeColor y x "white")
                                             ]
                                             []
                                         ]
