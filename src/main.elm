@@ -300,7 +300,7 @@ update msg model =
                         Dict.insert
                             (Dict.size model.history)
                             ( ( x, y )
-                            , getCampusColor model ( x, y )
+                            , getCampusColor model.campus ( x, y )
                             )
                             model.history
 
@@ -316,7 +316,7 @@ update msg model =
                         Dict.insert
                             (Dict.size tempHistory)
                             ( ( x, y )
-                            , getCampusColor model ( x, y )
+                            , getCampusColor model.campus ( x, y )
                             )
                             tempHistory
               }
@@ -337,7 +337,7 @@ update msg model =
 
         AddColorToSubPalette color ->
             ( { model
-                | subPalette = addColorToSubPalette model color
+                | subPalette = addColorToSubPalette model.subPalette color
                 , mainPalette = model.colorValue
               }
             , Cmd.none
@@ -345,7 +345,7 @@ update msg model =
 
         SetMainPalette n ->
             ( { model
-                | mainPalette = getSubPaletteColor model n
+                | mainPalette = getSubPaletteColor model.subPalette n
               }
             , Cmd.none
             )
@@ -987,7 +987,7 @@ makeSavedata model =
                                     ++ ","
                                     ++ String.fromInt y
                                     ++ "),"
-                                    ++ getCampusColor model ( x, y )
+                                    ++ getCampusColor model.campus ( x, y )
                             )
                         <|
                             List.range 0 (model.campusSize.width - 1)
@@ -1030,7 +1030,7 @@ makeSavedata model =
                 (\n ->
                     String.fromInt n
                         ++ ","
-                        ++ getSubPaletteColor model n
+                        ++ getSubPaletteColor model.subPalette n
                 )
             <|
                 List.range 0 (Dict.size model.subPalette - 1)
@@ -2143,7 +2143,7 @@ viewPalettePanel model =
                                     div
                                         [ HAttrs.style "width" "25px"
                                         , HAttrs.style "height" "25px"
-                                        , HAttrs.style "background-color" <| getSubPaletteColor model (plt - 1)
+                                        , HAttrs.style "background-color" <| getSubPaletteColor model.subPalette (plt - 1)
                                         , HAttrs.style "border" "solid 1px black"
                                         , onDoubleClick (DeleteSubPalette plt)
                                         , onClick (SetMainPalette (plt - 1))
@@ -2236,14 +2236,14 @@ createCampusWindow model =
 --FUNC--
 
 
-getSubPaletteColor : Model -> Int -> String
-getSubPaletteColor model n =
-    Maybe.withDefault "white" (Dict.get n model.subPalette)
+getSubPaletteColor : SubPalette -> Serial -> CssColor
+getSubPaletteColor subPalette n =
+    Maybe.withDefault "white" (Dict.get n subPalette)
 
 
-getCampusColor : Model -> Point -> String
-getCampusColor model ( x, y ) =
-    Maybe.withDefault "white" (Dict.get ( x, y ) model.campus)
+getCampusColor : Campus -> Point -> String
+getCampusColor campus ( x, y ) =
+    Maybe.withDefault "white" (Dict.get ( x, y ) campus)
 
 
 viewCampus : Model -> Points -> Html Msg
@@ -2264,7 +2264,7 @@ viewCampus model ( width, height ) =
                                             [ HAttrs.style "width" (model.setting.width ++ "px")
                                             , HAttrs.style "height" (model.setting.height ++ "px")
                                             , HAttrs.style "border" (model.setting.borderColor ++ " " ++ model.setting.borderStyle)
-                                            , HAttrs.style "background-color" (getCampusColor model ( x, y ))
+                                            , HAttrs.style "background-color" (getCampusColor model.campus ( x, y ))
                                             , HAttrs.style "padding" "0px"
                                             , HAttrs.style "margin" "-1px"
                                             , HEvents.onClick (ChangeColor ( x, y ) model.mainPalette)
@@ -2283,11 +2283,11 @@ viewCampus model ( width, height ) =
         div [] []
 
 
-addColorToSubPalette : Model -> CssColor -> SubPalette
-addColorToSubPalette model color =
+addColorToSubPalette : SubPalette -> CssColor -> SubPalette
+addColorToSubPalette subPalette color =
     let
         tempSubPalette =
-            model.subPalette
+            subPalette
                 |> DictEx.mapKeys (\n -> n + 1)
     in
     Dict.insert
@@ -2296,8 +2296,8 @@ addColorToSubPalette model color =
         tempSubPalette
 
 
-displayPalette : Model -> Html Msg
-displayPalette model =
+displayPalette : SubPalette -> Html Msg
+displayPalette subPalette=
     div [] <|
         List.map
             (\plt ->
@@ -2305,7 +2305,7 @@ displayPalette model =
                     [ div
                         [ HAttrs.id "palette_square"
                         , HEvents.onClick <| SetMainPalette (plt - 1)
-                        , HAttrs.style "background-color" <| getSubPaletteColor model (plt - 1)
+                        , HAttrs.style "background-color" <| getSubPaletteColor subPalette (plt - 1)
                         ]
                         []
                     , div [ HAttrs.id "palette_color_name" ]
@@ -2313,7 +2313,7 @@ displayPalette model =
                     ]
             )
         <|
-            List.range 1 (Dict.size model.subPalette)
+            List.range 1 (Dict.size subPalette)
 
 
 isColor : String -> Bool
