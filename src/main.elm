@@ -16,6 +16,9 @@ import Bootstrap.Modal as BModal
 import Bootstrap.Text as BText
 import Bootstrap.Utilities.Flex as BUtilsFlex
 import Bootstrap.Utilities.Spacing as BUtilsSpacing
+import Bootstrap.Utilities.Border as BUtilsBorder
+import Bootstrap.Utilities.Size as BUtilsSize
+import Bootstrap.Alert as BAlert
 import Browser
 import Bytes exposing (..)
 import Dict exposing (..)
@@ -657,19 +660,36 @@ update msg model =
             )
 
         ApplySavedata model_ ->
-            ( { model
-                | setting = settingFromSavedata model.loadedSavedata
-                , campus = campusFromSavedata model.loadedSavedata
-                , mainPalette = mainPaletteFromSavedata model.loadedSavedata
-                , campusSize = campusSizeFromSavedata model.loadedSavedata
-                , didCreateCampus = didCreateCampusFromSavedata model.loadedSavedata
-                , toolsSetting = toolsSettingFromSavedata model.loadedSavedata
-                , subPalette = subPaletteFromSavedata model.loadedSavedata
-                , history = historyFromSavedata model.loadedSavedata
-                , openingModalWindow = BModal.hidden
-              }
-            , Cmd.none
-            )
+            let
+                savedata = model.loadedSavedata
+            in
+            if isSOSOGUSavedata model.loadedSavedata then
+                ( { model
+                    | setting = settingFromSavedata savedata
+                    , campus = campusFromSavedata savedata
+                    , mainPalette = mainPaletteFromSavedata savedata
+                    , campusSize = campusSizeFromSavedata savedata
+                    , didCreateCampus = didCreateCampusFromSavedata savedata
+                    , toolsSetting = toolsSettingFromSavedata savedata
+                    , subPalette = subPaletteFromSavedata savedata
+                    , history = historyFromSavedata savedata
+                    , openingModalWindow = BModal.hidden
+                  }
+                , Cmd.none
+                )
+            else
+                ( model, Cmd.none )
+
+
+isSOSOGUSavedata : Savedata -> Bool
+isSOSOGUSavedata savedata =
+    case
+        JD.decodeString (JD.field "general" (JD.field "isSOSOGUSavedata" JD.bool)) savedata
+    of
+        Ok bool ->
+            bool
+        Err _ ->
+            False
 
 
 toolsSettingFromSavedata : Savedata -> ToolsSetting
@@ -1040,7 +1060,13 @@ makeSavedata model =
     in
     JE.encode 4 <|
         JE.object
-            [ ( "setting"
+            [ ( "general",
+                JE.object
+                    [ ( "isSOSOGUSavedata", JE.bool True )
+                    , ( "version", JE.string "1.0" )
+                    ]
+              )
+            , ( "setting"
               , JE.object
                     [ ( "borderColor", JE.string model.setting.borderColor )
                     , ( "borderStyle", JE.string model.setting.borderStyle )
@@ -1629,8 +1655,7 @@ openSettingPanel model =
                         [ BSelect.onChange Change
                         , BSelect.small
                         , BSelect.attrs
-                            [ HAttrs.style "" ""
-                            , HAttrs.style "height" "18px"
+                            [ HAttrs.style "height" "18px"
                             , HAttrs.style "width" "80px"
                             , HAttrs.style "font-size" "13px"
                             , HAttrs.style "padding" "0px"
@@ -2164,6 +2189,23 @@ isCorrectSetting setting =
 
 createCampusWindow : Model -> Html Msg
 createCampusWindow model =
+    let
+        viewLoadSavedataErr : Html Msg
+        viewLoadSavedataErr =
+            case model.loadedSavedata of
+                "" ->
+                    H.text ""
+                _ ->
+                    if (isSOSOGUSavedata model.loadedSavedata) then
+                        H.text ""
+                    else
+                        BAlert.simpleDanger [ HAttrs.style "margin" "10px" 
+                                            ] 
+                                            [ div [ 
+                                                  ] 
+                                                  [H.text "Bad Savedata"]
+                                            ]
+    in
     BGrid.container []
         [ BModal.config CloseModal
             |> BModal.hideOnBackdropClick False
@@ -2223,6 +2265,13 @@ createCampusWindow model =
                                 , BBtn.attrs [ onClick UpSavedata ]
                                 ]
                                 [ H.text "Load Savedata" ]
+                            ]
+                        ]
+                    , BGrid.row []
+                        [BGrid.col
+                            [ BCol.textAlign BText.alignXsCenter
+                            ]
+                            [ div[] [viewLoadSavedataErr]
                             ]
                         ]
                     ]
