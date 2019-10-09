@@ -3,6 +3,7 @@ port module Main exposing (..)
 --import Debug exposing (..)
 
 import Array exposing (..)
+import Bootstrap.Alert as BAlert
 import Bootstrap.Button as BBtn
 import Bootstrap.CDN as BCDN
 import Bootstrap.Form.Input as BInput
@@ -14,11 +15,10 @@ import Bootstrap.Grid.Col as BCol
 import Bootstrap.Grid.Row as BRow
 import Bootstrap.Modal as BModal
 import Bootstrap.Text as BText
-import Bootstrap.Utilities.Flex as BUtilsFlex
-import Bootstrap.Utilities.Spacing as BUtilsSpacing
 import Bootstrap.Utilities.Border as BUtilsBorder
+import Bootstrap.Utilities.Flex as BUtilsFlex
 import Bootstrap.Utilities.Size as BUtilsSize
-import Bootstrap.Alert as BAlert
+import Bootstrap.Utilities.Spacing as BUtilsSpacing
 import Browser
 import Bytes exposing (..)
 import Dict exposing (..)
@@ -40,15 +40,18 @@ import Json.Decode as JD
 import Json.Encode as JE
 import List.Extra as ListEx exposing (..)
 import Parser as P exposing (..)
+import Platform.Sub exposing (..)
 import Regex exposing (..)
 import Result.Extra as ResultEX exposing (..)
 import Svg exposing (..)
 import Svg.Attributes as SAttrs exposing (..)
 import Task exposing (..)
+import Time exposing (..)
 
 
 css path =
     H.node "link" [ rel "stylesheet", href path ] []
+
 
 
 --MODEL--
@@ -72,6 +75,7 @@ type alias Model =
     , campusImageUrl : String
     , settingPanelStatus : PanelStatus
     , loadedSavedata : Savedata
+    , timeGetter : TimeGetter
     }
 
 
@@ -215,6 +219,19 @@ type alias Savedata =
     String
 
 
+type alias TimeGetter =
+    { zone : Time.Zone
+    , time : Time.Posix
+    }
+
+
+initTimeGetter : TimeGetter
+initTimeGetter =
+    { zone = Time.utc
+    , time = Time.millisToPosix 0
+    }
+
+
 
 --INIT--
 
@@ -238,8 +255,9 @@ init _ =
       , campusImageUrl = ""
       , settingPanelStatus = Close
       , loadedSavedata = ""
+      , timeGetter = initTimeGetter
       }
-    , Cmd.none
+    , Task.perform AdjustTimeZone Time.here
     )
 
 
@@ -276,6 +294,8 @@ type Msg
     | LoadSavedata File
     | ToStringSavedata String
     | ApplySavedata Model
+    | Tick Time.Posix
+    | AdjustTimeZone Time.Zone
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -289,6 +309,9 @@ update msg model =
 
         panelPosition_ =
             model.tempSetting.panelPosition
+
+        timeGetter_ =
+            model.timeGetter
     in
     case msg of
         ChangeColor ( x, y ) color ->
@@ -661,7 +684,8 @@ update msg model =
 
         ApplySavedata model_ ->
             let
-                savedata = model.loadedSavedata
+                savedata =
+                    model.loadedSavedata
             in
             if isSOSOGUSavedata model.loadedSavedata then
                 ( { model
@@ -677,8 +701,15 @@ update msg model =
                   }
                 , Cmd.none
                 )
+
             else
                 ( model, Cmd.none )
+
+        Tick newTime ->
+            ( { model | timeGetter = { timeGetter_ | time = newTime } }, Cmd.none )
+
+        AdjustTimeZone newZone ->
+            ( { model | timeGetter = { timeGetter_ | zone = newZone } }, Cmd.none )
 
 
 isSOSOGUSavedata : Savedata -> Bool
@@ -688,6 +719,7 @@ isSOSOGUSavedata savedata =
     of
         Ok bool ->
             bool
+
         Err _ ->
             False
 
@@ -984,7 +1016,91 @@ toStringSaveData file =
 
 dlSavedata : Model -> Cmd msg
 dlSavedata model =
-    FileDL.string "sosogu.json" "application/json" (makeSavedata model)
+    let
+        toStringYear =
+            String.fromInt (Time.toYear model.timeGetter.zone model.timeGetter.time)
+
+        toStringMonth =
+            monthToString (Time.toMonth model.timeGetter.zone model.timeGetter.time)
+
+        toStringDay =
+            String.fromInt (Time.toDay model.timeGetter.zone model.timeGetter.time)
+
+        toStringHour =
+            let
+                hour = String.fromInt (Time.toHour model.timeGetter.zone model.timeGetter.time)
+            in
+                if String.length hour == 1 then
+                    "0" ++ hour
+                else if String.length hour == 2 then
+                    hour
+                else
+                    hour
+
+        toStringMinute =
+            String.fromInt (Time.toMinute model.timeGetter.zone model.timeGetter.time)
+
+        toStringSecond =
+            String.fromInt (Time.toSecond model.timeGetter.zone model.timeGetter.time)
+
+        monthToString : Month -> String
+        monthToString month =
+            case month of
+                Jan ->
+                    "Jan"
+
+                Feb ->
+                    "Feb"
+
+                Mar ->
+                    "Mar"
+
+                Apr ->
+                    "Apr"
+
+                May ->
+                    "May"
+
+                Jun ->
+                    "Jun"
+
+                Jul ->
+                    "Jul"
+
+                Aug ->
+                    "Aug"
+
+                Sep ->
+                    "Sep"
+
+                Oct ->
+                    "Oct"
+
+                Nov ->
+                    "Nov"
+
+                Dec ->
+                    "Dev"
+    in
+    FileDL.string
+        ("sosogu"
+            ++ "-"
+            ++ toStringHour
+            ++ "h"
+            ++ toStringMinute
+            ++ "m"
+            ++ toStringSecond
+            ++ "s"
+            ++ "-"
+            ++ toStringYear
+            ++ "."
+            ++ toStringMonth
+            ++ "."
+            ++ toStringDay
+            ++ ".json"
+        )
+        "application/json"
+        (makeSavedata model)
 
 
 upSavedata : Cmd Msg
@@ -1060,8 +1176,8 @@ makeSavedata model =
     in
     JE.encode 4 <|
         JE.object
-            [ ( "general",
-                JE.object
+            [ ( "general"
+              , JE.object
                     [ ( "isSOSOGUSavedata", JE.bool True )
                     , ( "version", JE.string "1.0" )
                     ]
@@ -1352,7 +1468,6 @@ viewToolsPanel model =
                             E.text "DL"
                     }
 
-
         viewUndoButton : Element Msg
         viewUndoButton =
             Input.button []
@@ -1477,7 +1592,7 @@ panelHr =
         , Border.color <| shiroIro
         ]
     <|
-        none
+        E.none
 
 
 viewSettingPanel : Model -> Element Msg
@@ -2195,16 +2310,19 @@ createCampusWindow model =
             case model.loadedSavedata of
                 "" ->
                     H.text ""
+
                 _ ->
-                    if (isSOSOGUSavedata model.loadedSavedata) then
+                    if isSOSOGUSavedata model.loadedSavedata then
                         H.text ""
+
                     else
-                        BAlert.simpleDanger [ HAttrs.style "margin" "10px" 
-                                            ] 
-                                            [ div [ 
-                                                  ] 
-                                                  [H.text "Bad Savedata"]
-                                            ]
+                        BAlert.simpleDanger
+                            [ HAttrs.style "margin" "10px"
+                            ]
+                            [ div
+                                []
+                                [ H.text "Bad Savedata" ]
+                            ]
     in
     BGrid.container []
         [ BModal.config CloseModal
@@ -2268,10 +2386,10 @@ createCampusWindow model =
                             ]
                         ]
                     , BGrid.row []
-                        [BGrid.col
+                        [ BGrid.col
                             [ BCol.textAlign BText.alignXsCenter
                             ]
-                            [ div[] [viewLoadSavedataErr]
+                            [ div [] [ viewLoadSavedataErr ]
                             ]
                         ]
                     ]
@@ -2346,7 +2464,7 @@ addColorToSubPalette subPalette color =
 
 
 displayPalette : SubPalette -> Html Msg
-displayPalette subPalette=
+displayPalette subPalette =
     div [] <|
         List.map
             (\plt ->
@@ -2573,7 +2691,7 @@ main =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    campusImageUrlToElm GetImageUrl
+    batch [ campusImageUrlToElm GetImageUrl, Time.every 1000 Tick ]
 
 
 port generateCampusImage : () -> Cmd msg
