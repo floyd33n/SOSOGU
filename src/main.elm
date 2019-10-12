@@ -162,7 +162,13 @@ type alias History =
 
 initHistory : History
 initHistory =
-    Dict.fromList <| ListEx.lift2 Tuple.pair (List.range 0 0) (ListEx.lift2 Tuple.pair (ListEx.lift2 Tuple.pair (List.range 0 0) (List.range 0 0)) [ "white" ])
+    {-
+       Dict.fromList <|
+           ListEx.lift2 Tuple.pair (List.range 0 0)
+               ListEx.lift2 Tuple.pair (ListEx.lift2 Tuple.pair (List.range 0 0) (List.range 0 0)) [ "white" ]
+    -}
+    --Dict.fromList [ ( 0, ( ( 0, 0 ), "white" ) ) ]
+    Dict.empty
 
 
 type alias Setting =
@@ -418,7 +424,7 @@ update msg model =
 
         CreateCampus ->
             let
-                createCampusList : Points -> List ( ( Int, Int ), String )
+                createCampusList : Points -> List ( Point, CssColor )
                 createCampusList ( width_, height_ ) =
                     ListEx.lift2
                         Tuple.pair
@@ -1028,14 +1034,17 @@ dlSavedata model =
 
         toStringHour =
             let
-                hour = String.fromInt (Time.toHour model.timeGetter.zone model.timeGetter.time)
+                hour =
+                    String.fromInt (Time.toHour model.timeGetter.zone model.timeGetter.time)
             in
-                if String.length hour == 1 then
-                    "0" ++ hour
-                else if String.length hour == 2 then
-                    hour
-                else
-                    hour
+            if String.length hour == 1 then
+                "0" ++ hour
+
+            else if String.length hour == 2 then
+                hour
+
+            else
+                hour
 
         toStringMinute =
             String.fromInt (Time.toMinute model.timeGetter.zone model.timeGetter.time)
@@ -1086,12 +1095,9 @@ dlSavedata model =
         ("sosogu"
             ++ "-"
             ++ toStringHour
-            ++ "h"
-            ++ toStringMinute
-            ++ "m"
-            ++ toStringSecond
-            ++ "s"
             ++ "-"
+            ++ toStringMinute
+            ++ "_"
             ++ toStringYear
             ++ "."
             ++ toStringMonth
