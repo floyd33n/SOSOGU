@@ -5,7 +5,7 @@
   <title>SOSOGU</title>
   <link rel="stylesheet" href="style.css">
   <link rel="shortcut icon" href="file/favicon.ico">
-  <script src="main.min.js"></script>
+  <script src="main.js"></script>
 </head>
 
 <body>
@@ -19,8 +19,6 @@
     app.ports.generateCampusImage.subscribe(function () {
       html2canvas(document.getElementById("campus")).then(canvas => {
           var campusImg = canvas.toDataURL();
-          document.getElementById("downloadImage").href = campusImg;
-          document.getElementById("downloadImage").download = 'campus.png';
           app.ports.campusImageUrlToElm.send(campusImg)
         });
     });
