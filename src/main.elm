@@ -3,6 +3,7 @@ port module Main exposing (..)
 --import Debug exposing (..)
 
 import Array exposing (..)
+import Base64 exposing (..)
 import Bootstrap.Alert as BAlert
 import Bootstrap.Button as BBtn
 import Bootstrap.CDN as BCDN
@@ -21,6 +22,8 @@ import Bootstrap.Utilities.Size as BUtilsSize
 import Bootstrap.Utilities.Spacing as BUtilsSpacing
 import Browser
 import Bytes exposing (..)
+import Bytes.Decode as BD exposing (..)
+import Bytes.Encode as BE exposing (..)
 import Dict exposing (..)
 import Dict.Extra as DictEx
 import Element as E exposing (..)
@@ -76,6 +79,7 @@ type alias Model =
     , settingPanelStatus : PanelStatus
     , loadedSavedata : Savedata
     , timeGetter : TimeGetter
+    , saveModalWindow : BModal.Visibility
     }
 
 
@@ -262,6 +266,7 @@ init _ =
       , settingPanelStatus = Close
       , loadedSavedata = ""
       , timeGetter = initTimeGetter
+      , saveModalWindow = BModal.hidden
       }
     , Task.perform AdjustTimeZone Time.here
     )
@@ -281,14 +286,13 @@ type Msg
     | SetCampusHeight String
     | CreateCampus
     | ShowModal
-    | CloseModal
+    | CloseCreateCampusWindow
     | BorderColorValue String
     | Change String
     | ChangePixelSize String String
     | SetPixelWidth String
     | SetPixelHeight String
     | SetCampusPosition CampusPosition
-    | GenerateImage
     | ChangePanelPosition Panel Position
     | ApplySetting
     | Undo Point
@@ -302,6 +306,9 @@ type Msg
     | ApplySavedata Model
     | Tick Time.Posix
     | AdjustTimeZone Time.Zone
+    | ShowSaveWindow
+    | CloseSaveWindow
+    | DLImage
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -461,7 +468,7 @@ update msg model =
             , Cmd.none
             )
 
-        CloseModal ->
+        CloseCreateCampusWindow ->
             ( { model | openingModalWindow = BModal.hidden }
             , Cmd.none
             )
@@ -550,15 +557,6 @@ update msg model =
                     }
               }
             , Cmd.none
-            )
-
-        GenerateImage ->
-            ( { model
-                | toolsSetting =
-                    { isDisplayDlButton = True
-                    }
-              }
-            , generateCampusImage ()
             )
 
         GetImageUrl url ->
@@ -716,6 +714,44 @@ update msg model =
 
         AdjustTimeZone newZone ->
             ( { model | timeGetter = { timeGetter_ | zone = newZone } }, Cmd.none )
+
+        ShowSaveWindow ->
+            ( { model | saveModalWindow = BModal.shown }
+            , generateCampusImage ()
+            )
+
+        CloseSaveWindow ->
+            ( { model | saveModalWindow = BModal.hidden }
+            , Cmd.none
+            )
+
+        DLImage ->
+            ( model
+            , dlImage model.campusImageUrl
+            )
+
+
+dlImage : String -> Cmd Msg
+dlImage url =
+    let
+        base64ToBytes =
+            case
+                Base64.toBytes <|
+                    String.dropLeft 22 url
+            of
+                Nothing ->
+                    Just dummyBytes
+
+                Just bytes ->
+                    Just bytes
+
+        dummyBytes =
+            BE.encode (BE.string "")
+
+        imageBytes =
+            Maybe.withDefault dummyBytes base64ToBytes
+    in
+    FileDL.bytes "campus.png" "image/png" imageBytes
 
 
 isSOSOGUSavedata : Savedata -> Bool
@@ -1257,7 +1293,8 @@ view model =
     div
         [ HAttrs.style "height" "100%"
         ]
-        [ layout
+        [ viewSaveWindow model
+        , layout
             []
           <|
             column [ E.width E.fill, E.height E.fill ]
@@ -1408,72 +1445,6 @@ campusPosition setting =
 viewToolsPanel : Model -> Element Msg
 viewToolsPanel model =
     let
-        generateButton : Element Msg
-        generateButton =
-            if model.didCreateCampus then
-                Input.button []
-                    { onPress = Just GenerateImage
-                    , label =
-                        E.el
-                            [ Font.color <| shiroIro
-                            , Font.size <| 14
-                            ]
-                        <|
-                            E.text "Gen"
-                    }
-
-            else
-                Input.button []
-                    { onPress = Nothing
-                    , label =
-                        E.el
-                            [ Font.color <| shiroIro
-                            , Font.size <| 14
-                            , Font.strike
-                            , E.alpha 0.6
-                            ]
-                        <|
-                            E.text "Gen"
-                    }
-
-        dlButton : Element Msg
-        dlButton =
-            if model.toolsSetting.isDisplayDlButton then
-                Input.button []
-                    { onPress = Nothing
-                    , label =
-                        E.el
-                            [ Font.color <| shiroIro
-                            , Font.size <| 14
-                            , htmlAttribute <| HAttrs.href model.campusImageUrl
-                            ]
-                        <|
-                            html <|
-                                H.a
-                                    [ HAttrs.style "color" "white"
-                                    , HAttrs.style "font-size" "14px"
-                                    , HAttrs.href model.campusImageUrl
-                                    , HAttrs.target "_blank"
-                                    , HAttrs.id "downloadImage"
-                                    , HAttrs.download "campus.png"
-                                    ]
-                                    [ H.text "DL" ]
-                    }
-
-            else
-                Input.button []
-                    { onPress = Nothing
-                    , label =
-                        E.el
-                            [ Font.color <| shiroIro
-                            , Font.size <| 14
-                            , Font.strike
-                            , E.alpha 0.6
-                            ]
-                        <|
-                            E.text "DL"
-                    }
-
         viewUndoButton : Element Msg
         viewUndoButton =
             Input.button []
@@ -1499,7 +1470,7 @@ viewToolsPanel model =
         saveButton : Element Msg
         saveButton =
             Input.button []
-                { onPress = Just DLSavedata
+                { onPress = Just ShowSaveWindow
                 , label =
                     E.el
                         [ Font.color <| shiroIro
@@ -1508,20 +1479,6 @@ viewToolsPanel model =
                     <|
                         E.text <|
                             "Save"
-                }
-
-        loadButton : Element Msg
-        loadButton =
-            Input.button []
-                { onPress = Just UpSavedata
-                , label =
-                    E.el
-                        [ Font.color <| shiroIro
-                        , Font.size <| 14
-                        ]
-                    <|
-                        E.text <|
-                            "Load"
                 }
     in
     row
@@ -1567,10 +1524,6 @@ viewToolsPanel model =
             , E.spacing 5
             ]
             [ saveButton
-            , loadButton
-            , verticalLine
-            , generateButton
-            , dlButton
             , verticalLine
             , viewUndoButton
             ]
@@ -2308,6 +2261,48 @@ isCorrectSetting setting =
     isColor setting.borderColor && isCorrectWidthHeight setting.width setting.height
 
 
+viewSaveWindow : Model -> Html Msg
+viewSaveWindow model =
+    BGrid.container []
+        [ BModal.config CloseSaveWindow
+            |> BModal.hideOnBackdropClick True
+            |> BModal.h5 [] [ H.text "Save" ]
+            |> BModal.body []
+                [ BGrid.containerFluid []
+                    [ BGrid.row []
+                        [ BGrid.col
+                            [ BCol.xs6 ]
+                            [ div [] [ H.text "Save Project" ]
+                            , div []
+                                [ BBtn.button
+                                    [ BBtn.outlinePrimary
+                                    , BBtn.primary
+                                    , BBtn.attrs [ onClick DLSavedata ]
+                                    ]
+                                    [ H.text "DL Savedata" ]
+                                ]
+                            ]
+                        , BGrid.col
+                            [ BCol.xs6 ]
+                            [ div [] [ H.text "Save Image" ]
+                            , div []
+                                [ BBtn.button
+                                    [ BBtn.outlinePrimary
+                                    , BBtn.primary
+                                    , BBtn.attrs
+                                        [ onClick DLImage
+                                        ]
+                                    ]
+                                    [ H.text "DL Image" ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            |> BModal.view model.saveModalWindow
+        ]
+
+
 createCampusWindow : Model -> Html Msg
 createCampusWindow model =
     let
@@ -2331,7 +2326,7 @@ createCampusWindow model =
                             ]
     in
     BGrid.container []
-        [ BModal.config CloseModal
+        [ BModal.config CloseCreateCampusWindow
             |> BModal.hideOnBackdropClick False
             |> BModal.small
             |> BModal.h5
