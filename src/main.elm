@@ -4,43 +4,43 @@ port module Main exposing (..)
 
 import Array exposing (..)
 import Base64 exposing (..)
-import Bootstrap.Alert as BAlert
-import Bootstrap.Button as BBtn
-import Bootstrap.CDN as BCDN
-import Bootstrap.Form.Input as BInput
-import Bootstrap.Form.Radio as BRadio
-import Bootstrap.Form.Select as BSelect
-import Bootstrap.General.HAlign as BGHAlign
-import Bootstrap.Grid as BGrid
-import Bootstrap.Grid.Col as BCol
-import Bootstrap.Grid.Row as BRow
-import Bootstrap.Modal as BModal
-import Bootstrap.Text as BText
-import Bootstrap.Utilities.Border as BUtilsBorder
-import Bootstrap.Utilities.Flex as BUtilsFlex
-import Bootstrap.Utilities.Size as BUtilsSize
-import Bootstrap.Utilities.Spacing as BUtilsSpacing
+import Bootstrap.Alert as BAlert exposing (..)
+import Bootstrap.Button as BBtn exposing (..)
+import Bootstrap.CDN as BCDN exposing (..)
+import Bootstrap.Form.Input as BInput exposing (..)
+import Bootstrap.Form.Radio as BRadio exposing (..)
+import Bootstrap.Form.Select as BSelect exposing (..)
+import Bootstrap.General.HAlign as BGHAlign exposing (..)
+import Bootstrap.Grid as BGrid exposing (..)
+import Bootstrap.Grid.Col as BCol exposing (..)
+import Bootstrap.Grid.Row as BRow exposing (..)
+import Bootstrap.Modal as BModal exposing (..)
+import Bootstrap.Text as BText exposing (..)
+import Bootstrap.Utilities.Border as BUtilsBorder exposing (..)
+import Bootstrap.Utilities.Flex as BUtilsFlex exposing (..)
+import Bootstrap.Utilities.Size as BUtilsSize exposing (..)
+import Bootstrap.Utilities.Spacing as BUtilsSpacing exposing (..)
 import Browser
 import Bytes exposing (..)
 import Bytes.Decode as BD exposing (..)
 import Bytes.Encode as BE exposing (..)
 import Dict exposing (..)
-import Dict.Extra as DictEx
+import Dict.Extra as DictEx exposing (..)
 import Element as E exposing (..)
-import Element.Background as Background
-import Element.Border as Border
-import Element.Font as Font
-import Element.Input as Input
-import Element.Region as Region
+import Element.Background as Background exposing (..)
+import Element.Border as Border exposing (..)
+import Element.Font as Font exposing (..)
+import Element.Input as Input exposing (..)
+import Element.Region as Region exposing (..)
 import File exposing (..)
-import File.Download as FileDL
-import File.Select as FileSel
+import File.Download as FileDL exposing (..)
+import File.Select as FileSel exposing (..)
 import Html as H exposing (..)
 import Html.Attributes as HAttrs exposing (..)
 import Html.Events as HEvents exposing (..)
 import Html.Lazy as HLazy exposing (..)
-import Json.Decode as JD
-import Json.Encode as JE
+import Json.Decode as JD exposing (..)
+import Json.Encode as JE exposing (..)
 import List.Extra as ListEx exposing (..)
 import Parser as P exposing (..)
 import Platform.Sub exposing (..)
@@ -1298,7 +1298,7 @@ view model =
             []
           <|
             column [ E.width E.fill, E.height E.fill ]
-                [ row
+                [ E.row
                     [ E.width E.fill
                     , E.height <| px 50
                     , Background.color <| rouIro
@@ -1307,7 +1307,7 @@ view model =
                     , Border.color <| shiroIro
                     ]
                     [ E.row
-                        [ alignLeft
+                        [ E.alignLeft
                         , Font.color <| shiroIro
                         , htmlAttribute <| HAttrs.style "letter-spacing" "0.06em"
                         , E.spacing 5
@@ -1321,8 +1321,8 @@ view model =
                             }
                         , E.text "SOSOGU"
                         ]
-                    , row
-                        [ alignRight
+                    , E.row
+                        [ E.alignRight
                         , E.spacing 6
                         ]
                         [ newTabLink []
@@ -1402,7 +1402,7 @@ viewPanels model =
                     , viewCampusPanel model
                     ]
     in
-    row
+    E.row
         [ E.width E.fill
         , E.height E.fill
         ]
@@ -1432,12 +1432,12 @@ campusPosition setting =
             ]
 
         TopRight ->
-            [ alignRight
+            [ E.alignRight
             , alignTop
             ]
 
         TopLeft ->
-            [ alignLeft
+            [ E.alignLeft
             , alignTop
             ]
 
@@ -1481,7 +1481,7 @@ viewToolsPanel model =
                             "Save"
                 }
     in
-    row
+    E.row
         [ E.width E.fill
         , E.height <| px 36
         , case ( model.setting.panelPosition.settingPanel, model.setting.panelPosition.palettePanel ) of
@@ -1509,7 +1509,7 @@ viewToolsPanel model =
             , htmlAttribute <| HAttrs.property "aria-label" (JE.string "Bottom")
             ]
           <|
-            row
+            E.row
                 [ E.spacing 2
                 ]
                 [ E.image [ htmlAttribute <| HAttrs.style "filter" "invert(100%)" ]
@@ -1519,7 +1519,7 @@ viewToolsPanel model =
                 , E.text "Tools"
                 ]
         , E.row
-            [ alignRight
+            [ E.alignRight
             , paddingXY 20 0
             , E.spacing 5
             ]
@@ -1624,7 +1624,7 @@ openSettingPanel model =
                     { onPress = Just CloseSettingPanel
                     , label =
                         E.el [ centerX ] <|
-                            row [ E.spacing 2 ]
+                            E.row [ E.spacing 2 ]
                                 [ E.el
                                     [ Border.color <| shiroIro
                                     , Border.width <| 1
@@ -1716,7 +1716,7 @@ openSettingPanel model =
                         item_ : String -> String -> BSelect.Item msg
                         item_ value_ text_ =
                             BSelect.item
-                                [ value value_
+                                [ HAttrs.value value_
                                 , HAttrs.style "height" "13px"
                                 , HAttrs.style "position" "relative"
                                 , HAttrs.style "text-align" "center"
@@ -1779,7 +1779,7 @@ openSettingPanel model =
                                 else
                                     ""
                 in
-                [ row
+                [ E.row
                     [ Font.color <| shiroIro
                     , Font.size <| 14
                     , centerX
@@ -1808,7 +1808,7 @@ openSettingPanel model =
                         , HAttrs.style "font-size" "13px"
                         ]
                         [ H.text <| pixelSizeErr model.tempSetting.width ]
-                , row
+                , E.row
                     [ Font.color <| shiroIro
                     , Font.size <| 14
                     , centerX
@@ -1949,7 +1949,7 @@ viewCampusPositionSetting tempSetting =
         tempDiv : CampusPosition -> Html Msg
         tempDiv position_ =
             div
-                [ onClick (SetCampusPosition position_)
+                [ HEvents.onClick (SetCampusPosition position_)
                 , HAttrs.style "border" "none"
                 , HAttrs.style "width" "15px"
                 , HAttrs.style "height" "15px"
@@ -1985,7 +1985,7 @@ viewSettingPalettePositionSelect panel_ tempSetting =
         temp_ : Position -> Html Msg
         temp_ position_ =
             div
-                [ onClick (ChangePanelPosition panel_ position_)
+                [ HEvents.onClick (ChangePanelPosition panel_ position_)
                 , HAttrs.style "border" "none"
                 , HAttrs.style "width" "15px"
                 , HAttrs.style "height" "15px"
@@ -2048,7 +2048,7 @@ viewPalettePanel model =
         , Border.color <| shiroIro
         , Background.color <| rouIro
         ]
-        [ row
+        [ E.row
             [ Font.color <| shiroIro
             , Font.size <| 16
             , centerX
@@ -2128,7 +2128,7 @@ viewPalettePanel model =
                         ]
                         { onPress = Just (AddColorToSubPalette model.colorValue)
                         , label =
-                            row
+                            E.row
                                 [ centerX
                                 , centerY
                                 ]
@@ -2164,7 +2164,7 @@ viewPalettePanel model =
                             ]
                             { onPress = Nothing
                             , label =
-                                row
+                                E.row
                                     [ centerX
                                     , centerY
                                     ]
@@ -2245,7 +2245,7 @@ viewPalettePanel model =
                                         , HAttrs.style "background-color" <| getSubPaletteColor model.subPalette (plt - 1)
                                         , HAttrs.style "border" "solid 1px black"
                                         , onDoubleClick (DeleteSubPalette plt)
-                                        , onClick (SetMainPalette (plt - 1))
+                                        , HEvents.onClick (SetMainPalette (plt - 1))
                                         ]
                                         []
                         )
@@ -2277,7 +2277,7 @@ viewSaveWindow model =
                                 [ BBtn.button
                                     [ BBtn.outlinePrimary
                                     , BBtn.primary
-                                    , BBtn.attrs [ onClick DLSavedata ]
+                                    , BBtn.onClick DLSavedata
                                     ]
                                     [ H.text "DL Savedata" ]
                                 ]
@@ -2289,9 +2289,7 @@ viewSaveWindow model =
                                 [ BBtn.button
                                     [ BBtn.outlinePrimary
                                     , BBtn.primary
-                                    , BBtn.attrs
-                                        [ onClick DLImage
-                                        ]
+                                    , BBtn.onClick DLImage
                                     ]
                                     [ H.text "DL Image" ]
                                 ]
@@ -2360,7 +2358,7 @@ createCampusWindow model =
                             [ BBtn.button
                                 [ BBtn.outlinePrimary
                                 , BBtn.primary
-                                , BBtn.attrs [ onClick CreateCampus ]
+                                , BBtn.onClick CreateCampus
                                 , BBtn.disabled <| not (isCorrectWidthHeight model.tempCampusSize.width model.tempCampusSize.height)
                                 ]
                                 [ H.text "Create Campus" ]
@@ -2381,7 +2379,7 @@ createCampusWindow model =
                             [ BBtn.button
                                 [ BBtn.outlinePrimary
                                 , BBtn.secondary
-                                , BBtn.attrs [ onClick UpSavedata ]
+                                , BBtn.onClick UpSavedata
                                 ]
                                 [ H.text "Load Savedata" ]
                             ]
