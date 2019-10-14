@@ -681,7 +681,7 @@ update msg model =
 
         ToStringSavedata savedata ->
             ( { model
-                | loadedSavedata = savedata
+                | loadedSavedata = decodeSavedata savedata
               }
             , applySavedata model
             )
@@ -1142,12 +1142,27 @@ dlSavedata model =
             ++ ".json"
         )
         "application/json"
-        (makeSavedata model)
+        (encodeSavedataWithBase64 model)
 
 
 upSavedata : Cmd Msg
 upSavedata =
     FileSel.file [ "application/json" ] LoadSavedata
+
+
+encodeSavedataWithBase64 model =
+    Maybe.withDefault "fk" (Base64.fromBytes (BE.encode (BE.string (makeSavedata model))))
+
+
+decodeSavedata savedata =
+    let
+        dummy =
+            BE.encode (BE.string "")
+
+        b64ToBytes =
+            Maybe.withDefault dummy (Base64.toBytes savedata)
+    in
+    Maybe.withDefault "" (BD.decode (BD.string (Bytes.width b64ToBytes)) b64ToBytes)
 
 
 makeSavedata : Model -> String
