@@ -1141,13 +1141,13 @@ dlSavedata model =
             ++ toStringDay
             ++ ".json"
         )
-        "application/json"
+        ""
         (encodeSavedataWithBase64 model)
 
 
 upSavedata : Cmd Msg
 upSavedata =
-    FileSel.file [ "application/json" ] LoadSavedata
+    FileSel.file [ "" ] LoadSavedata
 
 
 encodeSavedataWithBase64 model =
