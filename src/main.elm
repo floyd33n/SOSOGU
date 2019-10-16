@@ -1462,7 +1462,11 @@ viewToolsPanel model =
     let
         viewUndoButton : Element Msg
         viewUndoButton =
-            Input.button []
+            Input.button
+                [ Border.color shiroIro
+                , Border.widthEach { top = 0, right = 0, left = 0, bottom = 1 }
+                , E.height <| px 18
+                ]
                 { onPress =
                     let
                         x =
@@ -1476,6 +1480,7 @@ viewToolsPanel model =
                     E.el
                         [ Font.color <| shiroIro
                         , Font.size <| 14
+                        , centerY
                         ]
                     <|
                         E.text <|
@@ -1484,12 +1489,17 @@ viewToolsPanel model =
 
         saveButton : Element Msg
         saveButton =
-            Input.button []
+            Input.button
+                [ Border.color <| shiroIro
+                , Border.widthEach { top = 0, right = 0, left = 0, bottom = 1 }
+                , E.height <| px 18
+                ]
                 { onPress = Just ShowSaveWindow
                 , label =
                     E.el
                         [ Font.color <| shiroIro
                         , Font.size <| 14
+                        , centerY
                         ]
                     <|
                         E.text <|
@@ -1536,7 +1546,7 @@ viewToolsPanel model =
         , E.row
             [ E.alignRight
             , paddingXY 20 0
-            , E.spacing 5
+            , E.spacing 10
             ]
             [ saveButton
             , verticalLine
