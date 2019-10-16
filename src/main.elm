@@ -2310,7 +2310,7 @@ viewSaveWindow model =
                         , BGrid.col
                             [ BCol.xs6 ]
                             [ div [] [ H.text "Save Image" ]
-                            , div []
+                            , div [ HAttrs.id "downloadImage" ]
                                 [ BBtn.button
                                     [ BBtn.outlinePrimary
                                     , BBtn.primary
