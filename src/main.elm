@@ -80,6 +80,8 @@ type alias Model =
     , loadedSavedata : Savedata
     , timeGetter : TimeGetter
     , saveModalWindow : BModal.Visibility
+    , saveEditingCampusModalWindow : BModal.Visibility
+    , saveAndNewCampusModalWindow : BModal.Visibility
     }
 
 
@@ -242,6 +244,11 @@ initTimeGetter =
     }
 
 
+type YN
+    = Yes
+    | No
+
+
 
 --INIT--
 
@@ -267,6 +274,8 @@ init _ =
       , loadedSavedata = ""
       , timeGetter = initTimeGetter
       , saveModalWindow = BModal.hidden
+      , saveEditingCampusModalWindow = BModal.hidden
+      , saveAndNewCampusModalWindow = BModal.hidden
       }
     , Task.perform AdjustTimeZone Time.here
     )
@@ -309,6 +318,9 @@ type Msg
     | ShowSaveWindow
     | CloseSaveWindow
     | DLImage
+    | NewProject
+    | SaveEditingCampusModalWindow YN
+    | CloseSaveEditingCampusModalWindow
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -721,13 +733,55 @@ update msg model =
             )
 
         CloseSaveWindow ->
-            ( { model | saveModalWindow = BModal.hidden }
+            ( { model
+                | saveModalWindow = BModal.hidden
+                , saveAndNewCampusModalWindow = BModal.hidden
+              }
             , Cmd.none
             )
 
         DLImage ->
             ( model
             , dlImage model.campusImageUrl
+            )
+
+        NewProject ->
+            ( if model.didCreateCampus then
+                { model
+                    | saveEditingCampusModalWindow = BModal.shown
+                }
+
+              else
+                { model
+                    | openingModalWindow = BModal.shown
+                }
+            , Cmd.none
+            )
+
+        SaveEditingCampusModalWindow yn ->
+            case yn of
+                Yes ->
+                    ( { model
+                        | saveEditingCampusModalWindow = BModal.hidden
+                        , saveAndNewCampusModalWindow = BModal.shown
+                      }
+                    , Cmd.none
+                    )
+
+                No ->
+                    ( { model
+                        | saveEditingCampusModalWindow = BModal.hidden
+                        , saveAndNewCampusModalWindow = BModal.hidden
+                        , openingModalWindow = BModal.shown
+                      }
+                    , Cmd.none
+                    )
+
+        CloseSaveEditingCampusModalWindow ->
+            ( { model
+                | saveEditingCampusModalWindow = BModal.hidden
+              }
+            , Cmd.none
             )
 
 
@@ -1309,6 +1363,8 @@ view model =
         [ HAttrs.style "height" "100%"
         ]
         [ viewSaveWindow model
+        , viewConfirmSaveCampus model
+        , viewSaveAndNewCampusModalWindow model
         , layout
             []
           <|
@@ -1505,6 +1561,25 @@ viewToolsPanel model =
                         E.text <|
                             "Save"
                 }
+
+        newButton : Element Msg
+        newButton =
+            Input.button
+                [ Border.color <| shiroIro
+                , Border.widthEach { top = 0, right = 0, left = 0, bottom = 1 }
+                , E.height <| px 18
+                ]
+                { onPress = Just NewProject
+                , label =
+                    E.el
+                        [ Font.color <| shiroIro
+                        , Font.size <| 14
+                        , centerY
+                        ]
+                    <|
+                        E.text <|
+                            "New"
+                }
     in
     E.row
         [ E.width E.fill
@@ -1548,7 +1623,9 @@ viewToolsPanel model =
             , paddingXY 20 0
             , E.spacing 10
             ]
-            [ saveButton
+            [ newButton
+            , verticalLine
+            , saveButton
             , verticalLine
             , viewUndoButton
             ]
@@ -2284,6 +2361,98 @@ viewPalettePanel model =
 isCorrectSetting : Setting -> Bool
 isCorrectSetting setting =
     isColor setting.borderColor && isCorrectWidthHeight setting.width setting.height
+
+
+viewConfirmSaveCampus : Model -> Html Msg
+viewConfirmSaveCampus model =
+    BGrid.container []
+        [ BModal.config CloseSaveEditingCampusModalWindow
+            |> BModal.hideOnBackdropClick True
+            |> BModal.h5 [] [ H.text "Save Editing Campus?" ]
+            |> BModal.body []
+                [ BGrid.containerFluid []
+                    [ BGrid.row []
+                        [ BGrid.col
+                            [ BCol.xs6 ]
+                            [ div []
+                                [ BBtn.button
+                                    [ BBtn.outlineSecondary
+                                    , BBtn.secondary
+                                    , BBtn.onClick (SaveEditingCampusModalWindow No)
+                                    ]
+                                    [ H.text "No" ]
+                                ]
+                            ]
+                        , BGrid.col
+                            [ BCol.xs6 ]
+                            [ div []
+                                [ BBtn.button
+                                    [ BBtn.outlinePrimary
+                                    , BBtn.primary
+                                    , BBtn.onClick (SaveEditingCampusModalWindow Yes)
+                                    ]
+                                    [ H.text "Yes" ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            |> BModal.view model.saveEditingCampusModalWindow
+        ]
+
+
+viewSaveAndNewCampusModalWindow : Model -> Html Msg
+viewSaveAndNewCampusModalWindow model =
+    BGrid.container []
+        [ BModal.config CloseSaveWindow
+            |> BModal.hideOnBackdropClick True
+            |> BModal.h5 [] [ H.text "Save" ]
+            |> BModal.body []
+                [ BGrid.containerFluid []
+                    [ BGrid.row []
+                        [ BGrid.col
+                            [ BCol.xs6 ]
+                            [ div [] [ H.text "Save Project" ]
+                            , div []
+                                [ BBtn.button
+                                    [ BBtn.outlinePrimary
+                                    , BBtn.primary
+                                    , BBtn.onClick DLSavedata
+                                    ]
+                                    [ H.text "DL Savedata" ]
+                                ]
+                            ]
+                        , BGrid.col
+                            [ BCol.xs6 ]
+                            [ div [] [ H.text "Save Image" ]
+                            , div [ HAttrs.id "downloadImage" ]
+                                [ BBtn.button
+                                    [ BBtn.outlinePrimary
+                                    , BBtn.primary
+                                    , BBtn.onClick DLImage
+                                    ]
+                                    [ H.text "DL Image" ]
+                                ]
+                            ]
+                        ]
+                    , BGrid.row []
+                        [ BGrid.col
+                            [ BCol.xs6 ]
+                            [ div [] [ H.text "New Campus" ]
+                            , div []
+                                [ BBtn.button
+                                    [ BBtn.outlinePrimary
+                                    , BBtn.primary
+                                    , BBtn.onClick (SaveEditingCampusModalWindow No)
+                                    ]
+                                    [ H.text "New Campus" ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            |> BModal.view model.saveAndNewCampusModalWindow
+        ]
 
 
 viewSaveWindow : Model -> Html Msg
