@@ -205,8 +205,8 @@ initSetting : Setting
 initSetting =
     { borderColor = "black"
     , borderStyle = "solid 1px"
-    , width = "20"
-    , height = "20"
+    , width = "10"
+    , height = "10"
     , panelPosition = initPanelPosition
     }
 
@@ -2621,11 +2621,10 @@ viewCampus model ( width, height ) =
                                         ]
                                     <|
                                         [ div
-                                            [ HAttrs.style "width" (model.setting.width ++ "px")
-                                            , HAttrs.style "height" (model.setting.height ++ "px")
+                                            [ HAttrs.style "padding-right" (model.setting.width ++ "px")
+                                            , HAttrs.style "padding-top" (model.setting.height ++ "px")
                                             , HAttrs.style "border" (model.setting.borderColor ++ " " ++ model.setting.borderStyle)
                                             , HAttrs.style "background-color" (getCampusColor model.campus ( x, y ))
-                                            , HAttrs.style "padding" "0px"
                                             , HAttrs.style "margin" "-1px"
                                             , HEvents.onClick (ChangeColor ( x, y ) model.mainPalette)
                                             ]
