@@ -2,5 +2,5 @@
 Pixel Art Editor.
 ## Build
 ```
-elm make src/main.elm --output=main.js
+./optimize.sh src/main.elm
 ```
