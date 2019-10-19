@@ -48,6 +48,7 @@ import Regex exposing (..)
 import Result.Extra as ResultEX exposing (..)
 import Svg exposing (..)
 import Svg.Attributes as SAttrs exposing (..)
+import Svg.Events as SEvents exposing (..)
 import Task exposing (..)
 import Time exposing (..)
 
@@ -179,11 +180,15 @@ initHistory =
 
 type alias Setting =
     { borderColor : CssColor
-    , borderStyle : String
+    , borderStyle : BorderStyle
     , width : String
     , height : String
     , panelPosition : PanelPosition
     }
+
+
+type alias BorderStyle =
+    String
 
 
 type alias PanelPosition =
@@ -204,9 +209,9 @@ initPanelPosition =
 initSetting : Setting
 initSetting =
     { borderColor = "black"
-    , borderStyle = "solid 1px"
-    , width = "10"
-    , height = "10"
+    , borderStyle = "solid"
+    , width = "20"
+    , height = "20"
     , panelPosition = initPanelPosition
     }
 
@@ -904,7 +909,7 @@ settingFromSavedata savedata =
                     style
 
                 Err _ ->
-                    "solid 1px"
+                    "solid"
 
         decodeWidth : String
         decodeWidth =
@@ -1837,13 +1842,10 @@ openSettingPanel model =
                             , HAttrs.style "padding" "0px"
                             ]
                         ]
-                        [ item_ "solid 1px" "solid"
+                        [ item_ "solid" "solid"
                         , item_ "none" "none"
-                        , item_ "dotted 1px" "dotted"
-                        , item_ "dashed 1px" "dashed"
-                        , item_ "double" "double"
-                        , item_ "groove" "groove"
-                        , item_ "ridge" "ridge"
+                        , item_ "dotted" "dotted"
+                        , item_ "dashed" "dashed"
                         ]
             ]
 
@@ -2606,8 +2608,8 @@ getCampusColor campus ( x, y ) =
     Maybe.withDefault "white" (Dict.get ( x, y ) campus)
 
 
-viewCampus : Model -> Points -> Html Msg
-viewCampus model ( width, height ) =
+viewCampusS : Model -> Points -> Html Msg
+viewCampusS model ( width, height ) =
     if model.didCreateCampus then
         div [ HAttrs.id "campus" ]
             [ div [] <|
@@ -2629,6 +2631,82 @@ viewCampus model ( width, height ) =
                                             , HEvents.onClick (ChangeColor ( x, y ) model.mainPalette)
                                             ]
                                             []
+                                        ]
+                                )
+                            <|
+                                List.range 0 (width - 1)
+                    )
+                <|
+                    List.range 0 (height - 1)
+            ]
+
+    else
+        div [] []
+
+
+viewCampus : Model -> Points -> Html Msg
+viewCampus model ( width, height ) =
+    let
+        strokeAttrs : BorderStyle -> CssColor -> List (Svg.Attribute msg)
+        strokeAttrs style color =
+            case style of
+                "solid" ->
+                    [ SAttrs.stroke color
+                    ]
+
+                "none" ->
+                    [ SAttrs.stroke "" ]
+
+                "dashed" ->
+                    [ SAttrs.stroke color
+                    , SAttrs.strokeDasharray "4"
+                    ]
+
+                "dotted" ->
+                    [ SAttrs.stroke color
+                    , SAttrs.strokeDasharray "1"
+                    ]
+
+                _ ->
+                    [ SAttrs.stroke "red" ]
+    in
+    if model.didCreateCampus then
+        div
+            [ HAttrs.id "campus"
+            ]
+            [ div [] <|
+                List.map
+                    (\y ->
+                        div [] <|
+                            List.map
+                                (\x ->
+                                    div
+                                        [ HAttrs.style "float" "left"
+                                        , HAttrs.style "width" ("calc(1px + " ++ model.setting.width ++ "px)")
+                                        , HAttrs.style "height" ("calc(1px + " ++ model.setting.height ++ "px)")
+                                        , HAttrs.style "margin" "-1px"
+                                        , HAttrs.style "display" "flex"
+                                        ]
+                                    <|
+                                        [ Svg.svg
+                                            [ SAttrs.viewBox ("0, 0, " ++ model.setting.width ++ ", " ++ model.setting.height)
+                                            , SAttrs.width (model.setting.width ++ "px")
+                                            , SAttrs.height (model.setting.height ++ "px")
+                                            ]
+                                            [ rect
+                                                (List.append
+                                                    [ SAttrs.strokeWidth "1"
+                                                    , SAttrs.fill <| getCampusColor model.campus ( x, y )
+                                                    , SAttrs.width (model.setting.width ++ "px")
+                                                    , SAttrs.height (model.setting.height ++ "px")
+                                                    , SEvents.onClick (ChangeColor ( x, y ) model.mainPalette)
+                                                    , SAttrs.x "0"
+                                                    , SAttrs.y "0"
+                                                    ]
+                                                    (strokeAttrs model.setting.borderStyle model.setting.borderColor)
+                                                )
+                                                []
+                                            ]
                                         ]
                                 )
                             <|
