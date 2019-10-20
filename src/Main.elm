@@ -59,42 +59,6 @@ css path =
     H.node "link" [ rel "stylesheet", href path ] []
 
 
-initMainPalette : CssColor
-initMainPalette =
-    "white"
-
-
-initColorValue : CssColor
-initColorValue =
-    "white"
-
-
-initBorderColorValue : CssColor
-initBorderColorValue =
-    "black"
-
-
-initCampus : Campus
-initCampus =
-    Dict.empty
-
-
-initSubPalette : SubPalette
-initSubPalette =
-    Dict.fromList [ ( 0, "white" ) ]
-
-
-initHistory : History
-initHistory =
-    {-
-       Dict.fromList <|
-           ListEx.lift2 Tuple.pair (List.range 0 0)
-               ListEx.lift2 Tuple.pair (ListEx.lift2 Tuple.pair (List.range 0 0) (List.range 0 0)) [ "white" ]
-    -}
-    --Dict.fromList [ ( 0, ( ( 0, 0 ), "white" ) ) ]
-    Dict.empty
-
-
 initPanelPosition : PanelPosition
 initPanelPosition =
     { settingPanel = Left
@@ -132,10 +96,10 @@ initTimeGetter =
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( { campus = initCampus
-      , colorValue = initColorValue
-      , subPalette = initSubPalette
-      , mainPalette = initMainPalette
+    ( { campus = Dict.empty
+      , colorValue = "white"
+      , subPalette = Dict.fromList [ ( 0, "white" ) ]
+      , mainPalette = "white"
       , campusSize = CampusSize 0 0
       , tempCampusSize = TempCampusSize "" ""
       , didCreateCampus = False
@@ -143,9 +107,9 @@ init _ =
       , openingModalWindow = BModal.shown
       , setting = initSetting
       , tempSetting = initSetting
-      , borderColorValue = initBorderColorValue
+      , borderColorValue = "black"
       , toolsSetting = initToolsSetting
-      , history = initHistory
+      , history = Dict.empty
       , campusImageUrl = ""
       , settingPanelStatus = Close
       , loadedSavedata = ""
