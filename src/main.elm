@@ -2536,16 +2536,22 @@ createCampusWindow model =
                             [ div [ HAttrs.style "margin" "0 auto" ]
                                 [ H.text "Width" ]
                             , BInput.number
-                                [ BInput.small
-                                , BInput.onInput SetCampusWidth
+                                [ BInput.onInput SetCampusWidth
+                                , BInput.attrs
+                                    [ HAttrs.style "width" "90px"
+                                    , HAttrs.style "height" "30px"
+                                    ]
                                 ]
                             ]
                         , BGrid.col [ BCol.xs5 ]
                             [ div [ HAttrs.style "margin" "0 auto" ]
                                 [ H.text "Height" ]
                             , BInput.number
-                                [ BInput.small
-                                , BInput.onInput SetCampusHeight
+                                [ BInput.onInput SetCampusHeight
+                                , BInput.attrs
+                                    [ HAttrs.style "width" "90px"
+                                    , HAttrs.style "height" "30px"
+                                    ]
                                 ]
                             ]
                         ]
