@@ -2058,7 +2058,7 @@ viewCampusPositionSetting tempSetting =
                 , HAttrs.style "width" "15px"
                 , HAttrs.style "height" "15px"
                 , if tempSetting.panelPosition.campusPanel == position_ then
-                    HAttrs.style "background-color" "#47885e"
+                    HAttrs.style "background-color" "#f0ad00"
 
                   else
                     HAttrs.style "background-color" "white"
@@ -2096,14 +2096,14 @@ viewSettingPalettePositionSelect panel_ tempSetting =
                 , case panel_ of
                     SettingPanel ->
                         if tempSetting.panelPosition.settingPanel == position_ then
-                            HAttrs.style "background-color" "#47885e"
+                            HAttrs.style "background-color" "#60b5cc"
 
                         else
                             HAttrs.style "background-color" "white"
 
                     PalettePanel ->
                         if tempSetting.panelPosition.palettePanel == position_ then
-                            HAttrs.style "background-color" "#47885e"
+                            HAttrs.style "background-color" "#7fd13b"
 
                         else
                             HAttrs.style "background-color" "white"
