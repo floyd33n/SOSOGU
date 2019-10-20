@@ -2486,6 +2486,7 @@ viewSaveWindow model =
                                     [ BBtn.outlinePrimary
                                     , BBtn.primary
                                     , BBtn.onClick DLImage
+                                    , BBtn.disabled <| not model.didCreateCampus
                                     ]
                                     [ H.text "DL Image" ]
                                 ]
