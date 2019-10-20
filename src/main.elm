@@ -2063,6 +2063,7 @@ viewCampusPositionSetting tempSetting =
                   else
                     HAttrs.style "background-color" "white"
                 , HAttrs.style "float" "left"
+                , HAttrs.style "border" "solid 1px #5a6378"
                 , HAttrs.style "margin" "-1px"
                 , case position_ of
                     TopLeft ->
@@ -2108,6 +2109,7 @@ viewSettingPalettePositionSelect panel_ tempSetting =
                         else
                             HAttrs.style "background-color" "white"
                 , HAttrs.style "float" "left"
+                , HAttrs.style "border" "solid 1px #5a6378"
                 , HAttrs.style "margin" "-1px"
                 , if position_ == Left then
                     HAttrs.style "border-radius" "5px 0 0 5px"
