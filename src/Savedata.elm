@@ -154,8 +154,8 @@ createSavedata model =
             ]
 
 
-didCreateCampusFromSavedata : Savedata -> Bool
-didCreateCampusFromSavedata savedata =
+decodeDidCreateCampus : Savedata -> Bool
+decodeDidCreateCampus savedata =
     case
         JD.decodeString (JD.field "didCreateCampus" JD.bool) savedata
     of
@@ -166,8 +166,8 @@ didCreateCampusFromSavedata savedata =
             False
 
 
-campusSizeFromSavedata : Savedata -> CampusSize
-campusSizeFromSavedata savedata =
+decodeCampusSize : Savedata -> CampusSize
+decodeCampusSize savedata =
     { width =
         case
             JD.decodeString (JD.field "campusSize" (JD.field "width" JD.int)) savedata
@@ -189,8 +189,8 @@ campusSizeFromSavedata savedata =
     }
 
 
-mainPaletteFromSavedata : Savedata -> CssColor
-mainPaletteFromSavedata savedata =
+decodeMainPalette : Savedata -> CssColor
+decodeMainPalette savedata =
     case
         JD.decodeString (JD.field "mainPalette" JD.string) savedata
     of
@@ -201,8 +201,8 @@ mainPaletteFromSavedata savedata =
             "white"
 
 
-settingFromSavedata : Savedata -> Setting
-settingFromSavedata savedata =
+decodeSetting : Savedata -> Setting
+decodeSetting savedata =
     let
         decodeBorderColor : CssColor
         decodeBorderColor =
@@ -314,11 +314,11 @@ settingFromSavedata savedata =
     }
 
 
-historyFromSavedata : Savedata -> History
-historyFromSavedata savedata =
+decodeHistory : Savedata -> History
+decodeHistory savedata =
     let
-        decodeHistory : List String
-        decodeHistory =
+        decodeHistoryField : List String
+        decodeHistoryField =
             case
                 JD.decodeString (JD.field "history" (JD.list JD.string)) savedata
             of
@@ -348,15 +348,15 @@ historyFromSavedata savedata =
             Tuple.pair (getSerial n historyData) (Tuple.pair (getPoint n historyData) (getColor n historyData))
     in
     Dict.fromList <|
-        List.map (\n -> makeHistory n decodeHistory) <|
-            List.range 0 (List.length decodeHistory - 1)
+        List.map (\n -> makeHistory n decodeHistoryField) <|
+            List.range 0 (List.length decodeHistoryField - 1)
 
 
-subPaletteFromSavedata : Savedata -> SubPalette
-subPaletteFromSavedata savedata =
+decodeSubPalette : Savedata -> SubPalette
+decodeSubPalette savedata =
     let
-        decodeSubPalette : List String
-        decodeSubPalette =
+        decodeSubPaletteField : List String
+        decodeSubPaletteField =
             case
                 JD.decodeString (JD.field "subPalette" (JD.list JD.string)) savedata
             of
@@ -376,15 +376,15 @@ subPaletteFromSavedata savedata =
             Tuple.pair (getSerial n subPaletteData) (getColor n subPaletteData)
     in
     Dict.fromList <|
-        List.map (\n -> makeSubPalette n decodeSubPalette) <|
-            List.range 0 (List.length decodeSubPalette - 1)
+        List.map (\n -> makeSubPalette n decodeSubPaletteField) <|
+            List.range 0 (List.length decodeSubPaletteField - 1)
 
 
-campusFromSavedata : Savedata -> Campus
-campusFromSavedata savedata =
+decodeCampus : Savedata -> Campus
+decodeCampus savedata =
     let
-        decodeCampus : List String
-        decodeCampus =
+        decodeCampusField : List String
+        decodeCampusField =
             case
                 JD.decodeString (JD.field "campus" (JD.list JD.string)) savedata
             of
@@ -416,8 +416,8 @@ campusFromSavedata savedata =
             Tuple.pair (getPoint n campusData) (getColor n campusData)
     in
     Dict.fromList <|
-        List.map (\n -> makeCampusList n decodeCampus) <|
-            List.range 0 (List.length decodeCampus - 1)
+        List.map (\n -> makeCampusList n decodeCampusField) <|
+            List.range 0 (List.length decodeCampusField - 1)
 
 
 encodeSavedataWithBase64 model =

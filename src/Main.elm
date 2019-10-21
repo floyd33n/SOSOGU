@@ -536,13 +536,13 @@ update msg model =
             in
             if Savedata.isSavedata model.loadedSavedata then
                 ( { model
-                    | setting = settingFromSavedata savedata
-                    , campus = campusFromSavedata savedata
-                    , mainPalette = mainPaletteFromSavedata savedata
-                    , campusSize = campusSizeFromSavedata savedata
-                    , didCreateCampus = didCreateCampusFromSavedata savedata
-                    , subPalette = subPaletteFromSavedata savedata
-                    , history = historyFromSavedata savedata
+                    | setting = decodeSetting savedata
+                    , campus = decodeCampus savedata
+                    , mainPalette = decodeMainPalette savedata
+                    , campusSize = decodeCampusSize savedata
+                    , didCreateCampus = decodeDidCreateCampus savedata
+                    , subPalette = decodeSubPalette savedata
+                    , history = decodeHistory savedata
                     , openingModalWindow = BModal.hidden
                   }
                 , Cmd.none
