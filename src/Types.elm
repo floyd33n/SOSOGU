@@ -2,7 +2,6 @@ module Types exposing (..)
 
 import Bootstrap.Modal as BModal exposing (Visibility)
 import Dict exposing (..)
-import Savedata exposing (Savedata)
 import Time exposing (..)
 
 
@@ -19,7 +18,6 @@ type alias Model =
     , setting : Setting
     , tempSetting : Setting
     , borderColorValue : CssColor
-    , toolsSetting : ToolsSetting
     , history : History
     , campusImageUrl : String
     , settingPanelStatus : PanelStatus
@@ -112,6 +110,10 @@ type PanelStatus
     | Close
 
 
+type alias Savedata =
+    String
+
+
 type alias TimeGetter =
     { zone : Time.Zone
     , time : Time.Posix
@@ -121,8 +123,3 @@ type alias TimeGetter =
 type YN
     = Yes
     | No
-
-
-type alias ToolsSetting =
-    { isDisplayDlButton : Bool
-    }
