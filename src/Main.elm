@@ -1,7 +1,5 @@
 port module Main exposing (..)
 
---import Debug exposing (..)
-
 import Array exposing (..)
 import Base64 exposing (..)
 import Bootstrap.Alert as BAlert exposing (..)
@@ -24,6 +22,7 @@ import Browser
 import Bytes exposing (..)
 import Bytes.Decode as BD exposing (..)
 import Bytes.Encode as BE exposing (..)
+import Debug exposing (..)
 import Dict exposing (..)
 import Dict.Extra as DictEx exposing (..)
 import Element as E exposing (..)
@@ -56,31 +55,6 @@ import Types exposing (..)
 import Utilities exposing (..)
 
 
-initPanelPosition : PanelPosition
-initPanelPosition =
-    { settingPanel = Left
-    , palettePanel = Right
-    , campusPanel = TopCenter
-    }
-
-
-initSetting : Setting
-initSetting =
-    { borderColor = "black"
-    , borderStyle = "solid"
-    , width = "20"
-    , height = "20"
-    , panelPosition = initPanelPosition
-    }
-
-
-initTimeGetter : TimeGetter
-initTimeGetter =
-    { zone = Time.utc
-    , time = Time.millisToPosix 0
-    }
-
-
 
 --INIT--
 
@@ -110,6 +84,31 @@ init _ =
       }
     , Task.perform AdjustTimeZone Time.here
     )
+
+
+initPanelPosition : PanelPosition
+initPanelPosition =
+    { settingPanel = Left
+    , palettePanel = Right
+    , campusPanel = TopCenter
+    }
+
+
+initSetting : Setting
+initSetting =
+    { borderColor = "black"
+    , borderStyle = "solid"
+    , width = "20"
+    , height = "20"
+    , panelPosition = initPanelPosition
+    }
+
+
+initTimeGetter : TimeGetter
+initTimeGetter =
+    { zone = Time.utc
+    , time = Time.millisToPosix 0
+    }
 
 
 
@@ -751,10 +750,7 @@ view model =
     div
         [ HAttrs.style "height" "100%"
         ]
-        [ viewSaveWindow model
-        , viewConfirmSaveCampus model
-        , viewSaveAndNewCampusModalWindow model
-        , layout
+        [ layout
             []
           <|
             column [ E.width E.fill, E.height E.fill ]
@@ -763,8 +759,6 @@ view model =
                     , E.height <| px 50
                     , Background.color <| rouIro
                     , paddingXY 16 0
-                    , Border.widthEach { top = 1, right = 1, left = 1, bottom = 0 }
-                    , Border.color <| shiroIro
                     ]
                     [ E.row
                         [ E.alignLeft
@@ -821,16 +815,25 @@ view model =
                             }
                         ]
                     ]
+
+                {- Horizontal Separator -}
+                , E.el [ E.height <| px 1, E.width E.fill, Border.widthEach { top = 1, right = 0, left = 0, bottom = 0 }, Border.color shiroIro ] <| E.none
                 , viewPanels model
                 ]
         , loadCssElmReactor <| "../style.css"
-        , createCampusWindow model
+        , createCampusModalWindow model
+        , viewSaveModalWindow model
+        , viewConfirmSaveCampus model
+        , viewSaveAndNewCampusModalWindow model
         ]
 
 
 viewPanels : Model -> Element Msg
 viewPanels model =
     let
+        verticalSeparator =
+            E.el [ E.width <| px 1, E.height E.fill, Border.widthEach { top = 0, right = 1, left = 0, bottom = 0 }, Border.color shiroIro ] <| E.none
+
         view_ : List (Element Msg)
         view_ =
             case
@@ -840,25 +843,33 @@ viewPanels model =
             of
                 ( Left, Right ) ->
                     [ viewSettingPanel model
+                    , verticalSeparator
                     , viewCampusPanel model
+                    , verticalSeparator
                     , viewPalettePanel model
                     ]
 
                 ( Right, Left ) ->
                     [ viewPalettePanel model
+                    , verticalSeparator
                     , viewCampusPanel model
+                    , verticalSeparator
                     , viewSettingPanel model
                     ]
 
                 ( Right, Right ) ->
                     [ viewCampusPanel model
+                    , verticalSeparator
                     , viewPalettePanel model
+                    , verticalSeparator
                     , viewSettingPanel model
                     ]
 
                 ( Left, Left ) ->
                     [ viewSettingPanel model
+                    , verticalSeparator
                     , viewPalettePanel model
+                    , verticalSeparator
                     , viewCampusPanel model
                     ]
     in
@@ -973,19 +984,6 @@ viewToolsPanel model =
     E.row
         [ E.width E.fill
         , E.height <| px 36
-        , case ( model.setting.panelPosition.settingPanel, model.setting.panelPosition.palettePanel ) of
-            ( Right, Right ) ->
-                Border.widthEach { top = 1, right = 0, left = 1, bottom = 1 }
-
-            ( Left, Left ) ->
-                Border.widthEach { top = 1, right = 1, left = 0, bottom = 1 }
-
-            ( Right, Left ) ->
-                Border.widthEach { top = 1, right = 0, left = 0, bottom = 1 }
-
-            ( Left, Right ) ->
-                Border.widthEach { top = 1, right = 0, left = 0, bottom = 1 }
-        , Border.color <| shiroIro
         , Background.color <| rouIro
         ]
         [ E.el
@@ -1049,7 +1047,7 @@ viewSettingPanel : Model -> Element Msg
 viewSettingPanel model =
     case model.settingPanelStatus of
         Open ->
-            openSettingPanel model
+            openedSettingPanel model
 
         Close ->
             closedSettingPanel model
@@ -1060,7 +1058,6 @@ closedSettingPanel model =
     column
         [ E.width <| px 50
         , E.height E.fill
-        , Border.width 1
         , Border.color <| shiroIro
         , Background.color <| rouIro
         , E.spacing 2
@@ -1092,12 +1089,11 @@ closedSettingPanel model =
         ]
 
 
-openSettingPanel : Model -> Element Msg
-openSettingPanel model =
+openedSettingPanel : Model -> Element Msg
+openedSettingPanel model =
     column
         [ E.width <| px 110
         , E.height E.fill
-        , Border.width 1
         , Border.color <| shiroIro
         , Background.color <| rouIro
         ]
@@ -1213,6 +1209,7 @@ openSettingPanel model =
                                 , HAttrs.style "text-align" "center"
                                 , HAttrs.style "font-size" "13px"
                                 , HAttrs.style "padding" "0px"
+                                , HAttrs.selected <| value_ == model.setting.borderStyle
                                 ]
                                 [ H.text text_ ]
                     in
@@ -1519,23 +1516,6 @@ viewPalettePanel model =
     column
         [ E.width <| px 110
         , E.height E.fill
-        , case model.setting.panelPosition.palettePanel of
-            Right ->
-                case model.setting.panelPosition.settingPanel of
-                    Right ->
-                        Border.widthEach { top = 1, right = 0, left = 1, bottom = 1 }
-
-                    Left ->
-                        Border.width 1
-
-            Left ->
-                case model.setting.panelPosition.settingPanel of
-                    Right ->
-                        Border.width 1
-
-                    Left ->
-                        Border.widthEach { top = 1, right = 1, left = 0, bottom = 1 }
-        , Border.color <| shiroIro
         , Background.color <| rouIro
         ]
         [ E.row
@@ -1746,11 +1726,6 @@ viewPalettePanel model =
         ]
 
 
-isCorrectSetting : Setting -> Bool
-isCorrectSetting setting =
-    isColor setting.borderColor && isCorrectWidthHeight setting.width setting.height
-
-
 viewConfirmSaveCampus : Model -> Html Msg
 viewConfirmSaveCampus model =
     BGrid.container []
@@ -1843,8 +1818,8 @@ viewSaveAndNewCampusModalWindow model =
         ]
 
 
-viewSaveWindow : Model -> Html Msg
-viewSaveWindow model =
+viewSaveModalWindow : Model -> Html Msg
+viewSaveModalWindow model =
     BGrid.container []
         [ BModal.config CloseSaveWindow
             |> BModal.hideOnBackdropClick True
@@ -1884,8 +1859,8 @@ viewSaveWindow model =
         ]
 
 
-createCampusWindow : Model -> Html Msg
-createCampusWindow model =
+createCampusModalWindow : Model -> Html Msg
+createCampusModalWindow model =
     let
         viewLoadSavedataErr : Html Msg
         viewLoadSavedataErr =
@@ -1986,47 +1961,6 @@ createCampusWindow model =
         ]
 
 
-
---DEBUG--
---FUNC--
-
-
-viewCampusS : Model -> Points -> Html Msg
-viewCampusS model ( width, height ) =
-    if model.didCreateCampus then
-        div [ HAttrs.id "campus" ]
-            [ div [] <|
-                List.map
-                    (\y ->
-                        div [] <|
-                            List.map
-                                (\x ->
-                                    div
-                                        [ HAttrs.style "float" "left"
-                                        ]
-                                    <|
-                                        [ div
-                                            [ HAttrs.style "padding-right" (model.setting.width ++ "px")
-                                            , HAttrs.style "padding-top" (model.setting.height ++ "px")
-                                            , HAttrs.style "border" (model.setting.borderColor ++ " " ++ model.setting.borderStyle)
-                                            , HAttrs.style "background-color" (getCampusColor model.campus ( x, y ))
-                                            , HAttrs.style "margin" "-1px"
-                                            , HEvents.onClick (ChangeColor ( x, y ) model.mainPalette)
-                                            ]
-                                            []
-                                        ]
-                                )
-                            <|
-                                List.range 0 (width - 1)
-                    )
-                <|
-                    List.range 0 (height - 1)
-            ]
-
-    else
-        div [] []
-
-
 viewCampus : Model -> Points -> Html Msg
 viewCampus model ( width, height ) =
     let
@@ -2051,7 +1985,7 @@ viewCampus model ( width, height ) =
                     ]
 
                 _ ->
-                    [ SAttrs.stroke "red" ]
+                    [ SAttrs.stroke "black" ]
     in
     if model.didCreateCampus then
         div
@@ -2134,199 +2068,6 @@ displayPalette subPalette =
             )
         <|
             List.range 1 (Dict.size subPalette)
-
-
-isColor : String -> Bool
-isColor exValue =
-    case String.left 1 exValue of
-        "#" ->
-            xor
-                (Regex.contains (Maybe.withDefault Regex.never <| Regex.fromString "[g-z]")
-                    (String.dropLeft 1 exValue)
-                )
-            <|
-                String.length exValue
-                    == 4
-                    || String.length exValue
-                    == 7
-
-        _ ->
-            let
-                cssColorNames =
-                    [ "aliceblue"
-                    , "antiquewhite"
-                    , "aqua"
-                    , "aquamarine"
-                    , "azure"
-                    , "beige"
-                    , "bisque"
-                    , "black"
-                    , "blanchedalmond"
-                    , "blue"
-                    , "blueviolet"
-                    , "brown"
-                    , "burlywood"
-                    , "cadetblue"
-                    , "chartreuse"
-                    , "chocolate"
-                    , "coral"
-                    , "cornflowerblue"
-                    , "cornsilk"
-                    , "crimson"
-                    , "cyan"
-                    , "darkblue"
-                    , "darkcyan"
-                    , "darkgoldenrod"
-                    , "darkgray"
-                    , "darkgrey"
-                    , "darkgreen"
-                    , "darkkhaki"
-                    , "darkmagenta"
-                    , "darkolivegreen"
-                    , "darkorange"
-                    , "darkorchid"
-                    , "darkred"
-                    , "darksalmon"
-                    , "darkseagreen"
-                    , "darkslateblue"
-                    , "darkslategrey"
-                    , "darkslategray"
-                    , "darkturquoise"
-                    , "darkviolet"
-                    , "deeppink"
-                    , "deepskyblue"
-                    , "dimgray"
-                    , "dimgrey"
-                    , "dodgerblue"
-                    , "firebrick"
-                    , "floralwhite"
-                    , "forestgreen"
-                    , "fuchsia"
-                    , "gainsboro"
-                    , "ghostwhite"
-                    , "gold"
-                    , "goldenrod"
-                    , "gray"
-                    , "grey"
-                    , "green"
-                    , "greenyellow"
-                    , "honeydew"
-                    , "hotpink"
-                    , "indianred"
-                    , "indigo"
-                    , "ivory"
-                    , "khaki"
-                    , "lavender"
-                    , "lavenderblush"
-                    , "lawngreen"
-                    , "lemonchiffon"
-                    , "lightblue"
-                    , "lightcoral"
-                    , "lightcyan"
-                    , "lightgoldenrodyellow"
-                    , "lightgray"
-                    , "lightgrey"
-                    , "lightgreen"
-                    , "lightpink"
-                    , "lightsalmon"
-                    , "lightseagreen"
-                    , "lightskyblue"
-                    , "lightslategray"
-                    , "lightslategrey"
-                    , "lightsteelblue"
-                    , "lightyellow"
-                    , "lime"
-                    , "limegreen"
-                    , "linen"
-                    , "magenta"
-                    , "mediumaquamarine"
-                    , "mediumblue"
-                    , "mediumorchid"
-                    , "mediumpurple"
-                    , "mediumseagreen"
-                    , "mediumslateblue"
-                    , "mediumspringgreen"
-                    , "mediumturquoise"
-                    , "mediumvioletred"
-                    , "midnightblue"
-                    , "mintcream"
-                    , "mistyrose"
-                    , "moccasin"
-                    , "navajowhite"
-                    , "navy"
-                    , "oldlace"
-                    , "olive"
-                    , "olivedrab"
-                    , "orange"
-                    , "orangered"
-                    , "orchid"
-                    , "palegoldenrod"
-                    , "palegreen"
-                    , "paleturquoise"
-                    , "palevioletred"
-                    , "papayawhip"
-                    , "peachpuff"
-                    , "peru"
-                    , "pink"
-                    , "plum"
-                    , "powderblue"
-                    , "purple"
-                    , "rebeccapurple"
-                    , "red"
-                    , "rosybrown"
-                    , "royalblue"
-                    , "saddlebrown"
-                    , "salmon"
-                    , "sandybrown"
-                    , "seagreen"
-                    , "seashell"
-                    , "sienna"
-                    , "silver"
-                    , "skyblue"
-                    , "slateblue"
-                    , "slategray"
-                    , "slategrey"
-                    , "snow"
-                    , "springgreen"
-                    , "steelblue"
-                    , "tan"
-                    , "teal"
-                    , "thistle"
-                    , "tomato"
-                    , "turquoise"
-                    , "violet"
-                    , "wheat"
-                    , "white"
-                    , "whitesmoke"
-                    , "yellow"
-                    , "yellowgreen"
-                    ]
-
-                -- By https://www.w3schools.com/colors/colors_names.asp
-                isColorName : Bool
-                isColorName =
-                    List.member exValue cssColorNames
-            in
-            isColorName
-
-
-isCorrectWidthHeight : String -> String -> Bool
-isCorrectWidthHeight width_ height_ =
-    let
-        chkInt : Bool
-        chkInt =
-            Maybe.withDefault 0 (String.toInt width_)
-                * Maybe.withDefault 0 (String.toInt height_)
-                > 0
-
-        chkLength : Bool
-        chkLength =
-            Maybe.withDefault 0 (String.toInt width_)
-                <= 64
-                && Maybe.withDefault 0 (String.toInt height_)
-                <= 64
-    in
-    chkInt && chkLength
 
 
 

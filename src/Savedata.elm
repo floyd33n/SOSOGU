@@ -15,7 +15,10 @@ import Utilities exposing (..)
 isSavedata : Savedata -> Bool
 isSavedata savedata =
     case
-        JD.decodeString (JD.field "general" (JD.field "isSOSOGUSavedata" JD.bool)) savedata
+        JD.decodeString
+            (JD.field "general" <| JD.field "isSOSOGUSavedata" JD.bool)
+        <|
+            savedata
     of
         Ok bool ->
             bool
@@ -157,7 +160,10 @@ createSavedata model =
 decodeDidCreateCampus : Savedata -> Bool
 decodeDidCreateCampus savedata =
     case
-        JD.decodeString (JD.field "didCreateCampus" JD.bool) savedata
+        JD.decodeString
+            (JD.field "didCreateCampus" JD.bool)
+        <|
+            savedata
     of
         Ok bool ->
             bool
@@ -170,7 +176,10 @@ decodeCampusSize : Savedata -> CampusSize
 decodeCampusSize savedata =
     { width =
         case
-            JD.decodeString (JD.field "campusSize" (JD.field "width" JD.int)) savedata
+            JD.decodeString
+                (JD.field "campusSize" <| JD.field "width" JD.int)
+            <|
+                savedata
         of
             Ok width ->
                 width
@@ -179,7 +188,10 @@ decodeCampusSize savedata =
                 8
     , height =
         case
-            JD.decodeString (JD.field "campusSize" (JD.field "height" JD.int)) savedata
+            JD.decodeString
+                (JD.field "campusSize" <| JD.field "height" JD.int)
+            <|
+                savedata
         of
             Ok height ->
                 height
@@ -192,7 +204,10 @@ decodeCampusSize savedata =
 decodeMainPalette : Savedata -> CssColor
 decodeMainPalette savedata =
     case
-        JD.decodeString (JD.field "mainPalette" JD.string) savedata
+        JD.decodeString
+            (JD.field "mainPalette" JD.string)
+        <|
+            savedata
     of
         Ok color ->
             color
@@ -207,7 +222,10 @@ decodeSetting savedata =
         decodeBorderColor : CssColor
         decodeBorderColor =
             case
-                JD.decodeString (JD.field "setting" (JD.field "borderColor" JD.string)) savedata
+                JD.decodeString
+                    (JD.field "setting" <| JD.field "borderColor" JD.string)
+                <|
+                    savedata
             of
                 Ok color ->
                     color
@@ -218,7 +236,10 @@ decodeSetting savedata =
         decodeBorderStyle : String
         decodeBorderStyle =
             case
-                JD.decodeString (JD.field "setting" (JD.field "borderStyle" JD.string)) savedata
+                JD.decodeString
+                    (JD.field "setting" <| JD.field "borderStyle" JD.string)
+                <|
+                    savedata
             of
                 Ok style ->
                     style
@@ -229,7 +250,10 @@ decodeSetting savedata =
         decodeWidth : String
         decodeWidth =
             case
-                JD.decodeString (JD.field "setting" (JD.field "width" JD.string)) savedata
+                JD.decodeString
+                    (JD.field "setting" <| JD.field "width" JD.string)
+                <|
+                    savedata
             of
                 Ok width ->
                     width
@@ -240,7 +264,10 @@ decodeSetting savedata =
         decodeHeight : String
         decodeHeight =
             case
-                JD.decodeString (JD.field "setting" (JD.field "height" JD.string)) savedata
+                JD.decodeString
+                    (JD.field "setting" <| JD.field "height" JD.string)
+                <|
+                    savedata
             of
                 Ok height ->
                     height
@@ -252,7 +279,10 @@ decodeSetting savedata =
         decodePanelPosition =
             { settingPanel =
                 case
-                    JD.decodeString (JD.field "setting" (JD.field "panelPosition" (JD.field "settingPanel" JD.string))) savedata
+                    JD.decodeString
+                        (JD.field "setting" <| JD.field "panelPosition" <| JD.field "settingPanel" JD.string)
+                    <|
+                        savedata
                 of
                     Ok settingPanel ->
                         case settingPanel of
@@ -269,7 +299,10 @@ decodeSetting savedata =
                         Left
             , palettePanel =
                 case
-                    JD.decodeString (JD.field "setting" (JD.field "panelPosition" (JD.field "palettePanel" JD.string))) savedata
+                    JD.decodeString
+                        (JD.field "setting" <| JD.field "panelPosition" <| JD.field "palettePanel" JD.string)
+                    <|
+                        savedata
                 of
                     Ok palettePanel ->
                         case palettePanel of
@@ -286,7 +319,10 @@ decodeSetting savedata =
                         Right
             , campusPanel =
                 case
-                    JD.decodeString (JD.field "setting" (JD.field "panelPositon" (JD.field "campusPanel" JD.string))) savedata
+                    JD.decodeString
+                        (JD.field "setting" <| JD.field "panelPosition" <| JD.field "campusPanel" JD.string)
+                    <|
+                        savedata
                 of
                     Ok campusPanel ->
                         case campusPanel of
@@ -320,7 +356,10 @@ decodeHistory savedata =
         decodeHistoryField : List String
         decodeHistoryField =
             case
-                JD.decodeString (JD.field "history" (JD.list JD.string)) savedata
+                JD.decodeString
+                    (JD.field "history" <| JD.list JD.string)
+                <|
+                    savedata
             of
                 Ok history ->
                     history
@@ -329,23 +368,60 @@ decodeHistory savedata =
                     []
 
         getSerial n historyData =
-            Maybe.withDefault 0 (String.toInt (Maybe.withDefault "0" (ListEx.getAt 0 (String.split "," (Maybe.withDefault "0,(0,0),white" (ListEx.getAt n historyData))))))
+            --Maybe.withDefault 0 (String.toInt (Maybe.withDefault "0" (ListEx.getAt 0 (String.split "," (Maybe.withDefault "0,(0,0),white" (ListEx.getAt n historyData))))))
+            historyData
+                |> ListEx.getAt n
+                |> Maybe.withDefault "0,(0,0),white"
+                |> String.split ","
+                |> ListEx.getAt 0
+                |> Maybe.withDefault "0"
+                |> String.toInt
+                |> Maybe.withDefault 0
 
         getPoint n historyData =
             let
                 getX =
-                    Maybe.withDefault 0 (String.toInt (String.dropLeft 1 (Maybe.withDefault "(0" (ListEx.getAt 1 (String.split "," (Maybe.withDefault "0,(0,0),white" (ListEx.getAt n historyData)))))))
+                    --Maybe.withDefault 0 (String.toInt (String.dropLeft 1 (Maybe.withDefault "(0" (ListEx.getAt 1 (String.split "," (Maybe.withDefault "0,(0,0),white" (ListEx.getAt n historyData)))))))
+                    historyData
+                        |> ListEx.getAt n
+                        |> Maybe.withDefault "0,(0,0),white"
+                        |> String.split ","
+                        |> ListEx.getAt 1
+                        |> Maybe.withDefault "(0"
+                        |> String.dropLeft 1
+                        |> String.toInt
+                        |> Maybe.withDefault 0
 
                 getY =
-                    Maybe.withDefault 0 (String.toInt (String.dropRight 1 (Maybe.withDefault "0)" (ListEx.getAt 2 (String.split "," (Maybe.withDefault "0,(0,0),white" (ListEx.getAt n historyData)))))))
+                    --Maybe.withDefault 0 (String.toInt (String.dropRight 1 (Maybe.withDefault "0)" (ListEx.getAt 2 (String.split "," (Maybe.withDefault "0,(0,0),white" (ListEx.getAt n historyData)))))))
+                    historyData
+                        |> ListEx.getAt n
+                        |> Maybe.withDefault "0,(0,0),white"
+                        |> String.split ","
+                        |> ListEx.getAt 2
+                        |> Maybe.withDefault "0)"
+                        |> String.dropRight 1
+                        |> String.toInt
+                        |> Maybe.withDefault 0
             in
             ( getX, getY )
 
         getColor n historyData =
-            Maybe.withDefault "white" (ListEx.getAt 3 (String.split "," (Maybe.withDefault "0,(0,0),white" (ListEx.getAt n historyData))))
+            --Maybe.withDefault "white" (ListEx.getAt 3 (String.split "," (Maybe.withDefault "0,(0,0),white" (ListEx.getAt n historyData))))
+            historyData
+                |> ListEx.getAt n
+                |> Maybe.withDefault "0,(0,0),white"
+                |> String.split ","
+                |> ListEx.getAt 3
+                |> Maybe.withDefault "white"
 
         makeHistory n historyData =
-            Tuple.pair (getSerial n historyData) (Tuple.pair (getPoint n historyData) (getColor n historyData))
+            Tuple.pair
+                (getSerial n historyData)
+                (Tuple.pair
+                    (getPoint n historyData)
+                    (getColor n historyData)
+                )
     in
     Dict.fromList <|
         List.map (\n -> makeHistory n decodeHistoryField) <|
@@ -358,7 +434,10 @@ decodeSubPalette savedata =
         decodeSubPaletteField : List String
         decodeSubPaletteField =
             case
-                JD.decodeString (JD.field "subPalette" (JD.list JD.string)) savedata
+                JD.decodeString
+                    (JD.field "subPalette" <| JD.list JD.string)
+                <|
+                    savedata
             of
                 Ok subPalette ->
                     subPalette
@@ -367,13 +446,28 @@ decodeSubPalette savedata =
                     []
 
         getSerial n subPaletteData =
-            Maybe.withDefault 0 (String.toInt (Maybe.withDefault "0" (ListEx.getAt 0 (String.split "," (Maybe.withDefault "0,white" (ListEx.getAt n subPaletteData))))))
+            subPaletteData
+                |> ListEx.getAt n
+                |> Maybe.withDefault "0,white"
+                |> String.split ","
+                |> ListEx.getAt 0
+                |> Maybe.withDefault "0"
+                |> String.toInt
+                |> Maybe.withDefault 0
 
         getColor n subPaletteData =
-            Maybe.withDefault "white" (ListEx.getAt 1 (String.split "," (Maybe.withDefault "0,white" (ListEx.getAt n subPaletteData))))
+            --Maybe.withDefault "white" <| ListEx.getAt 1 <| String.split "," <| Maybe.withDefault "0,white" <| ListEx.getAt n subPaletteData
+            subPaletteData
+                |> ListEx.getAt n
+                |> Maybe.withDefault "0,white"
+                |> String.split ","
+                |> ListEx.getAt 1
+                |> Maybe.withDefault "white"
 
         makeSubPalette n subPaletteData =
-            Tuple.pair (getSerial n subPaletteData) (getColor n subPaletteData)
+            Tuple.pair
+                (getSerial n subPaletteData)
+                (getColor n subPaletteData)
     in
     Dict.fromList <|
         List.map (\n -> makeSubPalette n decodeSubPaletteField) <|
@@ -386,7 +480,10 @@ decodeCampus savedata =
         decodeCampusField : List String
         decodeCampusField =
             case
-                JD.decodeString (JD.field "campus" (JD.list JD.string)) savedata
+                JD.decodeString
+                    (JD.field "campus" <| JD.list JD.string)
+                <|
+                    savedata
             of
                 Ok campus ->
                     campus
@@ -399,21 +496,41 @@ decodeCampus savedata =
             let
                 getX : Int
                 getX =
-                    Maybe.withDefault 0 (String.toInt (String.slice 1 2 (Maybe.withDefault "0" (ListEx.getAt n campusData))))
+                    --Maybe.withDefault 0 (String.toInt (String.slice 1 2 (Maybe.withDefault "0" (ListEx.getAt n campusData))))
+                    campusData
+                        |> ListEx.getAt n
+                        |> Maybe.withDefault "0"
+                        |> String.slice 1 2
+                        |> String.toInt
+                        |> Maybe.withDefault 0
 
                 getY : Int
                 getY =
-                    Maybe.withDefault 0 (String.toInt (String.slice 3 4 (Maybe.withDefault "0" (ListEx.getAt n campusData))))
+                    --Maybe.withDefault 0 (String.toInt (String.slice 3 4 (Maybe.withDefault "0" (ListEx.getAt n campusData))))
+                    campusData
+                        |> ListEx.getAt n
+                        |> Maybe.withDefault "0"
+                        |> String.slice 3 4
+                        |> String.toInt
+                        |> Maybe.withDefault 0
             in
             ( getX, getY )
 
         getColor : Int -> List String -> CssColor
         getColor n campusData =
-            Maybe.withDefault "black" (ListEx.getAt 2 (String.split "," (Maybe.withDefault "white" (ListEx.getAt n campusData))))
+            --Maybe.withDefault "black" (ListEx.getAt 2 (String.split "," (Maybe.withDefault "white" (ListEx.getAt n campusData))))
+            campusData
+                |> ListEx.getAt n
+                |> Maybe.withDefault "white"
+                |> String.split ","
+                |> ListEx.getAt 2
+                |> Maybe.withDefault "black"
 
         makeCampusList : Int -> List String -> ( Point, CssColor )
         makeCampusList n campusData =
-            Tuple.pair (getPoint n campusData) (getColor n campusData)
+            Tuple.pair
+                (getPoint n campusData)
+                (getColor n campusData)
     in
     Dict.fromList <|
         List.map (\n -> makeCampusList n decodeCampusField) <|
@@ -421,7 +538,11 @@ decodeCampus savedata =
 
 
 encodeSavedataWithBase64 model =
-    Maybe.withDefault "fk" (Base64.fromBytes (BE.encode (BE.string (createSavedata model))))
+    createSavedata model
+        |> BE.string
+        |> BE.encode
+        |> Base64.fromBytes
+        |> Maybe.withDefault ""
 
 
 decodeSavedata savedata =
@@ -432,4 +553,8 @@ decodeSavedata savedata =
         b64ToBytes =
             Maybe.withDefault dummy (Base64.toBytes savedata)
     in
-    Maybe.withDefault "" (BD.decode (BD.string (Bytes.width b64ToBytes)) b64ToBytes)
+    --Maybe.withDefault "" <|
+    --    BD.decode (BD.string <| Bytes.width b64ToBytes) b64ToBytes
+    b64ToBytes
+        |> BD.decode (BD.string <| Bytes.width b64ToBytes)
+        |> Maybe.withDefault ""
