@@ -2,7 +2,46 @@ module Types exposing (..)
 
 import Bootstrap.Modal as BModal exposing (Visibility)
 import Dict exposing (..)
+import File exposing (..)
 import Time exposing (..)
+
+
+type Msg
+    = ChangeColor Point CssColor
+    | ColorValue String
+    | AddColorToSubPalette CssColor
+    | SetMainPalette Serial
+    | DeleteSubPalette Serial
+    | SetCampusWidth String
+    | SetCampusHeight String
+    | CreateCampus
+    | ShowModal
+    | CloseCreateCampusWindow
+    | BorderColorValue String
+    | Change String
+    | ChangePixelSize String String
+    | SetPixelWidth String
+    | SetPixelHeight String
+    | SetCampusPosition CampusPosition
+    | ChangePanelPosition Panel Position
+    | ApplySetting
+    | Undo Point
+    | GetImageUrl String
+    | OpenSettingPanel
+    | CloseSettingPanel
+    | DLSavedata
+    | UpSavedata
+    | LoadSavedata File
+    | ToStringSavedata String
+    | ApplySavedata Model
+    | Tick Time.Posix
+    | AdjustTimeZone Time.Zone
+    | ShowSaveWindow
+    | CloseSaveWindow
+    | DLImage
+    | NewProject
+    | SaveEditingCampusModalWindow YN
+    | CloseSaveEditingCampusModalWindow
 
 
 type alias Model =

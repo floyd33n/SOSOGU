@@ -1,6 +1,7 @@
 module Utilities exposing (..)
 
 import Dict exposing (..)
+import Element as E exposing (..)
 import Html as H exposing (node)
 import Html.Attributes as HA exposing (href, rel)
 import Regex exposing (..)
@@ -219,3 +220,23 @@ isColor exValue =
                     List.member exValue cssColorNames
             in
             isColorName
+
+
+rouIro =
+    rgb255 43 43 43
+
+
+sumiIro =
+    rgb255 89 88 87
+
+
+shiroIro =
+    rgb255 255 255 255
+
+
+shironeriIro =
+    rgb255 243 243 242
+
+
+shironezuIro =
+    rgb255 220 221 221
