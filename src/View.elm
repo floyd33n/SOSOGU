@@ -37,40 +37,32 @@ import Types exposing (..)
 import Utilities exposing (..)
 
 
-displayPalette : SubPalette -> Html Msg
-displayPalette subPalette =
-    div [] <|
-        List.map
-            (\plt ->
-                div []
-                    [ div
-                        [ HAttrs.id "palette_square"
-                        , HEvents.onClick <| SetMainPalette (plt - 1)
-                        , HAttrs.style "background-color" <| getSubPaletteColor subPalette (plt - 1)
-                        ]
-                        []
-                    , div [ HAttrs.id "palette_color_name" ]
-                        []
-                    ]
-            )
-        <|
-            List.range 1 (Dict.size subPalette)
+
+{-
+   viewSubPalette : SubPalette -> Html Msg
+   viewSubPalette subPalette =
+       div [] <|
+           List.map
+               (\plt ->
+                   div []
+                       [ div
+                           [ HAttrs.id "palette_square"
+                           , HEvents.onClick <| SetMainPalette (plt - 1)
+                           , HAttrs.style "background-color" <| getSubPaletteColor subPalette (plt - 1)
+                           ]
+                           []
+                       , div [ HAttrs.id "palette_color_name" ]
+                           []
+                       ]
+               )
+           <|
+               List.range 1 (Dict.size subPalette)
+-}
+-- Display button to select campus position
 
 
-verticalLine : Element Msg
-verticalLine =
-    E.el
-        [ E.width <| px 1
-        , E.height <| px 16
-        , Border.color <| shiroIro
-        , Border.widthEach { top = 0, right = 1, left = 0, bottom = 0 }
-        ]
-    <|
-        E.text ""
-
-
-viewCampusPositionSetting : Setting -> Html Msg
-viewCampusPositionSetting tempSetting =
+viewSelectCampusPositionButton : Setting -> Html Msg
+viewSelectCampusPositionButton tempSetting =
     let
         tempDiv : CampusPosition -> Html Msg
         tempDiv position_ =
@@ -106,8 +98,12 @@ viewCampusPositionSetting tempSetting =
         ]
 
 
-viewSettingPalettePositionSelect : Panel -> Setting -> Html Msg
-viewSettingPalettePositionSelect panel_ tempSetting =
+
+-- Display buttons to select setting panel & palette panel position
+
+
+viewSelectSettingAndPalettePositionButtons : Panel -> Setting -> Html Msg
+viewSelectSettingAndPalettePositionButtons panel_ tempSetting =
     let
         temp_ : Position -> Html Msg
         temp_ position_ =
@@ -144,16 +140,18 @@ viewSettingPalettePositionSelect panel_ tempSetting =
                 ]
                 []
     in
-    div [ HAttrs.style "float" "left" ]
-        [ div []
-            [ temp_ Left
-            , temp_ Right
-            ]
+    div []
+        [ temp_ Left
+        , temp_ Right
         ]
 
 
-panelHr : Element Msg
-panelHr =
+
+-- Display horizontal separator for the panel
+
+
+horizontalSeparatorForPanels : Element Msg
+horizontalSeparatorForPanels =
     E.el
         [ centerX
         , E.width <| px 80
@@ -164,23 +162,8 @@ panelHr =
         E.none
 
 
-campusPosition : Setting -> List (E.Attribute Msg)
-campusPosition setting =
-    case setting.panelPosition.campusPanel of
-        TopCenter ->
-            [ centerX
-            , alignTop
-            ]
 
-        TopRight ->
-            [ E.alignRight
-            , alignTop
-            ]
-
-        TopLeft ->
-            [ E.alignLeft
-            , alignTop
-            ]
+-- Display campus
 
 
 viewCampus : Model -> Points -> Html Msg
@@ -262,70 +245,65 @@ viewCampus model ( width, height ) =
 viewToolsPanel : Model -> Element Msg
 viewToolsPanel model =
     let
+        buttonAttrs =
+            [ Border.color shiroIro
+            , Border.widthEach { top = 0, right = 0, left = 0, bottom = 1 }
+            , E.height <| px 18
+            , Font.color shiroIro
+            , Font.size 14
+            , centerY
+            ]
+
         viewUndoButton : Element Msg
         viewUndoButton =
             Input.button
-                [ Border.color shiroIro
-                , Border.widthEach { top = 0, right = 0, left = 0, bottom = 1 }
-                , E.height <| px 18
-                ]
+                buttonAttrs
                 { onPress =
                     let
                         x =
-                            Tuple.first (Tuple.first (Maybe.withDefault ( ( 0, 0 ), "white" ) (Dict.get (Dict.size model.history - 1) model.history)))
+                            model.history
+                                |> Dict.get (Dict.size model.history - 1)
+                                |> Maybe.withDefault ( ( 0, 0 ), "white" )
+                                |> Tuple.first
+                                |> Tuple.first
 
                         y =
-                            Tuple.second (Tuple.first (Maybe.withDefault ( ( 0, 0 ), "white" ) (Dict.get (Dict.size model.history - 1) model.history)))
+                            model.history
+                                |> Dict.get (Dict.size model.history - 1)
+                                |> Maybe.withDefault ( ( 0, 0 ), "white" )
+                                |> Tuple.first
+                                |> Tuple.second
                     in
                     Just <| Undo ( y, x )
-                , label =
-                    E.el
-                        [ Font.color <| shiroIro
-                        , Font.size <| 14
-                        , centerY
-                        ]
-                    <|
-                        E.text <|
-                            "Undo"
+                , label = E.text "Undo"
                 }
 
         saveButton : Element Msg
         saveButton =
             Input.button
-                [ Border.color <| shiroIro
-                , Border.widthEach { top = 0, right = 0, left = 0, bottom = 1 }
-                , E.height <| px 18
-                ]
+                buttonAttrs
                 { onPress = Just ShowSaveWindow
-                , label =
-                    E.el
-                        [ Font.color <| shiroIro
-                        , Font.size <| 14
-                        , centerY
-                        ]
-                    <|
-                        E.text <|
-                            "Save"
+                , label = E.text "Save"
                 }
 
         newButton : Element Msg
         newButton =
             Input.button
-                [ Border.color <| shiroIro
-                , Border.widthEach { top = 0, right = 0, left = 0, bottom = 1 }
-                , E.height <| px 18
-                ]
+                buttonAttrs
                 { onPress = Just NewProject
-                , label =
-                    E.el
-                        [ Font.color <| shiroIro
-                        , Font.size <| 14
-                        , centerY
-                        ]
-                    <|
-                        E.text <|
-                            "New"
+                , label = E.text "New"
                 }
+
+        verticalSeparatorForToolsPanel : Element Msg
+        verticalSeparatorForToolsPanel =
+            E.el
+                [ E.width <| px 1
+                , E.height <| px 16
+                , Border.color <| shiroIro
+                , Border.widthEach { top = 0, right = 1, left = 0, bottom = 0 }
+                ]
+            <|
+                E.none
     in
     E.row
         [ E.width E.fill
@@ -357,16 +335,20 @@ viewToolsPanel model =
             , E.spacing 10
             ]
             [ newButton
-            , verticalLine
+            , verticalSeparatorForToolsPanel
             , saveButton
-            , verticalLine
+            , verticalSeparatorForToolsPanel
             , viewUndoButton
             ]
         ]
 
 
-closedSettingPanel : Model -> Element Msg
-closedSettingPanel model =
+
+-- Display closed setting panel
+
+
+viewClosedSettingPanel : Element Msg
+viewClosedSettingPanel =
     column
         [ E.width <| px 50
         , E.height E.fill
@@ -401,8 +383,12 @@ closedSettingPanel model =
         ]
 
 
-openedSettingPanel : Model -> Element Msg
-openedSettingPanel model =
+
+-- Dispaly opened setting panel
+
+
+viewOpenedSettingPanel : Model -> Element Msg
+viewOpenedSettingPanel model =
     column
         [ E.width <| px 110
         , E.height E.fill
@@ -442,7 +428,7 @@ openedSettingPanel model =
                                 , E.text "Setting"
                                 ]
                     }
-        , panelHr
+        , horizontalSeparatorForPanels
 
         -- Border Color --
         , column
@@ -458,7 +444,7 @@ openedSettingPanel model =
                 ]
               <|
                 E.text "Border Color"
-            , panelHr
+            , horizontalSeparatorForPanels
             , E.el
                 [ centerX
                 ]
@@ -508,7 +494,7 @@ openedSettingPanel model =
                 ]
               <|
                 E.text "Border Style"
-            , panelHr
+            , horizontalSeparatorForPanels
             , E.el [] <|
                 html <|
                     let
@@ -556,7 +542,7 @@ openedSettingPanel model =
                 ]
               <|
                 E.text "Pixel Size"
-            , panelHr
+            , horizontalSeparatorForPanels
             , column [ E.spacing 3 ] <|
                 let
                     pixelSizeErr : String -> String
@@ -650,7 +636,7 @@ openedSettingPanel model =
                 ]
               <|
                 E.text "Position"
-            , panelHr
+            , horizontalSeparatorForPanels
             , column
                 [ Font.size 14
                 , Font.color <| shiroIro
@@ -666,7 +652,7 @@ openedSettingPanel model =
                         E.text "Setting"
                     , E.el [ centerX ] <|
                         html <|
-                            viewSettingPalettePositionSelect SettingPanel model.tempSetting
+                            viewSelectSettingAndPalettePositionButtons SettingPanel model.tempSetting
                     ]
                 , column
                     [ centerX
@@ -676,7 +662,7 @@ openedSettingPanel model =
                         E.text "Palette"
                     , E.el [ centerX ] <|
                         html <|
-                            viewSettingPalettePositionSelect PalettePanel model.tempSetting
+                            viewSelectSettingAndPalettePositionButtons PalettePanel model.tempSetting
                     ]
                 , column
                     [ centerX
@@ -686,7 +672,7 @@ openedSettingPanel model =
                         E.text "Campus"
                     , E.el [ centerX ] <|
                         html <|
-                            viewCampusPositionSetting model.tempSetting
+                            viewSelectCampusPositionButton model.tempSetting
                     ]
                 ]
             ]
@@ -763,7 +749,7 @@ viewPalettePanel model =
                 }
             , E.text "Palette"
             ]
-        , panelHr
+        , horizontalSeparatorForPanels
         , column
             [ centerX
             , padding 3
@@ -777,7 +763,7 @@ viewPalettePanel model =
                 ]
               <|
                 E.text "Add Color"
-            , panelHr
+            , horizontalSeparatorForPanels
             , E.el
                 [ centerX
                 ]
@@ -898,7 +884,7 @@ viewPalettePanel model =
                 ]
               <|
                 E.text "Main Palette"
-            , panelHr
+            , horizontalSeparatorForPanels
             , E.el
                 [ centerX
                 ]
@@ -925,7 +911,7 @@ viewPalettePanel model =
                 ]
               <|
                 E.text "Sub Palette"
-            , panelHr
+            , horizontalSeparatorForPanels
             , column
                 [ centerX
                 ]
@@ -955,15 +941,41 @@ viewPalettePanel model =
         ]
 
 
+
+{- Campus is displayed in this Panel -}
+
+
 viewCampusPanel : Model -> Element Msg
 viewCampusPanel model =
+    let
+        campusPositionAttrs : List (E.Attribute Msg)
+        campusPositionAttrs =
+            case model.setting.panelPosition.campusPanel of
+                TopCenter ->
+                    [ centerX
+                    , alignTop
+                    , padding 3
+                    ]
+
+                TopRight ->
+                    [ E.alignRight
+                    , alignTop
+                    , padding 3
+                    ]
+
+                TopLeft ->
+                    [ E.alignLeft
+                    , alignTop
+                    , padding 3
+                    ]
+    in
     column
         [ E.width E.fill
         , E.height E.fill
         , Background.color <| shironezuIro
         ]
         [ viewToolsPanel model
-        , E.el (padding 3 :: campusPosition model.setting) <|
+        , E.el campusPositionAttrs <|
             html <|
                 viewCampus model ( model.campusSize.width, model.campusSize.height )
         ]
@@ -973,10 +985,10 @@ viewSettingPanel : Model -> Element Msg
 viewSettingPanel model =
     case model.settingPanelStatus of
         Open ->
-            openedSettingPanel model
+            viewOpenedSettingPanel model
 
         Close ->
-            closedSettingPanel model
+            viewClosedSettingPanel
 
 
 viewPanels : Model -> Element Msg
