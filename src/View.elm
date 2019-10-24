@@ -512,7 +512,7 @@ viewOpenedSettingPanel model =
                                 [ H.text text_ ]
                     in
                     BSelect.select
-                        [ BSelect.onChange Change
+                        [ BSelect.onChange SelectBorderStyle
                         , BSelect.small
                         , BSelect.attrs
                             [ HAttrs.style "height" "18px"

@@ -135,11 +135,9 @@ update msg model =
         ChangeColor ( x, y ) color ->
             ( { model
                 | campus =
-                    Dict.update
-                        ( x, y )
-                        (Maybe.map (\n -> color))
-                        model.campus
-                , history = addHistory model.history ( x, y ) model.campus
+                    changeCampusColor model.campus ( x, y ) color
+                , history =
+                    addHistory model.history ( x, y ) model.campus
               }
             , Cmd.none
             )
@@ -158,23 +156,28 @@ update msg model =
 
         AddColorToSubPalette color ->
             ( { model
-                | subPalette = addColorToSubPalette model.subPalette color
-                , mainPalette = model.colorValue
+                | subPalette =
+                    addColorToSubPalette model.subPalette color
+                , mainPalette =
+                    model.colorValue
               }
             , Cmd.none
             )
 
         SetMainPalette n ->
             ( { model
-                | mainPalette = getSubPaletteColor model.subPalette n
+                | mainPalette =
+                    getSubPaletteColor model.subPalette n
               }
             , Cmd.none
             )
 
         DeleteSubPalette n ->
             ( { model
-                | subPalette = deleteSubPaletteColor model.subPalette n
-                , mainPalette = "white"
+                | subPalette =
+                    deleteSubPaletteColor model.subPalette n
+                , mainPalette =
+                    "white"
               }
             , Cmd.none
             )
@@ -212,8 +215,10 @@ update msg model =
                         , model.tempCampusSize.height
                         )
                 , campusSize =
-                    { width = toIntTemp model.tempCampusSize.width
-                    , height = toIntTemp model.tempCampusSize.height
+                    { width =
+                        toIntTemp model.tempCampusSize.width
+                    , height =
+                        toIntTemp model.tempCampusSize.height
                     }
                 , openingModalWindow = BModal.hidden
                 , didCreateCampus = True
@@ -234,26 +239,23 @@ update msg model =
         BorderColorValue value ->
             ( { model
                 | tempSetting =
-                    { borderColor =
-                        if String.isEmpty value then
-                            model.setting.borderColor
+                    { tempSetting_
+                        | borderColor =
+                            if String.isEmpty value then
+                                model.setting.borderColor
 
-                        else
-                            String.toLower value
-                    , borderStyle = model.tempSetting.borderStyle
-                    , width = model.tempSetting.width
-                    , height = model.tempSetting.height
-                    , panelPosition = model.tempSetting.panelPosition
+                            else
+                                String.toLower value
                     }
               }
             , Cmd.none
             )
 
-        Change str ->
+        SelectBorderStyle style ->
             ( { model
                 | tempSetting =
                     { tempSetting_
-                        | borderStyle = str
+                        | borderStyle = style
                     }
               }
             , Cmd.none
@@ -391,8 +393,10 @@ update msg model =
 
         Undo ( y, x ) ->
             ( { model
-                | campus = undoAndUpdateCampus model.history ( x, y ) model.campus
-                , history = Dict.remove (Dict.size model.history - 1) model.history
+                | campus =
+                    undoAndUpdateCampus model.history ( x, y ) model.campus
+                , history =
+                    Dict.remove (Dict.size model.history - 1) model.history
               }
             , Cmd.none
             )
@@ -428,7 +432,8 @@ update msg model =
 
         ToStringSavedata savedata ->
             ( { model
-                | loadedSavedata = decodeSavedata savedata
+                | loadedSavedata =
+                    decodeSavedata savedata
               }
             , applySavedata model
             )
@@ -822,6 +827,14 @@ createNewCampus ( widthS, heightS ) =
                 (List.range 0 height)
             )
             [ "white" ]
+
+
+changeCampusColor : Campus -> Point -> CssColor -> Campus
+changeCampusColor campus ( x, y ) color =
+    Dict.update
+        ( x, y )
+        (Maybe.map (\n -> color))
+        campus
 
 
 

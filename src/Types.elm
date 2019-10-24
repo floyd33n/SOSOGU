@@ -18,7 +18,7 @@ type Msg
     | ShowModal
     | CloseCreateCampusWindow
     | BorderColorValue String
-    | Change String
+    | SelectBorderStyle String
     | ChangePixelSize String String
     | SetPixelWidth String
     | SetPixelHeight String
