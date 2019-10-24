@@ -139,30 +139,7 @@ update msg model =
                         ( x, y )
                         (Maybe.map (\n -> color))
                         model.campus
-                , history =
-                    if Dict.size model.history <= 100 then
-                        Dict.insert
-                            (Dict.size model.history)
-                            ( ( x, y )
-                            , getCampusColor model.campus ( x, y )
-                            )
-                            model.history
-
-                    else
-                        let
-                            tempHistory =
-                                model.history
-                                    |> Dict.toList
-                                    |> List.drop 1
-                                    |> Dict.fromList
-                                    |> DictEx.mapKeys (\n -> n - 1)
-                        in
-                        Dict.insert
-                            (Dict.size tempHistory)
-                            ( ( x, y )
-                            , getCampusColor model.campus ( x, y )
-                            )
-                            tempHistory
+                , history = addHistory model.history ( x, y ) model.campus
               }
             , Cmd.none
             )
@@ -196,19 +173,7 @@ update msg model =
 
         DeleteSubPalette n ->
             ( { model
-                | subPalette =
-                    Dict.union
-                        (model.subPalette
-                            |> Dict.toList
-                            |> List.take (n - 1)
-                            |> Dict.fromList
-                        )
-                        (model.subPalette
-                            |> Dict.toList
-                            |> List.drop n
-                            |> Dict.fromList
-                            |> DictEx.mapKeys (\m -> m - 1)
-                        )
+                | subPalette = deleteSubPaletteColor model.subPalette n
                 , mainPalette = "white"
               }
             , Cmd.none
@@ -236,31 +201,19 @@ update msg model =
 
         CreateCampus ->
             let
-                createCampusList : Points -> List ( Point, CssColor )
-                createCampusList ( width_, height_ ) =
-                    ListEx.lift2
-                        Tuple.pair
-                        (ListEx.lift2
-                            Tuple.pair
-                            (List.range 0 width_)
-                            (List.range 0 height_)
-                        )
-                        [ "white" ]
-
-                convertTemp : String -> Int
-                convertTemp str =
+                toIntTemp : String -> Int
+                toIntTemp str =
                     Maybe.withDefault 0 (String.toInt str)
             in
             ( { model
                 | campus =
-                    Dict.fromList <|
-                        createCampusList
-                            ( convertTemp model.tempCampusSize.width - 1
-                            , convertTemp model.tempCampusSize.height - 1
-                            )
+                    createNewCampus
+                        ( model.tempCampusSize.width
+                        , model.tempCampusSize.height
+                        )
                 , campusSize =
-                    { width = convertTemp model.tempCampusSize.width
-                    , height = convertTemp model.tempCampusSize.height
+                    { width = toIntTemp model.tempCampusSize.width
+                    , height = toIntTemp model.tempCampusSize.height
                     }
                 , openingModalWindow = BModal.hidden
                 , didCreateCampus = True
@@ -437,19 +390,8 @@ update msg model =
                 ( model, Cmd.none )
 
         Undo ( y, x ) ->
-            let
-                getHistoryColor : Point -> String
-                getHistoryColor ( x_, y_ ) =
-                    Tuple.second <|
-                        Maybe.withDefault ( ( 0, 0 ), "white" ) <|
-                            Dict.get (Dict.size model.history - 1) model.history
-            in
             ( { model
-                | campus =
-                    Dict.update
-                        ( x, y )
-                        (Maybe.map (\n -> getHistoryColor ( x, y )))
-                        model.campus
+                | campus = undoAndUpdateCampus model.history ( x, y ) model.campus
                 , history = Dict.remove (Dict.size model.history - 1) model.history
               }
             , Cmd.none
@@ -496,7 +438,7 @@ update msg model =
                 savedata =
                     model.loadedSavedata
             in
-            if Savedata.isSavedata model.loadedSavedata then
+            if isSavedata model.loadedSavedata then
                 ( { model
                     | setting = decodeSetting savedata
                     , campus = decodeCampus savedata
@@ -802,6 +744,84 @@ addColorToSubPalette subPalette color =
         0
         color
         tempSubPalette
+
+
+deleteSubPaletteColor : SubPalette -> Int -> SubPalette
+deleteSubPaletteColor subPalette n =
+    Dict.union
+        (subPalette
+            |> Dict.toList
+            |> List.take (n - 1)
+            |> Dict.fromList
+        )
+        (subPalette
+            |> Dict.toList
+            |> List.drop n
+            |> Dict.fromList
+            |> DictEx.mapKeys (\m -> m - 1)
+        )
+
+
+undoAndUpdateCampus : History -> Point -> Campus -> Campus
+undoAndUpdateCampus history ( x_, y_ ) campus =
+    let
+        getLatestHistoryColor =
+            history
+                |> Dict.get (Dict.size history - 1)
+                |> Maybe.withDefault ( ( 0, 0 ), "white" )
+                |> Tuple.second
+    in
+    Dict.update
+        ( x_, y_ )
+        (Maybe.map (\n -> getLatestHistoryColor))
+        campus
+
+
+addHistory : History -> Point -> Campus -> History
+addHistory history ( x, y ) campus =
+    if Dict.size history <= 100 then
+        Dict.insert
+            (Dict.size history)
+            ( ( x, y )
+            , getCampusColor campus ( x, y )
+            )
+            history
+
+    else
+        let
+            tempHistory =
+                history
+                    |> Dict.toList
+                    |> List.drop 1
+                    |> Dict.fromList
+                    |> DictEx.mapKeys (\n -> n - 1)
+        in
+        Dict.insert
+            (Dict.size tempHistory)
+            ( ( x, y )
+            , getCampusColor campus ( x, y )
+            )
+            tempHistory
+
+
+createNewCampus : ( String, String ) -> Campus
+createNewCampus ( widthS, heightS ) =
+    let
+        width =
+            Maybe.withDefault 0 (String.toInt widthS)
+
+        height =
+            Maybe.withDefault 0 (String.toInt heightS)
+    in
+    Dict.fromList <|
+        ListEx.lift2
+            Tuple.pair
+            (ListEx.lift2
+                Tuple.pair
+                (List.range 0 width)
+                (List.range 0 height)
+            )
+            [ "white" ]
 
 
 
