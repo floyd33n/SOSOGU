@@ -105,8 +105,16 @@ createSavedata model =
               , JE.object
                     [ ( "borderColor", JE.string model.setting.borderColor )
                     , ( "borderStyle", JE.string model.setting.borderStyle )
-                    , ( "width", JE.string model.setting.width )
-                    , ( "height", JE.string model.setting.height )
+                    , ( "pixelSize"
+                      , JE.object
+                            [ ( "width"
+                              , JE.string model.setting.pixelSize.width
+                              )
+                            , ( "height"
+                              , JE.string model.setting.pixelSize.height
+                              )
+                            ]
+                      )
                     , ( "panelPosition"
                       , JE.object
                             [ ( "settingPanel"
@@ -247,11 +255,11 @@ decodeSetting savedata =
                 Err _ ->
                     "solid"
 
-        decodeWidth : String
-        decodeWidth =
+        decodePixelWidth : String
+        decodePixelWidth =
             case
                 JD.decodeString
-                    (JD.field "setting" <| JD.field "width" JD.string)
+                    (JD.field "setting" <| JD.field "pixelSize" <| JD.field "width" JD.string)
                 <|
                     savedata
             of
@@ -261,11 +269,11 @@ decodeSetting savedata =
                 Err _ ->
                     "20"
 
-        decodeHeight : String
-        decodeHeight =
+        decodePixelHeight : String
+        decodePixelHeight =
             case
                 JD.decodeString
-                    (JD.field "setting" <| JD.field "height" JD.string)
+                    (JD.field "setting" <| JD.field "pixelSize" <| JD.field "height" JD.string)
                 <|
                     savedata
             of
@@ -274,6 +282,12 @@ decodeSetting savedata =
 
                 Err _ ->
                     "20"
+
+        decodePixelSize : PixelSize
+        decodePixelSize =
+            { width = decodePixelWidth
+            , height = decodePixelHeight
+            }
 
         decodePanelPosition : PanelPosition
         decodePanelPosition =
@@ -344,8 +358,7 @@ decodeSetting savedata =
     in
     { borderColor = decodeBorderColor
     , borderStyle = decodeBorderStyle
-    , width = decodeWidth
-    , height = decodeHeight
+    , pixelSize = decodePixelSize
     , panelPosition = decodePanelPosition
     }
 

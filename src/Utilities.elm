@@ -12,9 +12,14 @@ loadCssElmReactor path =
     H.node "link" [ HA.rel "stylesheet", HA.href path ] []
 
 
+isCorrectPixelSize : ( String, String ) -> Bool
+isCorrectPixelSize ( width, height ) =
+    Maybe.withDefault 0 (String.toInt width) * Maybe.withDefault 0 (String.toInt height) > 0
+
+
 isCorrectSetting : Setting -> Bool
 isCorrectSetting setting =
-    isColor setting.borderColor && isCorrectWidthHeight setting.width setting.height
+    isColor setting.borderColor && isCorrectWidthHeight setting.pixelSize.width setting.pixelSize.height
 
 
 isCorrectWidthHeight : String -> String -> Bool

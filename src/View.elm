@@ -204,23 +204,23 @@ viewCampus model ( width, height ) =
                                 (\x ->
                                     div
                                         [ HAttrs.style "float" "left"
-                                        , HAttrs.style "width" ("calc(1px + " ++ model.setting.width ++ "px)")
-                                        , HAttrs.style "height" ("calc(1px + " ++ model.setting.height ++ "px)")
+                                        , HAttrs.style "width" ("calc(1px + " ++ model.setting.pixelSize.width ++ "px)")
+                                        , HAttrs.style "height" ("calc(1px + " ++ model.setting.pixelSize.height ++ "px)")
                                         , HAttrs.style "margin" "-1px"
                                         , HAttrs.style "display" "flex"
                                         ]
                                     <|
                                         [ Svg.svg
-                                            [ SAttrs.viewBox ("0, 0, " ++ model.setting.width ++ ", " ++ model.setting.height)
-                                            , SAttrs.width (model.setting.width ++ "px")
-                                            , SAttrs.height (model.setting.height ++ "px")
+                                            [ SAttrs.viewBox ("0, 0, " ++ model.setting.pixelSize.width ++ ", " ++ model.setting.pixelSize.height)
+                                            , SAttrs.width (model.setting.pixelSize.width ++ "px")
+                                            , SAttrs.height (model.setting.pixelSize.height ++ "px")
                                             ]
                                             [ rect
                                                 (List.append
                                                     [ SAttrs.strokeWidth "1"
                                                     , SAttrs.fill <| getCampusColor model.campus ( x, y )
-                                                    , SAttrs.width (model.setting.width ++ "px")
-                                                    , SAttrs.height (model.setting.height ++ "px")
+                                                    , SAttrs.width (model.setting.pixelSize.width ++ "px")
+                                                    , SAttrs.height (model.setting.pixelSize.height ++ "px")
                                                     , SEvents.onClick (ChangeColor ( x, y ) model.mainPalette)
                                                     , SAttrs.x "0"
                                                     , SAttrs.y "0"
@@ -573,7 +573,7 @@ viewOpenedSettingPanel model =
                         BInput.text
                             [ BInput.onInput SetPixelWidth
                             , BInput.small
-                            , if Maybe.withDefault 0 (String.toInt model.tempSetting.width) > 0 then
+                            , if Maybe.withDefault 0 (String.toInt model.tempSetting.pixelSize.width) > 0 then
                                 BInput.attrs []
 
                               else
@@ -590,7 +590,7 @@ viewOpenedSettingPanel model =
                         [ HAttrs.style "color" "#e2041b"
                         , HAttrs.style "font-size" "13px"
                         ]
-                        [ H.text <| pixelSizeErr model.tempSetting.width ]
+                        [ H.text <| pixelSizeErr model.tempSetting.pixelSize.width ]
                 , E.row
                     [ Font.color <| shiroIro
                     , Font.size <| 14
@@ -602,7 +602,7 @@ viewOpenedSettingPanel model =
                         BInput.text
                             [ BInput.onInput SetPixelHeight
                             , BInput.small
-                            , if Maybe.withDefault 0 (String.toInt model.tempSetting.height) > 0 then
+                            , if Maybe.withDefault 0 (String.toInt model.tempSetting.pixelSize.height) > 0 then
                                 BInput.attrs []
 
                               else
@@ -619,7 +619,7 @@ viewOpenedSettingPanel model =
                         [ HAttrs.style "color" "#e2041b"
                         , HAttrs.style "font-size" "13px"
                         ]
-                        [ H.text <| pixelSizeErr model.tempSetting.height ]
+                        [ H.text <| pixelSizeErr model.tempSetting.pixelSize.height ]
                 ]
             ]
 

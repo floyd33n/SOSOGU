@@ -99,8 +99,10 @@ initSetting : Setting
 initSetting =
     { borderColor = "black"
     , borderStyle = "solid"
-    , width = "20"
-    , height = "20"
+    , pixelSize =
+        { width = "20"
+        , height = "20"
+        }
     , panelPosition = initPanelPosition
     }
 
@@ -261,31 +263,19 @@ update msg model =
             , Cmd.none
             )
 
-        ChangePixelSize width_ height_ ->
-            if Maybe.withDefault 0 (String.toInt width_) * Maybe.withDefault 0 (String.toInt height_) > 0 then
-                ( { model
-                    | tempSetting =
-                        { tempSetting_
-                            | width = width_
-                            , height = height_
-                        }
-                  }
-                , Cmd.none
-                )
-
-            else
-                ( model, Cmd.none )
-
         SetPixelWidth tempWidth_ ->
             ( { model
                 | tempSetting =
                     { tempSetting_
-                        | width =
-                            if String.isEmpty tempWidth_ then
-                                model.setting.width
+                        | pixelSize =
+                            { width =
+                                if String.isEmpty tempWidth_ then
+                                    model.setting.pixelSize.width
 
-                            else
-                                tempWidth_
+                                else
+                                    tempWidth_
+                            , height = model.tempSetting.pixelSize.height
+                            }
                     }
               }
             , Cmd.none
@@ -295,12 +285,15 @@ update msg model =
             ( { model
                 | tempSetting =
                     { tempSetting_
-                        | height =
-                            if String.isEmpty tempHeight_ then
-                                model.setting.height
+                        | pixelSize =
+                            { width = model.tempSetting.pixelSize.width
+                            , height =
+                                if String.isEmpty tempHeight_ then
+                                    model.setting.pixelSize.height
 
-                            else
-                                tempHeight_
+                                else
+                                    tempHeight_
+                            }
                     }
               }
             , Cmd.none

@@ -19,7 +19,6 @@ type Msg
     | CloseCreateCampusWindow
     | BorderColorValue String
     | SelectBorderStyle String
-    | ChangePixelSize String String
     | SetPixelWidth String
     | SetPixelHeight String
     | SetCampusPosition CampusPosition
@@ -96,6 +95,12 @@ type alias CampusSize =
     }
 
 
+type alias PixelSize =
+    { width : String
+    , height : String
+    }
+
+
 type alias Serial =
     Int
 
@@ -111,8 +116,7 @@ type alias History =
 type alias Setting =
     { borderColor : CssColor
     , borderStyle : BorderStyle
-    , width : String
-    , height : String
+    , pixelSize : PixelSize
     , panelPosition : PanelPosition
     }
 
