@@ -139,7 +139,7 @@ update msg model =
                 | campus =
                     changeCampusColor model.campus ( x, y ) color
                 , history =
-                    addHistory model.history ( x, y ) model.campus
+                    addHistory model.mainPalette model.history ( x, y ) model.campus
               }
             , Cmd.none
             )
@@ -775,9 +775,12 @@ undoAndUpdateCampus history ( x_, y_ ) campus =
         campus
 
 
-addHistory : History -> Point -> Campus -> History
-addHistory history ( x, y ) campus =
-    if Dict.size history <= 100 then
+addHistory : MainPaletteColor -> History -> Point -> Campus -> History
+addHistory mainPalette history ( x, y ) campus =
+    if getCampusColor campus ( x, y ) == mainPalette then
+        history
+
+    else if Dict.size history <= 100 then
         Dict.insert
             (Dict.size history)
             ( ( x, y )

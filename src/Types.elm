@@ -71,6 +71,10 @@ type alias CssColor =
     String
 
 
+type alias MainPaletteColor =
+    String
+
+
 type alias Campus =
     Dict Point CssColor
 
