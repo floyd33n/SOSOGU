@@ -53,20 +53,12 @@ getSubPaletteColor subPalette n =
         |> Maybe.withDefault "white"
 
 
-getHistoryColor : Point -> History -> CssColor
-getHistoryColor ( x_, y_ ) history =
+getHistoryColor : History -> Point -> CssColor
+getHistoryColor history ( x, y ) =
     history
         |> Dict.get (Dict.size history)
         |> Maybe.withDefault ( ( 0, 0 ), "white" )
         |> Tuple.second
-
-
-
-{-
-   Tuple.second <|
-       Maybe.withDefault ( ( 0, 0 ), "white" ) <|
-           Dict.get (Dict.size model.history - 1) model.history
--}
 
 
 isColor : String -> Bool

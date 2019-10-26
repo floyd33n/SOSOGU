@@ -83,10 +83,6 @@ type alias Point =
     ( Int, Int )
 
 
-type alias Points =
-    ( Int, Int )
-
-
 type alias TempCampusSize =
     { width : String
     , height : String

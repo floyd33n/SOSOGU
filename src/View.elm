@@ -166,8 +166,8 @@ horizontalSeparatorForPanels =
 -- Display campus
 
 
-viewCampus : Model -> Points -> Html Msg
-viewCampus model ( width, height ) =
+viewCampus : Model -> Html Msg
+viewCampus model =
     let
         strokeAttrs : BorderStyle -> CssColor -> List (Svg.Attribute msg)
         strokeAttrs style color =
@@ -232,10 +232,10 @@ viewCampus model ( width, height ) =
                                         ]
                                 )
                             <|
-                                List.range 0 (width - 1)
+                                List.range 0 (model.campusSize.width - 1)
                     )
                 <|
-                    List.range 0 (height - 1)
+                    List.range 0 (model.campusSize.height - 1)
             ]
 
     else
@@ -977,7 +977,7 @@ viewCampusPanel model =
         [ viewToolsPanel model
         , E.el campusPositionAttrs <|
             html <|
-                viewCampus model ( model.campusSize.width, model.campusSize.height )
+                viewCampus model
         ]
 
 
