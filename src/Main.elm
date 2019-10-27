@@ -144,7 +144,7 @@ update msg model =
             , Cmd.none
             )
 
-        ColorValue value ->
+        InputColorValue value ->
             ( { model
                 | colorValue =
                     if String.isEmpty model.colorValue then
@@ -161,7 +161,9 @@ update msg model =
                 | subPalette =
                     addColorToSubPalette model.subPalette color
                 , mainPalette =
-                    model.colorValue
+                    color
+
+                --model.colorValue
               }
             , Cmd.none
             )
@@ -184,7 +186,7 @@ update msg model =
             , Cmd.none
             )
 
-        SetCampusWidth width ->
+        InputCampusWidth width ->
             ( { model
                 | tempCampusSize =
                     { width = width
@@ -194,7 +196,7 @@ update msg model =
             , Cmd.none
             )
 
-        SetCampusHeight height ->
+        InputCampusHeight height ->
             ( { model
                 | tempCampusSize =
                     { height = height
@@ -228,17 +230,12 @@ update msg model =
             , Cmd.none
             )
 
-        ShowModal ->
-            ( { model | modalVisibility = BModal.shown }
-            , Cmd.none
-            )
-
-        CloseCreateCampusWindow ->
+        CloseCreateCampusModalWindow ->
             ( { model | openingModalWindow = BModal.hidden }
             , Cmd.none
             )
 
-        BorderColorValue value ->
+        InputBorderColor value ->
             ( { model
                 | tempSetting =
                     { tempSetting_
@@ -263,17 +260,17 @@ update msg model =
             , Cmd.none
             )
 
-        SetPixelWidth tempWidth_ ->
+        InputPixelWidth tempWidth ->
             ( { model
                 | tempSetting =
                     { tempSetting_
                         | pixelSize =
                             { width =
-                                if String.isEmpty tempWidth_ then
+                                if String.isEmpty tempWidth then
                                     model.setting.pixelSize.width
 
                                 else
-                                    tempWidth_
+                                    tempWidth
                             , height = model.tempSetting.pixelSize.height
                             }
                     }
@@ -281,25 +278,25 @@ update msg model =
             , Cmd.none
             )
 
-        SetPixelHeight tempHeight_ ->
+        InputPixelHeight tempHeight ->
             ( { model
                 | tempSetting =
                     { tempSetting_
                         | pixelSize =
                             { width = model.tempSetting.pixelSize.width
                             , height =
-                                if String.isEmpty tempHeight_ then
+                                if String.isEmpty tempHeight then
                                     model.setting.pixelSize.height
 
                                 else
-                                    tempHeight_
+                                    tempHeight
                             }
                     }
               }
             , Cmd.none
             )
 
-        SetCampusPosition position_ ->
+        InputCampusPosition position_ ->
             ( { model
                 | tempSetting =
                     { tempSetting_
@@ -317,7 +314,7 @@ update msg model =
             , Cmd.none
             )
 
-        ChangePanelPosition panel_ position_ ->
+        InputSettingAndPalettePosition panel_ position_ ->
             case panel_ of
                 SettingPanel ->
                     case position_ of
@@ -423,7 +420,7 @@ update msg model =
             , toStringSaveData savedata
             )
 
-        ToStringSavedata savedata ->
+        DecodeSavedata savedata ->
             ( { model
                 | loadedSavedata =
                     decodeSavedata savedata
@@ -459,12 +456,12 @@ update msg model =
         AdjustTimeZone newZone ->
             ( { model | timeGetter = { timeGetter_ | zone = newZone } }, Cmd.none )
 
-        ShowSaveWindow ->
+        ShowSaveModalWindow ->
             ( { model | saveModalWindow = BModal.shown }
             , generateCampusImage ()
             )
 
-        CloseSaveWindow ->
+        CloseSaveModalWindow ->
             ( { model
                 | saveModalWindow = BModal.hidden
                 , saveAndNewCampusModalWindow = BModal.hidden
@@ -490,7 +487,7 @@ update msg model =
             , Cmd.none
             )
 
-        SaveEditingCampusModalWindow yn ->
+        ShowSaveEditingCampusModalWindow yn ->
             case yn of
                 Yes ->
                     ( { model
@@ -547,7 +544,7 @@ applySavedata model =
 
 toStringSaveData : File -> Cmd Msg
 toStringSaveData file =
-    Task.perform ToStringSavedata (File.toString file)
+    Task.perform DecodeSavedata (File.toString file)
 
 
 dlSavedata : Model -> Cmd msg

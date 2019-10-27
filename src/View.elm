@@ -67,7 +67,7 @@ viewSelectCampusPositionButton tempSetting =
         tempDiv : CampusPosition -> Html Msg
         tempDiv position_ =
             div
-                [ HEvents.onClick (SetCampusPosition position_)
+                [ HEvents.onClick (InputCampusPosition position_)
                 , HAttrs.style "border" "none"
                 , HAttrs.style "width" "15px"
                 , HAttrs.style "height" "15px"
@@ -108,7 +108,7 @@ viewSelectSettingAndPalettePositionButtons panel_ tempSetting =
         temp_ : Position -> Html Msg
         temp_ position_ =
             div
-                [ HEvents.onClick (ChangePanelPosition panel_ position_)
+                [ HEvents.onClick (InputSettingAndPalettePosition panel_ position_)
                 , HAttrs.style "border" "none"
                 , HAttrs.style "width" "15px"
                 , HAttrs.style "height" "15px"
@@ -282,7 +282,7 @@ viewToolsPanel model =
         saveButton =
             Input.button
                 buttonAttrs
-                { onPress = Just ShowSaveWindow
+                { onPress = Just ShowSaveModalWindow
                 , label = E.text "Save"
                 }
 
@@ -451,7 +451,7 @@ viewOpenedSettingPanel model =
               <|
                 html <|
                     BInput.text
-                        [ BInput.onInput BorderColorValue
+                        [ BInput.onInput InputBorderColor
                         , if isColor model.tempSetting.borderColor then
                             BInput.attrs []
 
@@ -571,7 +571,7 @@ viewOpenedSettingPanel model =
                         E.text "width : "
                     , html <|
                         BInput.text
-                            [ BInput.onInput SetPixelWidth
+                            [ BInput.onInput InputPixelWidth
                             , BInput.small
                             , if Maybe.withDefault 0 (String.toInt model.tempSetting.pixelSize.width) > 0 then
                                 BInput.attrs []
@@ -600,7 +600,7 @@ viewOpenedSettingPanel model =
                         E.text "height : "
                     , html <|
                         BInput.text
-                            [ BInput.onInput SetPixelHeight
+                            [ BInput.onInput InputPixelHeight
                             , BInput.small
                             , if Maybe.withDefault 0 (String.toInt model.tempSetting.pixelSize.height) > 0 then
                                 BInput.attrs []
@@ -770,7 +770,7 @@ viewPalettePanel model =
               <|
                 html <|
                     BInput.text
-                        [ BInput.onInput ColorValue
+                        [ BInput.onInput InputColorValue
                         , if isColor model.colorValue then
                             BInput.attrs []
 
@@ -995,7 +995,14 @@ viewPanels : Model -> Element Msg
 viewPanels model =
     let
         verticalSeparator =
-            E.el [ E.width <| px 1, E.height E.fill, Border.widthEach { top = 0, right = 1, left = 0, bottom = 0 }, Border.color shiroIro ] <| E.none
+            E.el
+                [ E.width <| px 1
+                , E.height E.fill
+                , Border.widthEach { top = 0, right = 1, left = 0, bottom = 0 }
+                , Border.color shiroIro
+                ]
+            <|
+                E.none
 
         viewPanels_ : List (Element Msg)
         viewPanels_ =
@@ -1050,7 +1057,7 @@ viewPanels model =
 viewSaveAndNewCampusModalWindow : Model -> Html Msg
 viewSaveAndNewCampusModalWindow model =
     BGrid.container []
-        [ BModal.config CloseSaveWindow
+        [ BModal.config CloseSaveModalWindow
             |> BModal.hideOnBackdropClick True
             |> BModal.h5 [] [ H.text "Save" ]
             |> BModal.body []
@@ -1089,7 +1096,7 @@ viewSaveAndNewCampusModalWindow model =
                                 [ BBtn.button
                                     [ BBtn.outlinePrimary
                                     , BBtn.primary
-                                    , BBtn.onClick (SaveEditingCampusModalWindow No)
+                                    , BBtn.onClick (ShowSaveEditingCampusModalWindow No)
                                     ]
                                     [ H.text "New Campus" ]
                                 ]
@@ -1104,7 +1111,7 @@ viewSaveAndNewCampusModalWindow model =
 viewSaveModalWindow : Model -> Html Msg
 viewSaveModalWindow model =
     BGrid.container []
-        [ BModal.config CloseSaveWindow
+        [ BModal.config CloseSaveModalWindow
             |> BModal.hideOnBackdropClick True
             |> BModal.h5 [] [ H.text "Save" ]
             |> BModal.body []
@@ -1165,7 +1172,7 @@ createCampusModalWindow model =
                             ]
     in
     BGrid.container []
-        [ BModal.config CloseCreateCampusWindow
+        [ BModal.config CloseCreateCampusModalWindow
             |> BModal.hideOnBackdropClick False
             |> BModal.small
             |> BModal.h5
@@ -1178,7 +1185,7 @@ createCampusModalWindow model =
                             [ div [ HAttrs.style "margin" "0 auto" ]
                                 [ H.text "Width" ]
                             , BInput.number
-                                [ BInput.onInput SetCampusWidth
+                                [ BInput.onInput InputCampusWidth
                                 , BInput.attrs
                                     [ HAttrs.style "width" "90px"
                                     , HAttrs.style "height" "30px"
@@ -1189,7 +1196,7 @@ createCampusModalWindow model =
                             [ div [ HAttrs.style "margin" "0 auto" ]
                                 [ H.text "Height" ]
                             , BInput.number
-                                [ BInput.onInput SetCampusHeight
+                                [ BInput.onInput InputCampusHeight
                                 , BInput.attrs
                                     [ HAttrs.style "width" "90px"
                                     , HAttrs.style "height" "30px"
@@ -1259,7 +1266,7 @@ viewConfirmSaveCampusModalWindow model =
                                 [ BBtn.button
                                     [ BBtn.outlineSecondary
                                     , BBtn.secondary
-                                    , BBtn.onClick (SaveEditingCampusModalWindow No)
+                                    , BBtn.onClick (ShowSaveEditingCampusModalWindow No)
                                     ]
                                     [ H.text "No" ]
                                 ]
@@ -1270,7 +1277,7 @@ viewConfirmSaveCampusModalWindow model =
                                 [ BBtn.button
                                     [ BBtn.outlinePrimary
                                     , BBtn.primary
-                                    , BBtn.onClick (SaveEditingCampusModalWindow Yes)
+                                    , BBtn.onClick (ShowSaveEditingCampusModalWindow Yes)
                                     ]
                                     [ H.text "Yes" ]
                                 ]

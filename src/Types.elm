@@ -8,21 +8,20 @@ import Time exposing (..)
 
 type Msg
     = ChangeColor Point CssColor
-    | ColorValue String
+    | InputColorValue String
     | AddColorToSubPalette CssColor
     | SetMainPalette Serial
     | DeleteSubPalette Serial
-    | SetCampusWidth String
-    | SetCampusHeight String
+    | InputCampusWidth String
+    | InputCampusHeight String
     | CreateCampus
-    | ShowModal
-    | CloseCreateCampusWindow
-    | BorderColorValue String
+    | CloseCreateCampusModalWindow
+    | InputBorderColor String
     | SelectBorderStyle String
-    | SetPixelWidth String
-    | SetPixelHeight String
-    | SetCampusPosition CampusPosition
-    | ChangePanelPosition Panel Position
+    | InputPixelWidth String
+    | InputPixelHeight String
+    | InputCampusPosition CampusPosition
+    | InputSettingAndPalettePosition Panel Position
     | ApplySetting
     | Undo Point
     | GetImageUrl String
@@ -31,15 +30,15 @@ type Msg
     | DLSavedata
     | UpSavedata
     | LoadSavedata File
-    | ToStringSavedata String
+    | DecodeSavedata String
     | ApplySavedata Model
     | Tick Time.Posix
     | AdjustTimeZone Time.Zone
-    | ShowSaveWindow
-    | CloseSaveWindow
+    | ShowSaveModalWindow
+    | CloseSaveModalWindow
     | DLImage
     | NewProject
-    | SaveEditingCampusModalWindow YN
+    | ShowSaveEditingCampusModalWindow YN
     | CloseSaveEditingCampusModalWindow
 
 
