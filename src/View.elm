@@ -452,7 +452,7 @@ viewOpenedSettingPanel model =
                 html <|
                     BInput.text
                         [ BInput.onInput InputBorderColor
-                        , if isColor model.tempSetting.borderColor then
+                        , if isColor model.temp.setting.borderColor then
                             BInput.attrs []
 
                           else
@@ -470,10 +470,10 @@ viewOpenedSettingPanel model =
                         , HAttrs.style "font-size" "13px"
                         ]
                         [ H.text <|
-                            if isColor model.tempSetting.borderColor then
+                            if isColor model.temp.setting.borderColor then
                                 ""
 
-                            else if String.isEmpty model.tempSetting.borderColor then
+                            else if String.isEmpty model.temp.setting.borderColor then
                                 "Is Empty"
 
                             else
@@ -573,7 +573,7 @@ viewOpenedSettingPanel model =
                         BInput.text
                             [ BInput.onInput InputPixelWidth
                             , BInput.small
-                            , if Maybe.withDefault 0 (String.toInt model.tempSetting.pixelSize.width) > 0 then
+                            , if Maybe.withDefault 0 (String.toInt model.temp.setting.pixelSize.width) > 0 then
                                 BInput.attrs []
 
                               else
@@ -590,7 +590,7 @@ viewOpenedSettingPanel model =
                         [ HAttrs.style "color" "#e2041b"
                         , HAttrs.style "font-size" "13px"
                         ]
-                        [ H.text <| pixelSizeErr model.tempSetting.pixelSize.width ]
+                        [ H.text <| pixelSizeErr model.temp.setting.pixelSize.width ]
                 , E.row
                     [ Font.color <| shiroIro
                     , Font.size <| 14
@@ -602,7 +602,7 @@ viewOpenedSettingPanel model =
                         BInput.text
                             [ BInput.onInput InputPixelHeight
                             , BInput.small
-                            , if Maybe.withDefault 0 (String.toInt model.tempSetting.pixelSize.height) > 0 then
+                            , if Maybe.withDefault 0 (String.toInt model.temp.setting.pixelSize.height) > 0 then
                                 BInput.attrs []
 
                               else
@@ -619,7 +619,7 @@ viewOpenedSettingPanel model =
                         [ HAttrs.style "color" "#e2041b"
                         , HAttrs.style "font-size" "13px"
                         ]
-                        [ H.text <| pixelSizeErr model.tempSetting.pixelSize.height ]
+                        [ H.text <| pixelSizeErr model.temp.setting.pixelSize.height ]
                 ]
             ]
 
@@ -652,7 +652,7 @@ viewOpenedSettingPanel model =
                         E.text "Setting"
                     , E.el [ centerX ] <|
                         html <|
-                            viewSelectSettingAndPalettePositionButtons SettingPanel model.tempSetting
+                            viewSelectSettingAndPalettePositionButtons SettingPanel model.temp.setting
                     ]
                 , column
                     [ centerX
@@ -662,7 +662,7 @@ viewOpenedSettingPanel model =
                         E.text "Palette"
                     , E.el [ centerX ] <|
                         html <|
-                            viewSelectSettingAndPalettePositionButtons PalettePanel model.tempSetting
+                            viewSelectSettingAndPalettePositionButtons PalettePanel model.temp.setting
                     ]
                 , column
                     [ centerX
@@ -672,7 +672,7 @@ viewOpenedSettingPanel model =
                         E.text "Campus"
                     , E.el [ centerX ] <|
                         html <|
-                            viewSelectCampusPositionButton model.tempSetting
+                            viewSelectCampusPositionButton model.temp.setting
                     ]
                 ]
             ]
@@ -681,7 +681,7 @@ viewOpenedSettingPanel model =
             , paddingEach { top = 20, right = 0, left = 0, bottom = 0 }
             ]
           <|
-            if isCorrectSetting model.tempSetting then
+            if isCorrectSetting model.temp.setting then
                 Input.button
                     [ htmlAttribute <| HAttrs.style "color" "white"
                     , Border.color <| shiroIro
@@ -1213,7 +1213,7 @@ createCampusModalWindow model =
                                 [ BBtn.outlinePrimary
                                 , BBtn.primary
                                 , BBtn.onClick CreateCampus
-                                , BBtn.disabled <| not (isCorrectWidthHeight model.tempCampusSize.width model.tempCampusSize.height)
+                                , BBtn.disabled <| not (isCorrectWidthHeight model.temp.campusSize.width model.temp.campusSize.height)
                                 ]
                                 [ H.text "Create Campus" ]
                             ]

@@ -48,12 +48,10 @@ type alias Model =
     , subPalette : SubPalette
     , mainPalette : CssColor
     , campusSize : CampusSize
-    , tempCampusSize : TempCampusSize
     , didCreateCampus : Bool
     , modalVisibility : BModal.Visibility
     , openingModalWindow : BModal.Visibility
     , setting : Setting
-    , tempSetting : Setting
     , borderColorValue : CssColor
     , history : History
     , campusImageUrl : String
@@ -63,6 +61,13 @@ type alias Model =
     , saveModalWindow : BModal.Visibility
     , saveEditingCampusModalWindow : BModal.Visibility
     , saveAndNewCampusModalWindow : BModal.Visibility
+    , temp : Temp
+    }
+
+
+type alias Temp =
+    { campusSize : TempCampusSize
+    , setting : Setting
     }
 
 

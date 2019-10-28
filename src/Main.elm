@@ -67,12 +67,10 @@ init _ =
       , subPalette = Dict.fromList [ ( 0, "white" ) ]
       , mainPalette = "white"
       , campusSize = CampusSize 0 0
-      , tempCampusSize = TempCampusSize "" ""
       , didCreateCampus = False
       , modalVisibility = BModal.hidden
       , openingModalWindow = BModal.shown
       , setting = initSetting
-      , tempSetting = initSetting
       , borderColorValue = "black"
       , history = Dict.empty
       , campusImageUrl = ""
@@ -82,6 +80,7 @@ init _ =
       , saveModalWindow = BModal.hidden
       , saveEditingCampusModalWindow = BModal.hidden
       , saveAndNewCampusModalWindow = BModal.hidden
+      , temp = { campusSize = TempCampusSize "" "", setting = initSetting }
       }
     , Task.perform AdjustTimeZone Time.here
     )
@@ -124,11 +123,17 @@ update msg model =
         setting_ =
             model.setting
 
+        temp_ =
+            model.temp
+
         tempSetting_ =
-            model.tempSetting
+            model.temp.setting
+
+        tempCampusSize_ =
+            model.temp.campusSize
 
         panelPosition_ =
-            model.tempSetting.panelPosition
+            model.temp.setting.panelPosition
 
         timeGetter_ =
             model.timeGetter
@@ -188,9 +193,12 @@ update msg model =
 
         InputCampusWidth width ->
             ( { model
-                | tempCampusSize =
-                    { width = width
-                    , height = model.tempCampusSize.height
+                | temp =
+                    { temp_
+                        | campusSize =
+                            { width = width
+                            , height = model.temp.campusSize.height
+                            }
                     }
               }
             , Cmd.none
@@ -198,9 +206,12 @@ update msg model =
 
         InputCampusHeight height ->
             ( { model
-                | tempCampusSize =
-                    { height = height
-                    , width = model.tempCampusSize.width
+                | temp =
+                    { temp_
+                        | campusSize =
+                            { height = height
+                            , width = model.temp.campusSize.width
+                            }
                     }
               }
             , Cmd.none
@@ -215,14 +226,14 @@ update msg model =
             ( { model
                 | campus =
                     createNewCampus
-                        ( model.tempCampusSize.width
-                        , model.tempCampusSize.height
+                        ( model.temp.campusSize.width
+                        , model.temp.campusSize.height
                         )
                 , campusSize =
                     { width =
-                        toIntTemp model.tempCampusSize.width
+                        toIntTemp model.temp.campusSize.width
                     , height =
-                        toIntTemp model.tempCampusSize.height
+                        toIntTemp model.temp.campusSize.height
                     }
                 , openingModalWindow = BModal.hidden
                 , didCreateCampus = True
@@ -237,14 +248,17 @@ update msg model =
 
         InputBorderColor value ->
             ( { model
-                | tempSetting =
-                    { tempSetting_
-                        | borderColor =
-                            if String.isEmpty value then
-                                model.setting.borderColor
+                | temp =
+                    { temp_
+                        | setting =
+                            { tempSetting_
+                                | borderColor =
+                                    if String.isEmpty value then
+                                        model.setting.borderColor
 
-                            else
-                                String.toLower value
+                                    else
+                                        String.toLower value
+                            }
                     }
               }
             , Cmd.none
@@ -252,9 +266,12 @@ update msg model =
 
         SelectBorderStyle style ->
             ( { model
-                | tempSetting =
-                    { tempSetting_
-                        | borderStyle = style
+                | temp =
+                    { temp_
+                        | setting =
+                            { tempSetting_
+                                | borderStyle = style
+                            }
                     }
               }
             , Cmd.none
@@ -262,16 +279,19 @@ update msg model =
 
         InputPixelWidth tempWidth ->
             ( { model
-                | tempSetting =
-                    { tempSetting_
-                        | pixelSize =
-                            { width =
-                                if String.isEmpty tempWidth then
-                                    model.setting.pixelSize.width
+                | temp =
+                    { temp_
+                        | setting =
+                            { tempSetting_
+                                | pixelSize =
+                                    { width =
+                                        if String.isEmpty tempWidth then
+                                            model.setting.pixelSize.width
 
-                                else
-                                    tempWidth
-                            , height = model.tempSetting.pixelSize.height
+                                        else
+                                            tempWidth
+                                    , height = model.temp.setting.pixelSize.height
+                                    }
                             }
                     }
               }
@@ -280,16 +300,19 @@ update msg model =
 
         InputPixelHeight tempHeight ->
             ( { model
-                | tempSetting =
-                    { tempSetting_
-                        | pixelSize =
-                            { width = model.tempSetting.pixelSize.width
-                            , height =
-                                if String.isEmpty tempHeight then
-                                    model.setting.pixelSize.height
+                | temp =
+                    { temp_
+                        | setting =
+                            { tempSetting_
+                                | pixelSize =
+                                    { width = model.temp.setting.pixelSize.width
+                                    , height =
+                                        if String.isEmpty tempHeight then
+                                            model.setting.pixelSize.height
 
-                                else
-                                    tempHeight
+                                        else
+                                            tempHeight
+                                    }
                             }
                     }
               }
@@ -298,11 +321,14 @@ update msg model =
 
         InputCampusPosition position_ ->
             ( { model
-                | tempSetting =
-                    { tempSetting_
-                        | panelPosition =
-                            { panelPosition_
-                                | campusPanel = position_
+                | temp =
+                    { temp_
+                        | setting =
+                            { tempSetting_
+                                | panelPosition =
+                                    { panelPosition_
+                                        | campusPanel = position_
+                                    }
                             }
                     }
               }
@@ -320,11 +346,14 @@ update msg model =
                     case position_ of
                         Right ->
                             ( { model
-                                | tempSetting =
-                                    { tempSetting_
-                                        | panelPosition =
-                                            { panelPosition_
-                                                | settingPanel = Right
+                                | temp =
+                                    { temp_
+                                        | setting =
+                                            { tempSetting_
+                                                | panelPosition =
+                                                    { panelPosition_
+                                                        | settingPanel = Right
+                                                    }
                                             }
                                     }
                               }
@@ -333,11 +362,14 @@ update msg model =
 
                         Left ->
                             ( { model
-                                | tempSetting =
-                                    { tempSetting_
-                                        | panelPosition =
-                                            { panelPosition_
-                                                | settingPanel = Left
+                                | temp =
+                                    { temp_
+                                        | setting =
+                                            { tempSetting_
+                                                | panelPosition =
+                                                    { panelPosition_
+                                                        | settingPanel = Left
+                                                    }
                                             }
                                     }
                               }
@@ -348,11 +380,14 @@ update msg model =
                     case position_ of
                         Right ->
                             ( { model
-                                | tempSetting =
-                                    { tempSetting_
-                                        | panelPosition =
-                                            { panelPosition_
-                                                | palettePanel = Right
+                                | temp =
+                                    { temp_
+                                        | setting =
+                                            { tempSetting_
+                                                | panelPosition =
+                                                    { panelPosition_
+                                                        | palettePanel = Right
+                                                    }
                                             }
                                     }
                               }
@@ -361,11 +396,14 @@ update msg model =
 
                         Left ->
                             ( { model
-                                | tempSetting =
-                                    { tempSetting_
-                                        | panelPosition =
-                                            { panelPosition_
-                                                | palettePanel = Left
+                                | temp =
+                                    { temp_
+                                        | setting =
+                                            { tempSetting_
+                                                | panelPosition =
+                                                    { panelPosition_
+                                                        | palettePanel = Left
+                                                    }
                                             }
                                     }
                               }
@@ -373,8 +411,8 @@ update msg model =
                             )
 
         ApplySetting ->
-            if isCorrectSetting model.tempSetting then
-                ( { model | setting = model.tempSetting }
+            if isCorrectSetting model.temp.setting then
+                ( { model | setting = model.temp.setting }
                 , Cmd.none
                 )
 
