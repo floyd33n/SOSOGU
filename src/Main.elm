@@ -155,7 +155,7 @@ update msg model =
             model.modalStatus
     in
     case msg of
-        ChangeColor ( x, y ) color ->
+        ChangeCampusColor ( x, y ) color ->
             ( { model
                 | campus =
                     changeCampusColor model.campus ( x, y ) color

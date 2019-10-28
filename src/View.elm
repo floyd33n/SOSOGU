@@ -221,7 +221,7 @@ viewCampus model =
                                                     , SAttrs.fill <| getCampusColor model.campus ( x, y )
                                                     , SAttrs.width (model.setting.pixelSize.width ++ "px")
                                                     , SAttrs.height (model.setting.pixelSize.height ++ "px")
-                                                    , SEvents.onClick (ChangeColor ( x, y ) model.mainPalette)
+                                                    , SEvents.onClick (ChangeCampusColor ( x, y ) model.mainPalette)
                                                     , SAttrs.x "0"
                                                     , SAttrs.y "0"
                                                     ]

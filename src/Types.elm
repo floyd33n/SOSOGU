@@ -7,7 +7,7 @@ import Time exposing (..)
 
 
 type Msg
-    = ChangeColor Point CssColor
+    = ChangeCampusColor Point CssColor
     | InputColorValue String
     | AddColorToSubPalette CssColor
     | SetMainPalette Serial
