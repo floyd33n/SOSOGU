@@ -49,8 +49,6 @@ type alias Model =
     , mainPalette : CssColor
     , campusSize : CampusSize
     , didCreateCampus : Bool
-    , modalVisibility : BModal.Visibility
-    , openingModalWindow : BModal.Visibility
     , setting : Setting
     , borderColorValue : CssColor
     , history : History
@@ -58,10 +56,16 @@ type alias Model =
     , settingPanelStatus : PanelStatus
     , loadedSavedata : Savedata
     , timeGetter : TimeGetter
+    , temp : Temp
+    , modalStatus : ModalWindow
+    }
+
+
+type alias ModalWindow =
+    { openingModalWindow : BModal.Visibility
     , saveModalWindow : BModal.Visibility
     , saveEditingCampusModalWindow : BModal.Visibility
     , saveAndNewCampusModalWindow : BModal.Visibility
-    , temp : Temp
     }
 
 

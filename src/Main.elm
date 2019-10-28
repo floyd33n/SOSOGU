@@ -58,6 +58,14 @@ import View exposing (..)
 
 
 --INIT--
+{-
+   { modalVisibility : BModal.Visibility
+   , openingModalWindow : BModal.Visibility
+   , saveModalWindow : BModal.Visibility
+   , saveEditingCampusModalWindow : BModal.Visibility
+   , saveAndNewCampusModalWindow : BModal.Visibility
+   }
+-}
 
 
 init : () -> ( Model, Cmd Msg )
@@ -68,8 +76,6 @@ init _ =
       , mainPalette = "white"
       , campusSize = CampusSize 0 0
       , didCreateCampus = False
-      , modalVisibility = BModal.hidden
-      , openingModalWindow = BModal.shown
       , setting = initSetting
       , borderColorValue = "black"
       , history = Dict.empty
@@ -77,13 +83,20 @@ init _ =
       , settingPanelStatus = Close
       , loadedSavedata = ""
       , timeGetter = initTimeGetter
-      , saveModalWindow = BModal.hidden
-      , saveEditingCampusModalWindow = BModal.hidden
-      , saveAndNewCampusModalWindow = BModal.hidden
       , temp = { campusSize = TempCampusSize "" "", setting = initSetting }
+      , modalStatus = initModalWindow
       }
     , Task.perform AdjustTimeZone Time.here
     )
+
+
+initModalWindow : ModalWindow
+initModalWindow =
+    { openingModalWindow = BModal.shown
+    , saveModalWindow = BModal.hidden
+    , saveEditingCampusModalWindow = BModal.hidden
+    , saveAndNewCampusModalWindow = BModal.hidden
+    }
 
 
 initPanelPosition : PanelPosition
@@ -137,6 +150,9 @@ update msg model =
 
         timeGetter_ =
             model.timeGetter
+
+        modalStatus_ =
+            model.modalStatus
     in
     case msg of
         ChangeColor ( x, y ) color ->
@@ -235,14 +251,22 @@ update msg model =
                     , height =
                         toIntTemp model.temp.campusSize.height
                     }
-                , openingModalWindow = BModal.hidden
+                , modalStatus =
+                    { modalStatus_
+                        | openingModalWindow = BModal.hidden
+                    }
                 , didCreateCampus = True
               }
             , Cmd.none
             )
 
         CloseCreateCampusModalWindow ->
-            ( { model | openingModalWindow = BModal.hidden }
+            ( { model
+                | modalStatus =
+                    { modalStatus_
+                        | openingModalWindow = BModal.hidden
+                    }
+              }
             , Cmd.none
             )
 
@@ -480,7 +504,10 @@ update msg model =
                     , didCreateCampus = decodeDidCreateCampus savedata
                     , subPalette = decodeSubPalette savedata
                     , history = decodeHistory savedata
-                    , openingModalWindow = BModal.hidden
+                    , modalStatus =
+                        { modalStatus_
+                            | openingModalWindow = BModal.hidden
+                        }
                   }
                 , Cmd.none
                 )
@@ -495,14 +522,20 @@ update msg model =
             ( { model | timeGetter = { timeGetter_ | zone = newZone } }, Cmd.none )
 
         ShowSaveModalWindow ->
-            ( { model | saveModalWindow = BModal.shown }
+            ( { model
+                | modalStatus =
+                    { modalStatus_ | saveModalWindow = BModal.shown }
+              }
             , generateCampusImage ()
             )
 
         CloseSaveModalWindow ->
             ( { model
-                | saveModalWindow = BModal.hidden
-                , saveAndNewCampusModalWindow = BModal.hidden
+                | modalStatus =
+                    { modalStatus_
+                        | saveModalWindow = BModal.hidden
+                        , saveAndNewCampusModalWindow = BModal.hidden
+                    }
               }
             , Cmd.none
             )
@@ -515,12 +548,18 @@ update msg model =
         NewProject ->
             ( if model.didCreateCampus then
                 { model
-                    | saveEditingCampusModalWindow = BModal.shown
+                    | modalStatus =
+                        { modalStatus_
+                            | saveEditingCampusModalWindow = BModal.shown
+                        }
                 }
 
               else
                 { model
-                    | openingModalWindow = BModal.shown
+                    | modalStatus =
+                        { modalStatus_
+                            | openingModalWindow = BModal.shown
+                        }
                 }
             , Cmd.none
             )
@@ -529,24 +568,33 @@ update msg model =
             case yn of
                 Yes ->
                     ( { model
-                        | saveEditingCampusModalWindow = BModal.hidden
-                        , saveAndNewCampusModalWindow = BModal.shown
+                        | modalStatus =
+                            { modalStatus_
+                                | saveEditingCampusModalWindow = BModal.hidden
+                                , saveAndNewCampusModalWindow = BModal.shown
+                            }
                       }
                     , Cmd.none
                     )
 
                 No ->
                     ( { model
-                        | saveEditingCampusModalWindow = BModal.hidden
-                        , saveAndNewCampusModalWindow = BModal.hidden
-                        , openingModalWindow = BModal.shown
+                        | modalStatus =
+                            { modalStatus_
+                                | saveEditingCampusModalWindow = BModal.hidden
+                                , saveAndNewCampusModalWindow = BModal.hidden
+                                , openingModalWindow = BModal.shown
+                            }
                       }
                     , Cmd.none
                     )
 
         CloseSaveEditingCampusModalWindow ->
             ( { model
-                | saveEditingCampusModalWindow = BModal.hidden
+                | modalStatus =
+                    { modalStatus_
+                        | saveEditingCampusModalWindow = BModal.hidden
+                    }
               }
             , Cmd.none
             )

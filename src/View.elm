@@ -1104,7 +1104,7 @@ viewSaveAndNewCampusModalWindow model =
                         ]
                     ]
                 ]
-            |> BModal.view model.saveAndNewCampusModalWindow
+            |> BModal.view model.modalStatus.saveAndNewCampusModalWindow
         ]
 
 
@@ -1145,7 +1145,7 @@ viewSaveModalWindow model =
                         ]
                     ]
                 ]
-            |> BModal.view model.saveModalWindow
+            |> BModal.view model.modalStatus.saveModalWindow
         ]
 
 
@@ -1247,7 +1247,7 @@ createCampusModalWindow model =
                         ]
                     ]
                 ]
-            |> BModal.view model.openingModalWindow
+            |> BModal.view model.modalStatus.openingModalWindow
         ]
 
 
@@ -1285,5 +1285,5 @@ viewConfirmSaveCampusModalWindow model =
                         ]
                     ]
                 ]
-            |> BModal.view model.saveEditingCampusModalWindow
+            |> BModal.view model.modalStatus.saveEditingCampusModalWindow
         ]
