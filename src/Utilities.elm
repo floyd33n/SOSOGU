@@ -12,6 +12,35 @@ loadCssElmReactor path =
     H.node "link" [ HA.rel "stylesheet", HA.href path ] []
 
 
+isAllowProjectName : String -> Bool
+isAllowProjectName name =
+    let
+        incSlash =
+            String.contains "/" name
+
+        incColon =
+            String.contains ":" name
+
+        incAsterisk =
+            String.contains "*" name
+
+        incQuestion =
+            String.contains "?" name
+
+        incLessThan =
+            String.contains "<" name
+
+        incGreaterThan =
+            String.contains ">" name
+
+        incPipe =
+            String.contains "|" name
+    in
+    not <|
+        List.member True
+            [ incSlash, incColon, incAsterisk, incQuestion, incLessThan, incGreaterThan, incPipe ]
+
+
 isCorrectPixelSize : ( String, String ) -> Bool
 isCorrectPixelSize ( width, height ) =
     Maybe.withDefault 0 (String.toInt width) * Maybe.withDefault 0 (String.toInt height) > 0

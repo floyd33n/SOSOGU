@@ -37,30 +37,6 @@ import Types exposing (..)
 import Utilities exposing (..)
 
 
-
-{-
-   viewSubPalette : SubPalette -> Html Msg
-   viewSubPalette subPalette =
-       div [] <|
-           List.map
-               (\plt ->
-                   div []
-                       [ div
-                           [ HAttrs.id "palette_square"
-                           , HEvents.onClick <| SetMainPalette (plt - 1)
-                           , HAttrs.style "background-color" <| getSubPaletteColor subPalette (plt - 1)
-                           ]
-                           []
-                       , div [ HAttrs.id "palette_color_name" ]
-                           []
-                       ]
-               )
-           <|
-               List.range 1 (Dict.size subPalette)
--}
--- Display button to select campus position
-
-
 viewSelectCampusPositionButton : Setting -> Html Msg
 viewSelectCampusPositionButton tempSetting =
     let
@@ -1065,12 +1041,23 @@ viewSaveAndNewCampusModalWindow model =
                     [ BGrid.row []
                         [ BGrid.col
                             [ BCol.xs6 ]
-                            [ div [] [ H.text "Save Project" ]
+                            [ div [] [ H.text "Project Name" ]
+                            , div []
+                                [ BInput.text
+                                    [ BInput.onInput InputProjectName
+                                    , BInput.placeholder model.projectName
+                                    , BInput.attrs
+                                        [ HAttrs.style "width" "125px"
+                                        , HAttrs.style "height" "28px"
+                                        ]
+                                    ]
+                                ]
                             , div []
                                 [ BBtn.button
                                     [ BBtn.outlinePrimary
                                     , BBtn.primary
                                     , BBtn.onClick DLSavedata
+                                    , BBtn.disabled <| not (isAllowProjectName model.projectName)
                                     ]
                                     [ H.text "DL Savedata" ]
                                 ]
@@ -1088,6 +1075,7 @@ viewSaveAndNewCampusModalWindow model =
                                 ]
                             ]
                         ]
+                    , br [] []
                     , BGrid.row []
                         [ BGrid.col
                             [ BCol.xs6 ]
@@ -1095,7 +1083,7 @@ viewSaveAndNewCampusModalWindow model =
                             , div []
                                 [ BBtn.button
                                     [ BBtn.outlinePrimary
-                                    , BBtn.primary
+                                    , BBtn.danger
                                     , BBtn.onClick (ShowSaveEditingCampusModalWindow No)
                                     ]
                                     [ H.text "New Campus" ]
@@ -1119,12 +1107,23 @@ viewSaveModalWindow model =
                     [ BGrid.row []
                         [ BGrid.col
                             [ BCol.xs6 ]
-                            [ div [] [ H.text "Save Project" ]
+                            [ div [] [ H.text "Project Name" ]
+                            , div []
+                                [ BInput.text
+                                    [ BInput.onInput InputProjectName
+                                    , BInput.placeholder model.projectName
+                                    , BInput.attrs
+                                        [ HAttrs.style "width" "125px"
+                                        , HAttrs.style "height" "28px"
+                                        ]
+                                    ]
+                                ]
                             , div []
                                 [ BBtn.button
                                     [ BBtn.outlinePrimary
                                     , BBtn.primary
                                     , BBtn.onClick DLSavedata
+                                    , BBtn.disabled <| not (isAllowProjectName model.projectName)
                                     ]
                                     [ H.text "DL Savedata" ]
                                 ]

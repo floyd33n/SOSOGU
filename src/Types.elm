@@ -40,6 +40,7 @@ type Msg
     | NewProject
     | ShowSaveEditingCampusModalWindow YN
     | CloseSaveEditingCampusModalWindow
+    | InputProjectName String
 
 
 type alias Model =
@@ -58,6 +59,7 @@ type alias Model =
     , timeGetter : TimeGetter
     , temp : Temp
     , modalStatus : ModalWindow
+    , projectName : String
     }
 
 

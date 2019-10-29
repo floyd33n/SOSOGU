@@ -1,5 +1,7 @@
 port module Main exposing (..)
 
+--import Debug exposing (..)
+
 import Array exposing (..)
 import Base64 exposing (..)
 import Bootstrap.Alert as BAlert exposing (..)
@@ -22,7 +24,6 @@ import Browser
 import Bytes exposing (..)
 import Bytes.Decode as BD exposing (..)
 import Bytes.Encode as BE exposing (..)
-import Debug exposing (..)
 import Dict exposing (..)
 import Dict.Extra as DictEx exposing (..)
 import Element as E exposing (..)
@@ -58,14 +59,6 @@ import View exposing (..)
 
 
 --INIT--
-{-
-   { modalVisibility : BModal.Visibility
-   , openingModalWindow : BModal.Visibility
-   , saveModalWindow : BModal.Visibility
-   , saveEditingCampusModalWindow : BModal.Visibility
-   , saveAndNewCampusModalWindow : BModal.Visibility
-   }
--}
 
 
 init : () -> ( Model, Cmd Msg )
@@ -85,6 +78,7 @@ init _ =
       , timeGetter = initTimeGetter
       , temp = { campusSize = TempCampusSize "" "", setting = initSetting }
       , modalStatus = initModalWindow
+      , projectName = "Project"
       }
     , Task.perform AdjustTimeZone Time.here
     )
@@ -133,11 +127,11 @@ initTimeGetter =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     let
-        setting_ =
-            model.setting
-
         temp_ =
             model.temp
+
+        setting_ =
+            model.setting
 
         tempSetting_ =
             model.temp.setting
@@ -153,6 +147,13 @@ update msg model =
 
         modalStatus_ =
             model.modalStatus
+
+        blankToDefault value default =
+            if String.isEmpty value then
+                default
+
+            else
+                String.toLower value
     in
     case msg of
         ChangeCampusColor ( x, y ) color ->
@@ -210,12 +211,9 @@ update msg model =
         InputCampusWidth width ->
             ( { model
                 | temp =
-                    { temp_
-                        | campusSize =
-                            { width = width
-                            , height = model.temp.campusSize.height
-                            }
-                    }
+                    Temp
+                        (TempCampusSize width model.temp.campusSize.height)
+                        model.temp.setting
               }
             , Cmd.none
             )
@@ -223,12 +221,9 @@ update msg model =
         InputCampusHeight height ->
             ( { model
                 | temp =
-                    { temp_
-                        | campusSize =
-                            { height = height
-                            , width = model.temp.campusSize.width
-                            }
-                    }
+                    Temp
+                        (TempCampusSize model.temp.campusSize.width height)
+                        model.temp.setting
               }
             , Cmd.none
             )
@@ -273,17 +268,11 @@ update msg model =
         InputBorderColor value ->
             ( { model
                 | temp =
-                    { temp_
-                        | setting =
-                            { tempSetting_
-                                | borderColor =
-                                    if String.isEmpty value then
-                                        model.setting.borderColor
-
-                                    else
-                                        String.toLower value
-                            }
-                    }
+                    Temp
+                        model.temp.campusSize
+                        { setting_
+                            | borderColor = blankToDefault value model.setting.borderColor
+                        }
               }
             , Cmd.none
             )
@@ -291,12 +280,11 @@ update msg model =
         SelectBorderStyle style ->
             ( { model
                 | temp =
-                    { temp_
-                        | setting =
-                            { tempSetting_
-                                | borderStyle = style
-                            }
-                    }
+                    Temp
+                        model.temp.campusSize
+                        { setting_
+                            | borderStyle = style
+                        }
               }
             , Cmd.none
             )
@@ -304,20 +292,14 @@ update msg model =
         InputPixelWidth tempWidth ->
             ( { model
                 | temp =
-                    { temp_
-                        | setting =
-                            { tempSetting_
-                                | pixelSize =
-                                    { width =
-                                        if String.isEmpty tempWidth then
-                                            model.setting.pixelSize.width
-
-                                        else
-                                            tempWidth
-                                    , height = model.temp.setting.pixelSize.height
-                                    }
-                            }
-                    }
+                    Temp
+                        model.temp.campusSize
+                        { setting_
+                            | pixelSize =
+                                PixelSize
+                                    (blankToDefault tempWidth model.setting.pixelSize.width)
+                                    model.temp.setting.pixelSize.height
+                        }
               }
             , Cmd.none
             )
@@ -325,20 +307,14 @@ update msg model =
         InputPixelHeight tempHeight ->
             ( { model
                 | temp =
-                    { temp_
-                        | setting =
-                            { tempSetting_
-                                | pixelSize =
-                                    { width = model.temp.setting.pixelSize.width
-                                    , height =
-                                        if String.isEmpty tempHeight then
-                                            model.setting.pixelSize.height
-
-                                        else
-                                            tempHeight
-                                    }
-                            }
-                    }
+                    Temp
+                        model.temp.campusSize
+                        { setting_
+                            | pixelSize =
+                                PixelSize
+                                    model.temp.setting.pixelSize.width
+                                    (blankToDefault tempHeight model.setting.pixelSize.height)
+                        }
               }
             , Cmd.none
             )
@@ -599,6 +575,13 @@ update msg model =
             , Cmd.none
             )
 
+        InputProjectName name ->
+            ( { model
+                | projectName = blankToDefault name "Project"
+              }
+            , Cmd.none
+            )
+
 
 dlImage : String -> Cmd Msg
 dlImage url =
@@ -705,18 +688,18 @@ dlSavedata model =
                     "Dev"
     in
     FileDL.string
-        ("sosogu"
+        (model.projectName
             ++ "-"
             ++ toStringHour
-            ++ "-"
+            ++ "zi"
             ++ toStringMinute
-            ++ "_"
+            ++ "hun_"
             ++ toStringYear
             ++ "."
             ++ toStringMonth
             ++ "."
             ++ toStringDay
-            ++ ".json"
+            ++ ".sosogu"
         )
         ""
         (encodeSavedataWithBase64 model)
