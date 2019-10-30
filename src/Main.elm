@@ -76,7 +76,10 @@ init _ =
       , settingPanelStatus = Close
       , loadedSavedata = ""
       , timeGetter = initTimeGetter
-      , temp = { campusSize = TempCampusSize "" "", setting = initSetting }
+      , temp =
+            { campusSize = TempCampusSize "" ""
+            , setting = initSetting
+            }
       , modalStatus = initModalWindow
       , projectName = "Project"
       }
@@ -169,11 +172,7 @@ update msg model =
         InputColorValue value ->
             ( { model
                 | colorValue =
-                    if String.isEmpty model.colorValue then
-                        value
-
-                    else
-                        String.toLower value
+                    blankToDefault value model.colorValue
               }
             , Cmd.none
             )
@@ -718,6 +717,9 @@ view : Model -> Html Msg
 view model =
     div
         [ HAttrs.style "height" "100%"
+        , HAttrs.style "width" "100%"
+        , HAttrs.style "marin" "0"
+        , HAttrs.style "padding" "0"
         ]
         [ layout
             []

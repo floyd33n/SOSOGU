@@ -41,33 +41,45 @@ isAllowProjectName name =
             [ incSlash, incColon, incAsterisk, incQuestion, incLessThan, incGreaterThan, incPipe ]
 
 
-isCorrectPixelSize : ( String, String ) -> Bool
-isCorrectPixelSize ( width, height ) =
-    Maybe.withDefault 0 (String.toInt width) * Maybe.withDefault 0 (String.toInt height) > 0
-
-
-isCorrectSetting : Setting -> Bool
-isCorrectSetting setting =
-    isColor setting.borderColor && isCorrectWidthHeight setting.pixelSize.width setting.pixelSize.height
-
-
-isCorrectWidthHeight : String -> String -> Bool
-isCorrectWidthHeight width_ height_ =
+isCorrectPixelSize : PixelSize -> Bool
+isCorrectPixelSize p =
     let
-        chkInt : Bool
-        chkInt =
-            Maybe.withDefault 0 (String.toInt width_)
-                * Maybe.withDefault 0 (String.toInt height_)
-                > 0
+        sizeList =
+            List.map (\n -> Maybe.withDefault 0 (String.toInt n)) [ p.width, p.height ]
 
-        chkLength : Bool
-        chkLength =
-            Maybe.withDefault 0 (String.toInt width_)
-                <= 64
-                && Maybe.withDefault 0 (String.toInt height_)
-                <= 64
+        isFrom5To100 n =
+            5 <= n && 100 >= n
     in
-    chkInt && chkLength
+    List.map isFrom5To100 sizeList == [ True, True ]
+
+
+isCorrectSetting : TempSetting -> Bool
+isCorrectSetting tempSetting =
+    isColor tempSetting.borderColor && isCorrectPixelSize tempSetting.pixelSize
+
+
+isCorrectCampusSize : TempCampusSize -> Bool
+isCorrectCampusSize c =
+    let
+        sizeList =
+            List.map (\n -> Maybe.withDefault 0 (String.toInt n)) [ c.width, c.height ]
+
+        isFrom1To100 n =
+            1 <= n && 100 >= n
+    in
+    List.map isFrom1To100 sizeList == [ True, True ]
+
+
+isWarningCampusSize : TempCampusSize -> Bool
+isWarningCampusSize c =
+    let
+        sizeList =
+            List.map (\n -> Maybe.withDefault 0 (String.toInt n)) [ c.width, c.height ]
+
+        isGTE50 n =
+            50 <= n
+    in
+    List.map isGTE50 sizeList == [ True, True ]
 
 
 getCampusColor : Campus -> Point -> String

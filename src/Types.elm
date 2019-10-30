@@ -131,6 +131,10 @@ type alias Setting =
     }
 
 
+type alias TempSetting =
+    Setting
+
+
 type alias BorderStyle =
     String
 

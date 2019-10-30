@@ -218,6 +218,47 @@ viewCampus model =
         div [] []
 
 
+viewCampusS : Model -> Html Msg
+viewCampusS model =
+    if model.didCreateCampus then
+        div
+            [ HAttrs.id "campus"
+            ]
+            [ div [] <|
+                List.map
+                    (\y ->
+                        div [ HAttrs.style "float" "left" ] <|
+                            List.map
+                                (\x ->
+                                    div
+                                        [ HAttrs.style "border-top" "1px solid black"
+                                        , HAttrs.style "border-left" "1px solid black"
+                                        , HEvents.onClick (ChangeCampusColor ( x, y ) model.mainPalette)
+                                        , HAttrs.style "background-color" (getCampusColor model.campus ( x, y ))
+                                        , if y == model.campusSize.width then
+                                            HAttrs.style "width" "1px"
+
+                                          else
+                                            HAttrs.style "width" (model.setting.pixelSize.width ++ "px")
+                                        , if x == model.campusSize.height then
+                                            HAttrs.style "height" "1px"
+
+                                          else
+                                            HAttrs.style "height" (model.setting.pixelSize.height ++ "px")
+                                        ]
+                                        []
+                                )
+                            <|
+                                List.range 0 model.campusSize.width
+                    )
+                <|
+                    List.range 0 model.campusSize.height
+            ]
+
+    else
+        div [] []
+
+
 viewToolsPanel : Model -> Element Msg
 viewToolsPanel model =
     let
@@ -1210,11 +1251,29 @@ createCampusModalWindow model =
                             ]
                             [ BBtn.button
                                 [ BBtn.outlinePrimary
-                                , BBtn.primary
+                                , if isWarningCampusSize model.temp.campusSize then
+                                    BBtn.warning
+
+                                  else
+                                    BBtn.primary
                                 , BBtn.onClick CreateCampus
-                                , BBtn.disabled <| not (isCorrectWidthHeight model.temp.campusSize.width model.temp.campusSize.height)
+                                , BBtn.disabled <| not (isCorrectCampusSize model.temp.campusSize)
                                 ]
                                 [ H.text "Create Campus" ]
+                            ]
+                        ]
+                    , BGrid.row []
+                        [ BGrid.col
+                            [ BCol.textAlign BText.alignXsCenter
+                            , BCol.attrs []
+                            ]
+                            [ div [ HAttrs.style "color" "red" ]
+                                [ if isWarningCampusSize model.temp.campusSize then
+                                    H.text "It's Heavy... Also Need to Change Pixel Size"
+
+                                  else
+                                    H.text ""
+                                ]
                             ]
                         ]
                     , BGrid.row []
