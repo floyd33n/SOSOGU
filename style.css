@@ -6,6 +6,12 @@
   font-family: 'InterMedium';
   src: url('file/Inter-Medium.woff') format('woff');
 }
+html {
+    overflow: auto;
+}
+
 body {
   font-family: InterMedium;
+  margin: 0;
+  overflow: hidden;
 }
