@@ -142,6 +142,9 @@ update msg model =
         tempCampusSize_ =
             model.temp.campusSize
 
+        pixelSize_ =
+            model.temp.setting.pixelSize
+
         panelPosition_ =
             model.temp.setting.panelPosition
 
@@ -267,11 +270,12 @@ update msg model =
         InputBorderColor value ->
             ( { model
                 | temp =
-                    Temp
-                        model.temp.campusSize
-                        { setting_
-                            | borderColor = blankToDefault value model.setting.borderColor
-                        }
+                    { temp_
+                        | setting =
+                            { tempSetting_
+                                | borderColor = blankToDefault value model.setting.borderColor
+                            }
+                    }
               }
             , Cmd.none
             )
@@ -279,11 +283,9 @@ update msg model =
         SelectBorderStyle style ->
             ( { model
                 | temp =
-                    Temp
-                        model.temp.campusSize
-                        { setting_
-                            | borderStyle = style
-                        }
+                    { temp_
+                        | setting = { tempSetting_ | borderStyle = style }
+                    }
               }
             , Cmd.none
             )
@@ -291,14 +293,15 @@ update msg model =
         InputPixelWidth tempWidth ->
             ( { model
                 | temp =
-                    Temp
-                        model.temp.campusSize
-                        { setting_
-                            | pixelSize =
-                                PixelSize
-                                    (blankToDefault tempWidth model.setting.pixelSize.width)
-                                    model.temp.setting.pixelSize.height
-                        }
+                    { temp_
+                        | setting =
+                            { tempSetting_
+                                | pixelSize =
+                                    { pixelSize_
+                                        | width = tempWidth
+                                    }
+                            }
+                    }
               }
             , Cmd.none
             )
@@ -306,14 +309,15 @@ update msg model =
         InputPixelHeight tempHeight ->
             ( { model
                 | temp =
-                    Temp
-                        model.temp.campusSize
-                        { setting_
-                            | pixelSize =
-                                PixelSize
-                                    model.temp.setting.pixelSize.width
-                                    (blankToDefault tempHeight model.setting.pixelSize.height)
-                        }
+                    { temp_
+                        | setting =
+                            { tempSetting_
+                                | pixelSize =
+                                    { pixelSize_
+                                        | height = tempHeight
+                                    }
+                            }
+                    }
               }
             , Cmd.none
             )
