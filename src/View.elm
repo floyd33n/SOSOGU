@@ -1071,6 +1071,21 @@ viewPanels model =
 -- Modal Windows--
 
 
+viewBadProjectNameErrText : String -> Html Msg
+viewBadProjectNameErrText name =
+    if isAllowProjectName name then
+        div [ HAttrs.style "margin" "5px 0px" ] []
+
+    else
+        div
+            [ HAttrs.style "color" "red"
+            , HAttrs.style "margin" "5px 0px"
+            , HAttrs.style "font-size" "13px"
+            , HAttrs.style "width" "110px"
+            ]
+            [ H.text "Project Name Cannot Contain < > ? / * : |" ]
+
+
 viewSaveAndNewCampusModalWindow : Model -> Html Msg
 viewSaveAndNewCampusModalWindow model =
     BGrid.container []
@@ -1082,8 +1097,8 @@ viewSaveAndNewCampusModalWindow model =
                     [ BGrid.row []
                         [ BGrid.col
                             [ BCol.xs6 ]
-                            [ div [] [ H.text "Project Name" ]
-                            , div []
+                            [ div [ HAttrs.style "padding" "5px 0px" ] [ H.text "Project Name" ]
+                            , div [ HAttrs.style "padding" "5px 0px" ]
                                 [ BInput.text
                                     [ BInput.onInput InputProjectName
                                     , BInput.placeholder model.projectName
@@ -1093,7 +1108,8 @@ viewSaveAndNewCampusModalWindow model =
                                         ]
                                     ]
                                 ]
-                            , div []
+                            , viewBadProjectNameErrText model.projectName
+                            , div [ HAttrs.style "padding" "5px 0px" ]
                                 [ BBtn.button
                                     [ BBtn.outlinePrimary
                                     , BBtn.primary
@@ -1105,8 +1121,11 @@ viewSaveAndNewCampusModalWindow model =
                             ]
                         , BGrid.col
                             [ BCol.xs6 ]
-                            [ div [] [ H.text "Save Image" ]
-                            , div [ HAttrs.id "downloadImage" ]
+                            [ div [ HAttrs.style "padding" "5px 0px" ] [ H.text "Save Image" ]
+                            , div
+                                [ HAttrs.id "downloadImage"
+                                , HAttrs.style "padding" "5px 0px"
+                                ]
                                 [ BBtn.button
                                     [ BBtn.outlinePrimary
                                     , BBtn.primary
@@ -1148,8 +1167,8 @@ viewSaveModalWindow model =
                     [ BGrid.row []
                         [ BGrid.col
                             [ BCol.xs6 ]
-                            [ div [] [ H.text "Project Name" ]
-                            , div []
+                            [ div [ HAttrs.style "padding" "5px 0px" ] [ H.text "Project Name" ]
+                            , div [ HAttrs.style "padding" "5px 0px" ]
                                 [ BInput.text
                                     [ BInput.onInput InputProjectName
                                     , BInput.placeholder model.projectName
@@ -1159,7 +1178,8 @@ viewSaveModalWindow model =
                                         ]
                                     ]
                                 ]
-                            , div []
+                            , viewBadProjectNameErrText model.projectName
+                            , div [ HAttrs.style "padding" "5px 0px" ]
                                 [ BBtn.button
                                     [ BBtn.outlinePrimary
                                     , BBtn.primary
@@ -1171,8 +1191,11 @@ viewSaveModalWindow model =
                             ]
                         , BGrid.col
                             [ BCol.xs6 ]
-                            [ div [] [ H.text "Save Image" ]
-                            , div [ HAttrs.id "downloadImage" ]
+                            [ div [ HAttrs.style "padding" "5px 0px" ] [ H.text "Save Image" ]
+                            , div
+                                [ HAttrs.id "downloadImage"
+                                , HAttrs.style "padding" "5px 0px"
+                                ]
                                 [ BBtn.button
                                     [ BBtn.outlinePrimary
                                     , BBtn.primary

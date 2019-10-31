@@ -767,23 +767,26 @@ view model =
                                         E.text "Home"
                                     ]
                             }
-                        , newTabLink []
-                            { url = "https://github.com/floyd33n/SOSOGU"
-                            , label =
-                                E.row [ E.spacing 3 ]
-                                    [ E.image [ htmlAttribute <| HAttrs.style "filter" "invert(100%)" ]
-                                        { src = "file/mark-github.svg"
-                                        , description = ""
-                                        }
-                                    , E.el
-                                        [ Font.color <| shiroIro
-                                        , Font.size <| 15
-                                        , htmlAttribute <| HAttrs.style "letter-spacing" "0.05em"
-                                        ]
-                                      <|
-                                        E.text "Repository"
-                                    ]
-                            }
+
+                        {-
+                           , newTabLink []
+                               { url = "https://github.com/floyd33n/SOSOGU"
+                               , label =
+                                   E.row [ E.spacing 3 ]
+                                       [ E.image [ htmlAttribute <| HAttrs.style "filter" "invert(100%)" ]
+                                           { src = "file/mark-github.svg"
+                                           , description = ""
+                                           }
+                                       , E.el
+                                           [ Font.color <| shiroIro
+                                           , Font.size <| 15
+                                           , htmlAttribute <| HAttrs.style "letter-spacing" "0.05em"
+                                           ]
+                                         <|
+                                           E.text "Repository"
+                                       ]
+                               }
+                        -}
                         ]
                     ]
 
